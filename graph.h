@@ -4,7 +4,7 @@
 
 typedef struct _graph {
     /* Number of vertices.
-     * V={1,2,...,n} */
+     * V={0,1,...,n-1} */
     int	n;
 
     /* Adjacency matrix of size nXn

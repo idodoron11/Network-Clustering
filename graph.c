@@ -14,7 +14,7 @@ graph* constructGraphFromInput(int n, int m, int* adjMat){
     G->degrees = (int*) malloc(n * sizeof(int));
     assert(G->degrees != NULL);
 
-    /* updates G->degrees to include each the degree of each vertex */
+    /* updates G->degrees to include the degree of each vertex */
     for(i = 0; i < n; ++i){
         sum = 0;
         neighborsVector = adjMat + (i*n);
