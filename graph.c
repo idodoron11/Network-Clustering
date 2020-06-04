@@ -7,10 +7,12 @@ graph* constructGraphFromInput(int n, int m, int* adjMat){
     graph* G = (graph*) malloc(sizeof(graph));
     int i, j, sum;
     int* neighborsVector;
+    assert(G != NULL);
     G->n = n;
     G->m  = m;
     G->adjMat = adjMat;
     G->degrees = (int*) malloc(n * sizeof(int));
+    assert(G->degrees != NULL);
 
     /* updates G->degrees to include each the degree of each vertex */
     for(i = 0; i < n; ++i){
@@ -26,15 +28,19 @@ graph* constructGraphFromInput(int n, int m, int* adjMat){
 
 graph* constructEmptyGraph(int n){
     graph* G = (graph*) malloc(sizeof(graph));
+    assert(G != NULL);
     G->n = n;
     G->m = 0;
     G->adjMat = (int*) calloc(n * n, sizeof(int));
+    assert(G->adjMat != NULL);
     G->degrees = (int*) calloc(n, sizeof(int));
+    assert(G->degrees != NULL);
     return G;
 }
 
 void destroyGraph(graph* G){
     free(G->adjMat);
+    free(G->degrees);
     free(G);
 }
 
