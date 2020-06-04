@@ -5,9 +5,22 @@
 
 graph* constructGraphFromInput(int n, int m, int* adjMat){
     graph* G = (graph*) malloc(sizeof(graph));
+    int i, j, sum;
+    int* neighborsVector;
     G->n = n;
     G->m  = m;
     G->adjMat = adjMat;
+    G->degrees = (int*) malloc(n * sizeof(int));
+
+    /* updates G->degrees to include each the degree of each vertex */
+    for(i = 0; i < n; ++i){
+        sum = 0;
+        neighborsVector = adjMat + (i*n);
+        for(j = 0; j < n; ++j)
+            sum += neighborsVector[j];
+        G->degrees[i] = sum;
+    }
+
     return G;
 }
 
@@ -16,6 +29,7 @@ graph* constructEmptyGraph(int n){
     G->n = n;
     G->m = 0;
     G->adjMat = (int*) calloc(n * n, sizeof(int));
+    G->degrees = (int*) calloc(n, sizeof(int));
     return G;
 }
 
@@ -39,11 +53,17 @@ char setEdge(graph* G, int i, int j, int value){
 }
 
 void attachVertices(graph* G, int i, int j){
-    G->m += setEdge(G, i, j, 1);
+    int change = setEdge(G, i, j, 1);
+    G->m += change;
+    G->degrees[i] += change;
+    G->degrees[j] += change;
 }
 
 void detachVertices(graph* G, int i, int j){
-    G->m -= setEdge(G, i, j, 0);
+    int change = setEdge(G, i, j, 0);
+    G->m -= change;
+    G->degrees[i] -= change;
+    G->degrees[j] -= change;
 }
 
 int getEdge(graph* G, int i, int j){
@@ -60,11 +80,5 @@ void printGraph(graph* G){
 }
 
 int getDegree(graph* G, int i){
-    int n = G->n;
-    int* neighborsVector = G->adjMat + (i*n);
-    int k;
-    int sum = 0;
-    for(k = 0; k < n; ++k)
-        sum += neighborsVector[k];
-    return sum;
+    return G->degrees[i];
 }

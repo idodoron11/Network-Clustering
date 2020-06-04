@@ -13,6 +13,9 @@ typedef struct _graph {
 
     /* number of edges */
     int m;
+
+    /* a vector of size n, that stores the degree of each vertex */
+    int* degrees;
 } graph;
 
 /**
