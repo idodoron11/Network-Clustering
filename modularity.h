@@ -18,6 +18,6 @@ double* getModularityMatrix(graph* G);
  * @param k the length of the array g
  * @return The modularity matrix (B hat) with respect to the sub-graph defined by g.
  */
-double* getSubGraphModularityMatrix(double* fullModularityMatrix, int n, int* g, int k);
+double* getSubGraphModularityMatrix(double* const fullModularityMatrix, int n, int* const g, int k);
 
 #endif

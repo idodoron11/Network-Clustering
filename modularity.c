@@ -17,16 +17,16 @@ double* getModularityMatrix(graph* G){
     return B;
 }
 
-double* getSubGraphModularityMatrix(double* B, int n, int* g, int k){
+double* getSubGraphModularityMatrix(double* const B, int n, int* const g, int k){
     /* for clarity, i'm trying to name variables in the same way they
      * were referred to in section "Dividing Into Modularity Groups" */
     int i, j;
     double* B_hat = (double*) malloc(sizeof(double) * k * k);
-    int* f = (int*) calloc(k, sizeof(int));
+    double* f = (double*) calloc(k, sizeof(double));
     assert(B_hat != NULL);
     assert(f != NULL);
 
-    /* this loop computes the degrees of the vertices in the sub-graph, namely f[i] */
+    /* this loop computes f[i], as defined in the instructions */
     for(i = 0; i < k; ++i)
         for(j = 0; j < k; ++j)
             f[i] += B[g[i]*n + g[j]];
