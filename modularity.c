@@ -73,6 +73,7 @@ double power_iteration(spmat sm, double *vector, double *vectorResult) {
      * more memory space. */
 
     sm.mult(&sm, vectorResult, vector);
+    /* now we only need to take the dot product of vector with vectorResult */
     for(i = 0; i < sm.n; ++i){
         eigenvalue += vector[i] * vectorResult[i];
     }
