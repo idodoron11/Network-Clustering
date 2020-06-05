@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "modularity.h"
+#include <math.h>
 
 double* getModularityMatrix(graph* G){
     int n = G->n;
@@ -41,4 +42,39 @@ double* getSubGraphModularityMatrix(double* const B, int n, int* const g, int k)
     }
 
     return B_hat;
+}
+
+double power_iteration(spmat sm, double *vector, double *vectorResult) {
+    register int i, con = 1;
+    double eigenvalue = 0;
+    register double vectorSize, dif, eps = 0.00001;
+    while (con) {
+        sm.mult(&sm, vector, vectorResult);
+        vectorSize = 0;
+        for (i = 0; i < sm.n; i++) {
+            vectorSize += vectorResult[i] * vectorResult[i];
+        }
+        vectorSize = sqrt(vectorSize);
+        con = 0;
+        for (i = 0; i < sm.n; i++) {
+            vectorResult[i] /= vectorSize;
+            dif = fabs(vectorResult[i] - vector[i]);
+            if (dif >= eps) {
+                con = 1;
+            }
+            vector[i] = vectorResult[i];
+        }
+    }
+
+    /* the eigenvalue is Transpose(vectorResult)*sm*vectorResult
+     * See https://www.cse.huji.ac.il/~csip/tirgul2.pdf
+     * I'm using "vector" to store temporary results, since we
+     * don't need it anymore. That way we can avoid allocating
+     * more memory space. */
+
+    sm.mult(&sm, vectorResult, vector);
+    for(i = 0; i < sm.n; ++i){
+        eigenvalue += vector[i] * vectorResult[i];
+    }
+    return eigenvalue;
 }
