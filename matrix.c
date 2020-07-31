@@ -8,9 +8,9 @@
  * @param n size of matrix is nxn
  * @return matrix
  */
-matrix *generateMatrix(int n) {
+Matrix *createMatrix(int n) {
     int i;
-    matrix *mat = malloc(sizeof(matrix));
+    Matrix *mat = malloc(sizeof(Matrix));
     mat->values = malloc(sizeof(double *) * n);
     for (i = 0; i < n; i++) {
         mat->values[i] = malloc(sizeof(double) * n);
@@ -22,7 +22,7 @@ matrix *generateMatrix(int n) {
  * Free all the memory allocated by a matrix
  * @param mat matrix object
  */
-void freeMatrix(matrix *mat) {
+void freeMatrix(Matrix *mat) {
     int i;
     for (i = 0; i < mat->n; i++) {
         free(mat->values[i]);
@@ -39,7 +39,7 @@ void freeMatrix(matrix *mat) {
  * @param c column
  * @return value
  */
-int readVal(matrix *mat, int r, int c) {
+int readVal(Matrix *mat, int r, int c) {
     return mat->values[r][c];
 }
 
@@ -49,7 +49,7 @@ int readVal(matrix *mat, int r, int c) {
  * @param vector the size n vector to multiply by
  * @param vectorResult vector of size n, should already be allocated
  */
-void matrixVectorMult(matrix *mat, double *vector, double *vectorResult) {
+void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
     int r, c, sum;
     for (r = 0; r < mat->n; r++) {
         sum = 0;
@@ -66,7 +66,7 @@ void matrixVectorMult(matrix *mat, double *vector, double *vectorResult) {
  * @param vector initial vector for the algorithm
  * @param vectorResult the eigenvector found by the algorithm, should be allocated
  */
-void powerIteration(matrix *mat, double *vector, double *vectorResult) {
+void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
     register int i, con = 1;
     register double vectorSize, dif, eps = 0.00001;
     while (con) {

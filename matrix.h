@@ -1,18 +1,18 @@
 #ifndef _MATRIX_H
 #define _MATRIX_H
 
-typedef struct _matrix {
+typedef struct matrix {
     /* matrix size (n*n) */
     int n;
     double **values;
     double *colSums;
-} matrix;
+} Matrix;
 
-matrix *generateMatrix(int n);
+Matrix *createMatrix(int n);
 
-void freeMatrix(matrix *mat);
+void freeMatrix(Matrix *mat);
 
-int readVal(matrix *mat, int r, int c);
+int readVal(Matrix *mat, int r, int c);
 
 
 #endif
