@@ -2,13 +2,15 @@
 #define _MATRIX_H
 
 typedef struct _matrix {
-    /* Matrix size (n*n) */
+    /* matrix size (n*n) */
     int n;
-    int **values;
-    int *colSums;
+    double **values;
+    double *colSums;
 } matrix;
 
 matrix *generateMatrix(int n);
+
+void freeMatrix(matrix *mat);
 
 int readVal(matrix *mat, int r, int c);
 
