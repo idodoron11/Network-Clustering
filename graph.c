@@ -3,73 +3,50 @@
 #include <assert.h>
 #include "graph.h"
 
-graph* constructGraphFromInput(int n, int m, int* adjMat){
+graph* constructGraphFromInput(char* inputFilePath){
     graph* G = (graph*) malloc(sizeof(graph));
-    int i, j, sum;
-    int* neighborsVector;
-    assert(G != NULL);
-    G->n = n;
-    G->m  = m;
-    G->adjMat = adjMat;
-    G->degrees = (int*) malloc(n * sizeof(int));
-    assert(G->degrees != NULL);
-
-    /* updates G->degrees to include the degree of each vertex */
-    for(i = 0; i < n; ++i){
-        sum = 0;
-        neighborsVector = adjMat + (i*n);
-        for(j = 0; j < n; ++j)
-            sum += neighborsVector[j];
-        G->degrees[i] = sum;
-    }
-
-    return G;
-}
-
-graph* constructEmptyGraph(int n){
-    graph* G = (graph*) malloc(sizeof(graph));
-    assert(G != NULL);
+    int n, i, j, k;
+    double* row;
+    int* list;
+    FILE* graph_file = fopen(inputFilePath, "rb");
+    assert(graph_file != NULL);
+    assert(fread(&n, sizeof(int), 1, graph_file) == 1);
+    G->deg = (int*)calloc(n, sizeof(int));
+    assert(G->deg != NULL);
+    list = malloc(sizeof(int) * n);
+    assert(list != NULL);
     G->n = n;
     G->m = 0;
-    G->adjMat = (int*) calloc(n * n, sizeof(int));
+    G->spAdjMat = spmat_allocate_list(n);
+    G->adjMat = calloc(n*n, sizeof(double));
     assert(G->adjMat != NULL);
-    G->degrees = (int*) calloc(n, sizeof(int));
-    assert(G->degrees != NULL);
+
+    for(i=0; i < n; ++i){
+        assert(fread(&k, sizeof(int), 1, graph_file) == 1);
+        assert(fread(list, sizeof(int), k, graph_file) == (unsigned int) k);
+        G->deg[i] = k;
+        G->m += k;
+        row = G->adjMat + i*n;
+        while(k>0){
+            --k;
+            j = list[k];
+            row[j] = 1;
+        }
+        G->spAdjMat->add_row(G->spAdjMat, row, i);
+    }
+    /* Sum of degrees = 2 * Number of edges */
+    G->m /= 2;
+    fclose(graph_file);
+    free(list);
+
     return G;
 }
 
 void destroyGraph(graph* G){
+    G->spAdjMat->free(G->spAdjMat);
+    free(G->deg);
     free(G->adjMat);
-    free(G->degrees);
     free(G);
-}
-
-char setEdge(graph* G, int i, int j, int value){
-    int n = G->n;
-    assert(value == 0 || value == 1);
-    assert(i>=0 && i<n);
-    assert(j>=0 && j<n);
-    if(G->adjMat[i * n + j] == value)
-        return 0;
-    else {
-        G->adjMat[i * n + j] = value;
-        G->adjMat[j * n + i] = value;
-        return 1;
-    }
-}
-
-void attachVertices(graph* G, int i, int j){
-    int change = setEdge(G, i, j, 1);
-    G->m += change;
-    G->degrees[i] += change;
-    G->degrees[j] += change;
-}
-
-void detachVertices(graph* G, int i, int j){
-    int change = setEdge(G, i, j, 0);
-    G->m -= change;
-    G->degrees[i] -= change;
-    G->degrees[j] -= change;
 }
 
 int getEdge(graph* G, int i, int j){
@@ -80,11 +57,11 @@ void printGraph(graph* G){
     int n = G->n;
     int i;
     for(i = 0; i < n*n; ++i){
-        printf("%d", G->adjMat[i]);
+        printf("%d", (int) G->adjMat[i]);
         printf((i+1) % n == 0 ? "\n" : "\t");
     }
 }
 
 int getDegree(graph* G, int i){
-    return G->degrees[i];
+    return G->deg[i];
 }
