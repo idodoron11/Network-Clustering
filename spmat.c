@@ -4,13 +4,13 @@
 #include "spmat.h"
 
 /* linked list implementation starts here */
-struct linked_list{
+struct linked_list {
     double value;
     int colind;
     struct linked_list *next;
 } linked_list;
 typedef struct linked_list node;
-typedef node* nodeRef;
+typedef node *nodeRef;
 
 /* linked list operations */
 /**
@@ -21,16 +21,15 @@ typedef node* nodeRef;
  * @param n the dimension of the original matrix / the length of the given row.
  * @return a reference to the head of the new list (a nodeRef type variable).
  */
-nodeRef row_to_list(double const *row, int n){
+nodeRef row_to_list(double const *row, int n) {
     register nodeRef head = NULL, tail = NULL;
     register int i;
     register int nnz = 0;
-    for(i = 0; i < n; ++i){
-        if(row[i] != 0) {
-            if(head == NULL) {
+    for (i = 0; i < n; ++i) {
+        if (row[i] != 0) {
+            if (head == NULL) {
                 head = tail = malloc(sizeof(node));
-            }
-            else{
+            } else {
                 tail->next = malloc(sizeof(node));
                 tail = tail->next;
             }
@@ -42,31 +41,34 @@ nodeRef row_to_list(double const *row, int n){
     }
     return head;
 }
+
 /**
  * Prints a given list, for debugging purposes.
  * This function is not necessary.
  * @param head a reference to the first item in the list.
  */
-void print_list(nodeRef head){
-    if(head == NULL || head == 0)
+void print_list(nodeRef head) {
+    if (head == NULL || head == 0)
         printf("NULL\n");
-    else{
+    else {
         printf("%f --> ", head->value);
         print_list(head->next);
     }
 }
+
 /**
  * This function removes each node in the given list,
  * and frees-up any memory resource that has been dynamically
  * allocated to produce the it.
  * @param list_head a reference to the first item in the list.
  */
-void empty_list(nodeRef list_head){
-    if(list_head != NULL){
+void empty_list(nodeRef list_head) {
+    if (list_head != NULL) {
         empty_list(list_head->next);
         free(list_head);
     }
 }
+
 /* linked list implementation ends here */
 
 typedef struct matrix_pointers {
@@ -195,7 +197,7 @@ void array_mult(const struct _spmat *A, const double *v, double *result) {
  */
 spmat *spmat_allocate_list(int n) {
     register spmat *mat = malloc(sizeof(spmat));
-    register nodeRef* row_lists = (nodeRef*)malloc(n*sizeof(nodeRef));
+    register nodeRef *row_lists = (nodeRef *) malloc(n * sizeof(nodeRef));
     assert(mat != NULL);
     assert(row_lists != NULL);
     mat->n = n;
@@ -217,7 +219,7 @@ spmat *spmat_allocate_list(int n) {
 void list_add_row(struct _spmat *A, const double *row, int i) {
     register int n = A->n;
     register nodeRef list_head = row_to_list(row, n);
-    register nodeRef* row_lists = (nodeRef*) A->private;
+    register nodeRef *row_lists = (nodeRef *) A->private;
     row_lists[i] = list_head;
 }
 
@@ -227,11 +229,11 @@ void list_add_row(struct _spmat *A, const double *row, int i) {
  * @param A a pointer to the array-based sparse matrix.
  */
 void list_free(struct _spmat *A) {
-    register nodeRef* row_lists;
+    register nodeRef *row_lists;
     register int i;
     assert(A != NULL);
-    row_lists = (nodeRef*) A->private;
-    for(i = 0; i < A->n; ++i)
+    row_lists = (nodeRef *) A->private;
+    for (i = 0; i < A->n; ++i)
         empty_list(row_lists[i]);
     free(row_lists);
     free(A);
@@ -248,10 +250,10 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
     register int i, j;
     register nodeRef currElem;
     register double sum;
-    register nodeRef* row_lists = (nodeRef*) A->private;
-    for(i = 0; i < A->n; ++i){
+    register nodeRef *row_lists = (nodeRef *) A->private;
+    for (i = 0; i < A->n; ++i) {
         sum = 0;
-        for(currElem = row_lists[i]; currElem != NULL; currElem = currElem->next) {
+        for (currElem = row_lists[i]; currElem != NULL; currElem = currElem->next) {
             j = currElem->colind;
             sum += v[j] * currElem->value;
         }
