@@ -6,8 +6,11 @@
 
 int main() {
     spmat *spm;
+    Matrix *mat;
+    int n = 10;
     srand(time(0));
-    spm = generateRandomSpmat(10, 10);
+    mat = createMatrix(n);
+    spm = generateRandomSymSpmat(n, 10, mat);
     printSpmat(spm);
     return 0;
 }

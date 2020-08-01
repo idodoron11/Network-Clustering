@@ -12,6 +12,8 @@ Matrix *createMatrix(int n);
 
 void freeMatrix(Matrix *mat);
 
+void setVal(Matrix *mat, int r, int c, double val);
+
 int readVal(Matrix *mat, int r, int c);
 
 

@@ -33,6 +33,17 @@ void freeMatrix(Matrix *mat) {
 }
 
 /**
+ * Set value in matrix
+ * @param mat
+ * @param r row
+ * @param c column
+ * @return value
+ */
+void setVal(Matrix *mat, int r, int c, double val) {
+    mat->values[r][c] = val;
+}
+
+/**
  * Read value in matrix
  * @param mat
  * @param r row

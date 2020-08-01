@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "spmat.h"
+#include "matrix.h"
 
 /* linked list implementation starts here */
 struct linked_list {
@@ -272,27 +273,31 @@ double drand(double low, double high) {
 }
 
 /**
- * Generate a random sparse matrix
+ * Generate a random symmetric sparse matrix
  * @param n matrix of size nxn
  * @param percent probability of non-zero values
+ * @param mat regular matrix representation, should be allocated
  */
-spmat *generateRandomSpmat(int n, double percent) {
+spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
     int i, j;
-    double randNum, *row;
+    double randNum;
     spmat *spm = spmat_allocate_list(n);
     for (i = 0; i < n; i++) {
-        row = malloc(n * sizeof(double));
         for (j = 0; j < n; j++) {
-            randNum = drand(0, 100);
-            if (randNum <= percent) {
-                row[j] = 1;
-            } else {
-                row[j] = 0;
+            if (i < j) {
+                randNum = drand(0, 100);
+                if (randNum <= percent) {
+                    mat->values[i][j] = 1;
+                } else {
+                    mat->values[i][j] = 0;
+                }
+                mat->values[j][i] = mat->values[i][j];
+            } else if (i == j) {
+                mat->values[i][j] = 0;
             }
         }
-        spm->add_row(spm, row, i);
+        spm->add_row(spm, mat->values[i], i);
     }
-    free(row);
 
     return spm;
 }

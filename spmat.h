@@ -1,6 +1,8 @@
 #ifndef _SPMAT_H
 #define _SPMAT_H
 
+#include "matrix.h"
+
 typedef struct _spmat {
     /* Matrix size (n*n) */
     int n;
@@ -26,7 +28,7 @@ spmat *spmat_allocate_list(int n);
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */
 spmat *spmat_allocate_array(int n, int nnz);
 
-spmat *generateRandomSpmat(int n, double percent);
+spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);
 
 void printSpmat(spmat *spm);
 
