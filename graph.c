@@ -16,7 +16,7 @@ graph* constructGraphFromInput(char* inputFilePath){
     list = malloc(sizeof(int) * n);
     assert(list != NULL);
     G->n = n;
-    G->m = 0;
+    G->M = 0;
     G->spAdjMat = spmat_allocate_list(n);
     G->adjMat = calloc(n*n, sizeof(double));
     assert(G->adjMat != NULL);
@@ -25,7 +25,7 @@ graph* constructGraphFromInput(char* inputFilePath){
         assert(fread(&k, sizeof(int), 1, graph_file) == 1);
         assert(fread(list, sizeof(int), k, graph_file) == (unsigned int) k);
         G->deg[i] = k;
-        G->m += k;
+        G->M += k;
         row = G->adjMat + i*n;
         while(k>0){
             --k;
@@ -34,8 +34,6 @@ graph* constructGraphFromInput(char* inputFilePath){
         }
         G->spAdjMat->add_row(G->spAdjMat, row, i);
     }
-    /* Sum of degrees = 2 * Number of edges */
-    G->m /= 2;
     fclose(graph_file);
     free(list);
 

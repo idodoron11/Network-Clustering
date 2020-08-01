@@ -6,7 +6,7 @@
 
 double* getModularityMatrix(graph* G){
     int n = G->n;
-    int M = 2 * G->m; /* I think it should be multiplied by 2, but I'm not sure */
+    int M = G->M;
     double* B = (double*) malloc(n * n * sizeof(double));
     int i, j;
     assert(B != NULL);
@@ -19,7 +19,7 @@ double* getModularityMatrix(graph* G){
 }
 
 double* getSubGraphModularityMatrix(double* const B, int n, int* const g, int k){
-    /* for clarity, i'm trying to name variables in the same way they
+    /* for clarity, i'M trying to name variables in the same way they
      * were referred to in section "Dividing Into Modularity Groups" */
     int i, j;
     double* B_hat = (double*) malloc(sizeof(double) * k * k);
@@ -68,7 +68,7 @@ double power_iteration(spmat sm, double *vector, double *vectorResult) {
 
     /* the eigenvalue is Transpose(vectorResult)*sm*vectorResult
      * See https://www.cse.huji.ac.il/~csip/tirgul2.pdf
-     * I'm using "vector" to store temporary results, since we
+     * I'M using "vector" to store temporary results, since we
      * don't need it anymore. That way we can avoid allocating
      * more memory space. */
 

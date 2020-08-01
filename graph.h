@@ -14,8 +14,8 @@ typedef struct _graph {
     double* adjMat;
     spmat* spAdjMat;
 
-    /* number of edges */
-    int m;
+    /* Sum of Degrees */
+    int M;
 
     /* degrees vector */
     int* deg;
