@@ -34,4 +34,6 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);
 
 void printSpmat(spmat *spm);
 
+double drand(double low, double high);
+
 #endif

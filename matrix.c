@@ -81,8 +81,8 @@ void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
  * @param vectorResult the eigenvector found by the algorithm, should be allocated
  */
 void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
-    register int i, con = 1;
-    register double vectorSize, dif, eps = 0.00001;
+    int i, con = 1;
+    double vectorSize, dif, eps = 0.0001;
     while (con) {
         matrixVectorMult(mat, vector, vectorResult);
         vectorSize = 0;
