@@ -13,7 +13,7 @@ int main() {
     VerticesGroup *group;
     srand(time(0));
     AMatrix = createMatrix(n);
-    A = generateRandomSymSpmat(n, 10, AMatrix);
+    A = generateRandomSymSpmat(n, 20, AMatrix);
     M = spmatValuesSum(A);
     group = createVerticesGroup();
     for (i = 0; i < (int) (sizeof(vertices) / sizeof(vertices[0])); i++) {
@@ -22,7 +22,11 @@ int main() {
     calculateSubMatrix(AMatrix, M, group);
     printf("Edges matrix:\n");
     printSpmat(A);
-    printf("Edges sub matrix:\n");
+    printf("\nEdges sub matrix:\n");
     printSpmat(group->edgeSubMatrix);
+    printf("\nB sub matrix:\n");
+    printMatrix(group->bSubMatrix);
+    printf("\nB-hat sub matrix:\n");
+    printMatrix(group->bHatSubMatrix);
     return 0;
 }
