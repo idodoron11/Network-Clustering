@@ -262,6 +262,22 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
     }
 }
 
+double spmatValuesSum(spmat *spm) {
+    int i;
+    nodeRef *rows, node;
+    double sum = 0;
+    rows = (nodeRef *) spm->private;
+    for (i = 0; i < spm->n; i++) {
+        node = rows[i];
+        while (node != NULL) {
+            sum += node->value;
+            node = node->next;
+        }
+    }
+    return sum;
+}
+
+
 /**
  * Generate a random double
  * @param low inclusive
@@ -287,13 +303,13 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
             if (i < j) {
                 randNum = drand(0, 100);
                 if (randNum <= percent) {
-                    mat->values[i][j] = 1;
+                    setVal(mat, i, j, 1);
                 } else {
-                    mat->values[i][j] = 0;
+                    setVal(mat, i, j, 0);
                 }
-                mat->values[j][i] = mat->values[i][j];
+                setVal(mat, j, i, readVal(mat, i, j));
             } else if (i == j) {
-                mat->values[i][j] = 0;
+                setVal(mat, i, j, 0);
             }
         }
         spm->add_row(spm, mat->values[i], i);

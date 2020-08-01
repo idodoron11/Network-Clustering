@@ -3,14 +3,26 @@
 #include <time.h>
 #include "matrix.h"
 #include "spmat.h"
+#include "VerticesGroup.h"
 
 int main() {
-    spmat *spm;
-    Matrix *mat;
-    int n = 10;
+    spmat *A;
+    Matrix *AMatrix;
+    int i, M, n = 10;
+    int vertices[] = {3, 4, 7, 9};
+    VerticesGroup *group;
     srand(time(0));
-    mat = createMatrix(n);
-    spm = generateRandomSymSpmat(n, 10, mat);
-    printSpmat(spm);
+    AMatrix = createMatrix(n);
+    A = generateRandomSymSpmat(n, 10, AMatrix);
+    M = spmatValuesSum(A);
+    group = createVerticesGroup();
+    for (i = 0; i < (int) (sizeof(vertices) / sizeof(vertices[0])); i++) {
+        addVertexToGroup(group, vertices[i]);
+    }
+    calculateSubMatrix(AMatrix, M, group);
+    printf("Edges matrix:\n");
+    printSpmat(A);
+    printf("Edges sub matrix:\n");
+    printSpmat(group->edgeSubMatrix);
     return 0;
 }

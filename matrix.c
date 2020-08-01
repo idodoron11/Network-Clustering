@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "matrix.h"
+#include <math.h>
 
 /**
  * Generate a square matrix object
@@ -11,10 +11,12 @@
 Matrix *createMatrix(int n) {
     int i;
     Matrix *mat = malloc(sizeof(Matrix));
+    mat->n = n;
     mat->values = malloc(sizeof(double *) * n);
     for (i = 0; i < n; i++) {
         mat->values[i] = malloc(sizeof(double) * n);
     }
+    mat->rowSums = calloc(n, sizeof(double));
     return mat;
 }
 
@@ -28,7 +30,7 @@ void freeMatrix(Matrix *mat) {
         free(mat->values[i]);
     }
     free(mat->values);
-    free(mat->colSums);
+    free(mat->rowSums);
     free(mat);
 }
 
@@ -41,6 +43,7 @@ void freeMatrix(Matrix *mat) {
  */
 void setVal(Matrix *mat, int r, int c, double val) {
     mat->values[r][c] = val;
+    mat->rowSums[r] += val;
 }
 
 /**
@@ -50,7 +53,7 @@ void setVal(Matrix *mat, int r, int c, double val) {
  * @param c column
  * @return value
  */
-int readVal(Matrix *mat, int r, int c) {
+double readVal(Matrix *mat, int r, int c) {
     return mat->values[r][c];
 }
 
@@ -99,3 +102,16 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
     }
 }
 
+/**
+ * Print matrix
+ * @param mat
+ */
+void printMatrix(Matrix *mat) {
+    int i, j;
+    for (i = 0; i < mat->n; i++) {
+        for (j = 0; j < mat->n; j++) {
+            printf("%.1f ", readVal(mat, i, j));
+        }
+        printf("\n");
+    }
+}
