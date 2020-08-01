@@ -20,11 +20,12 @@ void freeVerticesGroup(VerticesGroup *group) {
         } while (node != group->first);
     }
     freeMatrix(group->bHatSubMatrix);
-    group->edges->free(group->edges);
+    group->edgeSubMatrix->free(group->edgeSubMatrix);
 }
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
     VertexNode *node = malloc(sizeof(VertexNode));
+    node->index = index;
     if (group->first != NULL) {
         node->next = group->first;
         node->prev = group->first->prev;

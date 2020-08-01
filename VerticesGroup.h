@@ -12,7 +12,7 @@ typedef struct vertexNode {
 
 typedef struct verticesGroup {
     VertexNode *first;
-    spmat *edges;
+    spmat *edgeSubMatrix;
     Matrix *bHatSubMatrix;
 } VerticesGroup;
 
@@ -22,4 +22,4 @@ void freeVerticesGroup(VerticesGroup *group);
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index);
 
-#endif //CLUSTER_VERTICESGROUP_H
+#endif

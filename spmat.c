@@ -260,3 +260,62 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
         result[i] = sum;
     }
 }
+
+/**
+ * Generate a random double
+ * @param low inclusive
+ * @param high inclusive
+ * @return randum number
+ */
+double drand(double low, double high) {
+    return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
+}
+
+/**
+ * Generate a random sparse matrix
+ * @param n matrix of size nxn
+ * @param percent probability of non-zero values
+ */
+spmat *generateRandomSpmat(int n, double percent) {
+    int i, j;
+    double randNum, *row;
+    spmat *spm = spmat_allocate_list(n);
+    for (i = 0; i < n; i++) {
+        row = malloc(n * sizeof(double));
+        for (j = 0; j < n; j++) {
+            randNum = drand(0, 100);
+            if (randNum <= percent) {
+                row[j] = 1;
+            } else {
+                row[j] = 0;
+            }
+        }
+        spm->add_row(spm, row, i);
+    }
+    free(row);
+
+    return spm;
+}
+
+/**
+ * Print sparse matrix
+ * @param spm
+ */
+void printSpmat(spmat *spm) {
+    int i, j, col;
+    nodeRef *rows = (nodeRef *) spm->private;
+    for (i = 0; i < spm->n; i++) {
+        nodeRef node = rows[i];
+        for (j = 0; j < spm->n; j++) {
+            col = node != NULL ? node->colind : spm->n;
+            if (j < col) {
+                printf("%d ", 0);
+            } else {
+                printf("%d ", (int) node->value);
+                node = node->next;
+            }
+        }
+        printf("\n");
+    }
+}
+
