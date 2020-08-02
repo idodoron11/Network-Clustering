@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include <math.h>
 
+void printVect(double *vector, int length);
 /**
  * Generate a square matrix object
  * @param n size of matrix is nxn
@@ -64,7 +65,8 @@ double readVal(Matrix *mat, int r, int c) {
  * @param vectorResult vector of size n, should already be allocated
  */
 void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
-    int r, c, sum;
+    int r, c;
+    double sum;
     for (r = 0; r < mat->n; r++) {
         sum = 0;
         for (c = 0; c < mat->n; c++) {
@@ -90,6 +92,9 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
             vectorSize += vectorResult[i] * vectorResult[i];
         }
         vectorSize = sqrt(vectorSize);
+        printf("vectorResult: \n");
+        printVect(vectorResult, mat->n);
+        printf("norm(vectorResult)=%f\n", vectorSize);
         con = 0;
         for (i = 0; i < mat->n; i++) {
             vectorResult[i] /= vectorSize;
@@ -99,6 +104,8 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
             }
             vector[i] = vectorResult[i];
         }
+        printf("normalized vectorResult: \n");
+        printVect(vectorResult, mat->n);
     }
 }
 
@@ -119,4 +126,18 @@ void printMatrix(Matrix *mat) {
         }
         printf("\n");
     }
+}
+
+/**
+ * Print vector
+ * @param vector
+ * @param length
+ */
+void printVect(double *vector, int length) {
+    int i;
+    printf("( ");
+    for (i = 0; i < length; i++) {
+        printf("%f ", vector[i]);
+    }
+    printf(" )\n");
 }

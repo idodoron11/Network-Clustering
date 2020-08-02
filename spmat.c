@@ -282,7 +282,7 @@ double spmatValuesSum(spmat *spm) {
  * Generate a random double
  * @param low inclusive
  * @param high inclusive
- * @return randum number
+ * @return random number
  */
 double drand(double low, double high) {
     return ((double) rand() * (high - low)) / (double) RAND_MAX + low;

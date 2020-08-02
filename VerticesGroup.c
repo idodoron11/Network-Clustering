@@ -46,7 +46,7 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
  * @param A edges matrix
  * @param M degrees sum
  * @param group
- * @return sub matrix
+ * @return Fills group->bSubMatrix and group->bHatSubMatrix.
  */
 void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
     VertexNode *node;
@@ -67,12 +67,15 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(A, group->verticesArr[i], group->verticesArr[j]);
+                /* For each vertex v: A[v][0] + ... + A[v][n-1] = deg(v) */
                 expectedEdges = A->rowSums[group->verticesArr[i]] * A->rowSums[group->verticesArr[j]] / M;
                 setVal(group->bSubMatrix, i, j, row[j] - expectedEdges);
+                /* the case where delta(i,j)=0 */
                 if (i != j) {
                     setVal(group->bHatSubMatrix, i, j, row[j] - expectedEdges);
                 }
             }
+            /* the case where i=j and so delta(i,j)=1. we subtract deg(i) from B[g][i][j]. */
             setVal(group->bHatSubMatrix, i, i, readVal(group->bSubMatrix, i, i) - group->bSubMatrix->rowSums[i]);
             group->edgeSubMatrix->add_row(group->edgeSubMatrix, row, i);
         }

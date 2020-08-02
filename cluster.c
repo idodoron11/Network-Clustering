@@ -7,7 +7,7 @@
 
 void randVector(double *vector, int n);
 
-void printVector(double *vector);
+void printVector(double *vector, int length);
 
 int main() {
     spmat *A;
@@ -29,6 +29,8 @@ int main() {
     calculateSubMatrix(AMatrix, M, group);
     randVector(vector, gSize);
     powerIteration(group->bHatSubMatrix, vector, s);
+    printf("\ns vector:\n");
+    printVector(s, 4);
     printf("Edges matrix:\n");
     printSpmat(A);
     printf("\nEdges sub matrix:\n");
@@ -38,7 +40,7 @@ int main() {
     printf("\nB-hat sub matrix:\n");
     printMatrix(group->bHatSubMatrix);
     printf("\ns vector:\n");
-    printVector(s);
+    printVector(s, 4);
     return 0;
 }
 
@@ -57,12 +59,13 @@ void randVector(double *vector, int n) {
 /**
  * Print vector
  * @param vector
+ * @param length
  */
-void printVector(double *vector) {
+void printVector(double *vector, int length) {
     int i;
     printf("( ");
-    for (i = 0; i < (int) (sizeof(*vector) / sizeof(double)); i++) {
+    for (i = 0; i < length; i++) {
         printf("%.1f ", vector[i]);
     }
-    printf(" )");
+    printf(" )\n");
 }
