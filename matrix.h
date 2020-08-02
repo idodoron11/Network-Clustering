@@ -6,7 +6,7 @@ typedef struct matrix {
     int n;
     double **values;
     double *rowSums;
-    double *colSums;
+    double *colAbsSums;
     int highestColSumIndex;
     char isShifted;
 } Matrix;

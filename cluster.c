@@ -12,9 +12,9 @@ void printVector(double *vector, int length);
 int main() {
     spmat *A;
     Matrix *AMatrix;
-    int i, M, n = 40, gSize = 10;
+    int i, M, n = 50, gSize = 4;
     double *vector, *s;
-    int gVertices[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39};
+    int gVertices[] = {5,17,32,6};
     VerticesGroup *group;
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
@@ -36,6 +36,10 @@ int main() {
     printMatrix(group->bSubMatrix);
     printf("\nB-hat sub matrix:\n");
     printMatrix(group->bHatSubMatrix);
+    printf("\nShifted B-hat sub matrix:\n");
+    setMatrixShift(group->bHatSubMatrix, 1);
+    printMatrix(group->bHatSubMatrix);
+    setMatrixShift(group->bHatSubMatrix, 0);
     printf("\ns vector:\n");
     powerIteration(group->bHatSubMatrix, vector, s);
     printVector(s, gSize);

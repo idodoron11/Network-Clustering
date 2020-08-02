@@ -20,7 +20,7 @@ Matrix *createMatrix(int n) {
     mat->rowSums = calloc(n, sizeof(double));
     /* If the matrix is non-symmetric, colSum[i] doesn't necessarily have to be rowSum[i].
      * Yet, if we know the matrix is symmetric in advance, it might be a little waste of memory. */
-    mat->colSums = calloc(n, sizeof(double));
+    mat->colAbsSums = calloc(n, sizeof(double));
     mat->highestColSumIndex = 0;
     mat->isShifted = 0;
     return mat;
@@ -37,7 +37,7 @@ void freeMatrix(Matrix *mat) {
     }
     free(mat->values);
     free(mat->rowSums);
-    free(mat->colSums);
+    free(mat->colAbsSums);
     free(mat);
 }
 
@@ -53,14 +53,14 @@ void setVal(Matrix *mat, int r, int c, double val) {
     int j;
     mat->values[r][c] = val;
     mat->rowSums[r] += val-oldVal;
-    mat->colSums[c] += val-oldVal;
-    if(c == mat->highestColSumIndex && val < oldVal){
+    mat->colAbsSums[c] += fabs(val) - fabs(oldVal);
+    if(c == mat->highestColSumIndex && fabs(val) < fabs(oldVal)){
         for(j = 0; j < mat->n; ++j){
-            if(mat->colSums[j] > mat->colSums[mat->highestColSumIndex])
+            if(mat->colAbsSums[j] > mat->colAbsSums[mat->highestColSumIndex])
                 mat->highestColSumIndex = j;
         }
     }
-    else if(c != mat->highestColSumIndex && mat->colSums[c] > mat->colSums[mat->highestColSumIndex])
+    else if(c != mat->highestColSumIndex && mat->colAbsSums[c] > mat->colAbsSums[mat->highestColSumIndex])
         mat->highestColSumIndex = c;
 }
 
@@ -70,7 +70,7 @@ void setVal(Matrix *mat, int r, int c, double val) {
  * @return norm-1 of mat, which is the maximum of colSum[i], for i=1,2,...,n.
  */
 double matrixNorm1(Matrix *mat){
-    return mat->colSums[mat->highestColSumIndex];
+    return mat->colAbsSums[mat->highestColSumIndex];
 }
 
 /**
@@ -100,7 +100,7 @@ char isMatrixShifted(Matrix *mat){
  */
 double readVal(Matrix *mat, int r, int c) {
     if(r == c && mat->isShifted != 0)
-        return mat->values[r][c] + mat->colSums[mat->highestColSumIndex];
+        return mat->values[r][c] + mat->colAbsSums[mat->highestColSumIndex];
     else
         return mat->values[r][c];
 }
@@ -131,10 +131,9 @@ void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
  */
 void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
     int i, con = 1, originalShiftStatus = isMatrixShifted(mat);
-    double vectorSize, dif, minus, eps = 0.0001;
+    double vectorSize, dif, eps = 0.0001;
     setMatrixShift(mat, 1);
     while (con == 1) {
-        minus = 1;
         matrixVectorMult(mat, vector, vectorResult);
         vectorSize = 0;
         for (i = 0; i < mat->n; i++) {
@@ -147,15 +146,11 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
             printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]);
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
-            if(vectorResult[i] + vector[i] >= eps * eps)
-                minus = 0;
             if (dif >= eps) {
                 con = 1;
             }
             vector[i] = vectorResult[i];
         }
-        if(minus == 1)
-            con = 0;
     }
     setMatrixShift(mat, originalShiftStatus);
 }
