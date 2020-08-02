@@ -15,9 +15,14 @@ Matrix *createMatrix(int n) {
     mat->n = n;
     mat->values = malloc(sizeof(double *) * n);
     for (i = 0; i < n; i++) {
-        mat->values[i] = malloc(sizeof(double) * n);
+        mat->values[i] = calloc(n, sizeof(double));
     }
     mat->rowSums = calloc(n, sizeof(double));
+    /* If the matrix is non-symmetric, colSum[i] doesn't necessarily have to be rowSum[i].
+     * Yet, if we know the matrix is symmetric in advance, it might be a little waste of memory. */
+    mat->colSums = calloc(n, sizeof(double));
+    mat->highestColSumIndex = 0;
+    mat->isShifted = 0;
     return mat;
 }
 
@@ -32,6 +37,7 @@ void freeMatrix(Matrix *mat) {
     }
     free(mat->values);
     free(mat->rowSums);
+    free(mat->colSums);
     free(mat);
 }
 
@@ -43,8 +49,46 @@ void freeMatrix(Matrix *mat) {
  * @return value
  */
 void setVal(Matrix *mat, int r, int c, double val) {
+    double oldVal = mat->values[r][c];
+    int j;
     mat->values[r][c] = val;
-    mat->rowSums[r] += val;
+    mat->rowSums[r] += val-oldVal;
+    mat->colSums[c] += val-oldVal;
+    if(c == mat->highestColSumIndex && val < oldVal){
+        for(j = 0; j < mat->n; ++j){
+            if(mat->colSums[j] > mat->colSums[mat->highestColSumIndex])
+                mat->highestColSumIndex = j;
+        }
+    }
+    else if(c != mat->highestColSumIndex && mat->colSums[c] > mat->colSums[mat->highestColSumIndex])
+        mat->highestColSumIndex = c;
+}
+
+/**
+ * Calculate matrix norm-1.
+ * @param mat
+ * @return norm-1 of mat, which is the maximum of colSum[i], for i=1,2,...,n.
+ */
+double matrixNorm1(Matrix *mat){
+    return mat->colSums[mat->highestColSumIndex];
+}
+
+/**
+ * Shifts or unshifts a given matrix.
+ * @param mat
+ * @param status should be 0 (unshift) or 1 (shift).
+ */
+void setMatrixShift(Matrix *mat, char status){
+    mat->isShifted = status;
+}
+
+/**
+ * Returns boolean value to indicate whether or not the matrix is shifted.
+ * @param mat
+ * @return True iff mat is shifted, namely mat->isShifted != 0;
+ */
+char isMatrixShifted(Matrix *mat){
+    return mat->isShifted != 0;
 }
 
 /**
@@ -55,7 +99,10 @@ void setVal(Matrix *mat, int r, int c, double val) {
  * @return value
  */
 double readVal(Matrix *mat, int r, int c) {
-    return mat->values[r][c];
+    if(r == c && mat->isShifted != 0)
+        return mat->values[r][c] + mat->colSums[mat->highestColSumIndex];
+    else
+        return mat->values[r][c];
 }
 
 /**
@@ -83,8 +130,9 @@ void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
  * @param vectorResult the eigenvector found by the algorithm, should be allocated
  */
 void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
-    int i, con = 1;
+    int i, con = 1, originalShiftStatus = isMatrixShifted(mat);
     double vectorSize, dif, eps = 0.0001;
+    setMatrixShift(mat, 1);
     while (con) {
         matrixVectorMult(mat, vector, vectorResult);
         vectorSize = 0;
@@ -92,9 +140,6 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
             vectorSize += vectorResult[i] * vectorResult[i];
         }
         vectorSize = sqrt(vectorSize);
-        printf("vectorResult: \n");
-        printVect(vectorResult, mat->n);
-        printf("norm(vectorResult)=%f\n", vectorSize);
         con = 0;
         for (i = 0; i < mat->n; i++) {
             vectorResult[i] /= vectorSize;
@@ -104,9 +149,8 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
             }
             vector[i] = vectorResult[i];
         }
-        printf("normalized vectorResult: \n");
-        printVect(vectorResult, mat->n);
     }
+    setMatrixShift(mat, originalShiftStatus);
 }
 
 /**

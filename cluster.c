@@ -12,9 +12,9 @@ void printVector(double *vector, int length);
 int main() {
     spmat *A;
     Matrix *AMatrix;
-    int i, M, n = 10, gSize = 4;
+    int i, M, n = 40, gSize = 10;
     double *vector, *s;
-    int gVertices[] = {3, 4, 7, 9};
+    int gVertices[] = {3,8,11,13,17,27,29,31,32,35};
     VerticesGroup *group;
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
@@ -28,9 +28,6 @@ int main() {
     }
     calculateSubMatrix(AMatrix, M, group);
     randVector(vector, gSize);
-    powerIteration(group->bHatSubMatrix, vector, s);
-    printf("\ns vector:\n");
-    printVector(s, 4);
     printf("Edges matrix:\n");
     printSpmat(A);
     printf("\nEdges sub matrix:\n");
@@ -40,7 +37,8 @@ int main() {
     printf("\nB-hat sub matrix:\n");
     printMatrix(group->bHatSubMatrix);
     printf("\ns vector:\n");
-    printVector(s, 4);
+    powerIteration(group->bHatSubMatrix, vector, s);
+    printVector(s, gSize);
     return 0;
 }
 

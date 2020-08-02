@@ -6,6 +6,9 @@ typedef struct matrix {
     int n;
     double **values;
     double *rowSums;
+    double *colSums;
+    int highestColSumIndex;
+    char isShifted;
 } Matrix;
 
 Matrix *createMatrix(int n);
@@ -19,6 +22,12 @@ double readVal(Matrix *mat, int r, int c);
 void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult);
 
 void powerIteration(Matrix *mat, double *vector, double *vectorResult);
+
+double matrixNorm1(Matrix *mat);
+
+void setMatrixShift(Matrix *mat, char status);
+
+char isMatrixShifted(Matrix *mat);
 
 void printMatrix(Matrix *mat);
 
