@@ -14,7 +14,7 @@ int main() {
     Matrix *AMatrix;
     int i, M, n = 40, gSize = 10;
     double *vector, *s;
-    int gVertices[] = {3,8,11,13,17,27,29,31,32,35};
+    int gVertices[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39};
     VerticesGroup *group;
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
