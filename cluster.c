@@ -3,6 +3,7 @@
 #include <time.h>
 #include "matrix.h"
 #include "spmat.h"
+#include "graph.h"
 #include "VerticesGroup.h"
 
 void randVector(double *vector, int n);
@@ -19,16 +20,18 @@ int main() {
     double *vector, *s, lambda;
     int gVertices[] = {5, 17, 32, 6};
     VerticesGroup *group, *newGroup;
+    graph *G = constructGraphFromInput("graph.in");
+    n = G->n;
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
     s = malloc(gSize * sizeof(double));
     AMatrix = createMatrix(n);
-    A = generateRandomSymSpmat(n, 20, AMatrix);
-    M = spmatValuesSum(A);
+    /* A = generateRandomSymSpmat(n, 20, AMatrix); */
+    A = G->spAdjMat;
+    AMatrix = G->adjMat;
+    M = G->M;
     group = createVerticesGroup();
-    for (i = 0; i < gSize; i++) {
-        addVertexToGroup(group, gVertices[i]);
-    }
+    addSequence(group, gVertices, gSize);
     calculateSubMatrix(AMatrix, M, group);
     randVector(vector, gSize);
     printf("Edges matrix:\n");

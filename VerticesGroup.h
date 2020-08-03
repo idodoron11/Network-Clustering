@@ -27,6 +27,8 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index);
 
 void removeVertexFromGroup(VerticesGroup *group, VertexNode *node);
 
+void addSequence(VerticesGroup *group, int *sequence, int length);
+
 void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group);
 
 #endif
