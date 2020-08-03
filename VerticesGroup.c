@@ -42,6 +42,18 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
 }
 
 /**
+ * Adds a sequence of indices to the group.
+ * @param group the group to which nodes are added.
+ * @param sequence a sequence of integers, representing nodes in a graph.
+ * @param length the length of the input sequence.
+ */
+void addSequence(VerticesGroup *group, int *sequence, int length){
+    int i;
+    for(i = 0; i < length; ++i)
+        addVertexToGroup(group, sequence[i]);
+}
+
+/**
  * Create sub matrix
  * @param A edges matrix
  * @param M degrees sum

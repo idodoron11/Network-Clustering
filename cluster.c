@@ -13,10 +13,10 @@ void printVector(double *vector, int length);
 int main() {
     spmat *A;
     Matrix *AMatrix;
-    int i, M, n, gSize = 6;
+    int M, n, gSize = 20;
     double *vector, *s, lambda;
     graph *G = constructGraphFromInput("graph.in");
-    int gVertices[] = {7,2,3,11,19,10};
+    int gVertices[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
     VerticesGroup *group;
     n = G->n;
     srand(time(0));
@@ -28,9 +28,7 @@ int main() {
     AMatrix = G->adjMat;
     M = G->M;
     group = createVerticesGroup();
-    for (i = 0; i < gSize; i++) {
-        addVertexToGroup(group, gVertices[i]);
-    }
+    addSequence(group, gVertices, gSize);
     calculateSubMatrix(AMatrix, M, group);
     randVector(vector, gSize);
     printf("Edges matrix:\n");
