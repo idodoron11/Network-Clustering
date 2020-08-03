@@ -11,14 +11,12 @@ typedef struct _graph {
 
     /* Adjacency matrix of size nXn
      * E={(i,j) s.t. spAdjMat[i*n + j]=1} */
-    double* adjMat;
+    Matrix* adjMat;
     spmat* spAdjMat;
 
     /* Sum of Degrees */
     int M;
 
-    /* degrees vector */
-    int* deg;
 } graph;
 
 /**
