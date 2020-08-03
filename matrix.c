@@ -4,6 +4,7 @@
 #include <math.h>
 
 void printVect(double *vector, int length);
+
 /**
  * Generate a square matrix object
  * @param n size of matrix is nxn
@@ -52,15 +53,14 @@ void setVal(Matrix *mat, int r, int c, double val) {
     double oldVal = mat->values[r][c];
     int j;
     mat->values[r][c] = val;
-    mat->rowSums[r] += val-oldVal;
+    mat->rowSums[r] += val - oldVal;
     mat->colAbsSums[c] += fabs(val) - fabs(oldVal);
-    if(c == mat->highestColSumIndex && fabs(val) < fabs(oldVal)){
-        for(j = 0; j < mat->n; ++j){
-            if(mat->colAbsSums[j] > mat->colAbsSums[mat->highestColSumIndex])
+    if (c == mat->highestColSumIndex && fabs(val) < fabs(oldVal)) {
+        for (j = 0; j < mat->n; ++j) {
+            if (mat->colAbsSums[j] > mat->colAbsSums[mat->highestColSumIndex])
                 mat->highestColSumIndex = j;
         }
-    }
-    else if(c != mat->highestColSumIndex && mat->colAbsSums[c] > mat->colAbsSums[mat->highestColSumIndex])
+    } else if (c != mat->highestColSumIndex && mat->colAbsSums[c] > mat->colAbsSums[mat->highestColSumIndex])
         mat->highestColSumIndex = c;
 }
 
@@ -69,7 +69,7 @@ void setVal(Matrix *mat, int r, int c, double val) {
  * @param mat
  * @return norm-1 of mat, which is the maximum of colSum[i], for i=1,2,...,n.
  */
-double matrixNorm1(Matrix *mat){
+double matrixNorm1(Matrix *mat) {
     return mat->colAbsSums[mat->highestColSumIndex];
 }
 
@@ -78,7 +78,7 @@ double matrixNorm1(Matrix *mat){
  * @param mat
  * @param status should be 0 (unshift) or 1 (shift).
  */
-void setMatrixShift(Matrix *mat, char status){
+void setMatrixShift(Matrix *mat, char status) {
     mat->isShifted = status;
 }
 
@@ -87,7 +87,7 @@ void setMatrixShift(Matrix *mat, char status){
  * @param mat
  * @return True iff mat is shifted, namely mat->isShifted != 0;
  */
-char isMatrixShifted(Matrix *mat){
+char isMatrixShifted(Matrix *mat) {
     return mat->isShifted != 0;
 }
 
@@ -99,7 +99,7 @@ char isMatrixShifted(Matrix *mat){
  * @return value
  */
 double readVal(Matrix *mat, int r, int c) {
-    if(r == c && mat->isShifted != 0)
+    if (r == c && mat->isShifted != 0)
         return mat->values[r][c] + mat->colAbsSums[mat->highestColSumIndex];
     else
         return mat->values[r][c];
@@ -128,12 +128,14 @@ void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
  * @param matrix a matrix object
  * @param vector initial vector for the algorithm
  * @param vectorResult the eigenvector found by the algorithm, should be allocated
+ * @return the eigenvalue of the eigenvector 'vectorResult'.
  */
-void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
+double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
     int i, con = 1, originalShiftStatus = isMatrixShifted(mat);
-    double vectorSize, dif, eps = 0.0001;
+    double vectorSize, dif, eps = 0.0001, lambda, x, y;
     setMatrixShift(mat, 1);
     while (con == 1) {
+        x = y = 0;
         matrixVectorMult(mat, vector, vectorResult);
         vectorSize = 0;
         for (i = 0; i < mat->n; i++) {
@@ -141,18 +143,26 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
         }
         vectorSize = sqrt(vectorSize);
         con = 0;
-        /*printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n");*/
+        /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
         for (i = 0; i < mat->n; i++) {
-            /*printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]);*/
+            /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
             if (dif >= eps) {
                 con = 1;
             }
+            x += vector[i] * vectorResult[i];
+            y += vector[i] * vector[i];
             vector[i] = vectorResult[i];
+
         }
     }
     setMatrixShift(mat, originalShiftStatus);
+
+    /* compute the corresponding eigenvalue (with respect to the un-shifted B_hat) */
+    lambda = x / y;
+    lambda -= matrixNorm1(mat);
+    return lambda;
 }
 
 /**

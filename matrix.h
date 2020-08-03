@@ -21,7 +21,7 @@ double readVal(Matrix *mat, int r, int c);
 
 void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult);
 
-void powerIteration(Matrix *mat, double *vector, double *vectorResult);
+double powerIteration(Matrix *mat, double *vector, double *vectorResult);
 
 double matrixNorm1(Matrix *mat);
 
