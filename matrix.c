@@ -128,12 +128,14 @@ void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
  * @param matrix a matrix object
  * @param vector initial vector for the algorithm
  * @param vectorResult the eigenvector found by the algorithm, should be allocated
+ * @return the eigenvalue of the eigenvector 'vectorResult'.
  */
-void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
+double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
     int i, con = 1, originalShiftStatus = isMatrixShifted(mat);
-    double vectorSize, dif, eps = 0.0001;
+    double vectorSize, dif, eps = 0.0001, lambda, x, y;
     setMatrixShift(mat, 1);
     while (con == 1) {
+        x = y = 0;
         matrixVectorMult(mat, vector, vectorResult);
         vectorSize = 0;
         for (i = 0; i < mat->n; i++) {
@@ -141,18 +143,26 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
         }
         vectorSize = sqrt(vectorSize);
         con = 0;
-        printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n");
+        /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
         for (i = 0; i < mat->n; i++) {
-            printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]);
+            /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
             if (dif >= eps) {
                 con = 1;
             }
+            x += vector[i] * vectorResult[i];
+            y += vector[i] * vector[i];
             vector[i] = vectorResult[i];
+
         }
     }
     setMatrixShift(mat, originalShiftStatus);
+
+    /* compute the corresponding eigenvalue (with respect to the un-shifted B_hat) */
+    lambda = x / y;
+    lambda -= matrixNorm1(mat);
+    return lambda;
 }
 
 /**

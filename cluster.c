@@ -13,7 +13,7 @@ int main() {
     spmat *A;
     Matrix *AMatrix;
     int i, M, n = 50, gSize = 4;
-    double *vector, *s;
+    double *vector, *s, lambda;
     int gVertices[] = {5,17,32,6};
     VerticesGroup *group;
     srand(time(0));
@@ -41,8 +41,9 @@ int main() {
     printMatrix(group->bHatSubMatrix);
     setMatrixShift(group->bHatSubMatrix, 0);
     printf("\ns vector:\n");
-    powerIteration(group->bHatSubMatrix, vector, s);
+    lambda = powerIteration(group->bHatSubMatrix, vector, s);
     printVector(s, gSize);
+    printf("\nlambda: %f\n", lambda);
     return 0;
 }
 
