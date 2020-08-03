@@ -141,9 +141,9 @@ void powerIteration(Matrix *mat, double *vector, double *vectorResult) {
         }
         vectorSize = sqrt(vectorSize);
         con = 0;
-        printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n");
+        /*printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n");*/
         for (i = 0; i < mat->n; i++) {
-            printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]);
+            /*printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]);*/
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
             if (dif >= eps) {

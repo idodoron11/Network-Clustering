@@ -41,6 +41,20 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
     return node;
 }
 
+void removeVertexFromGroup(VerticesGroup *group, VertexNode *node) {
+    if (group->first == node) {
+        if (group->size == 1) {
+            group->first = NULL;
+        } else {
+            group->first = node->next;
+        }
+    }
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    group->size--;
+    free(node);
+}
+
 /**
  * Create sub matrix
  * @param A edges matrix

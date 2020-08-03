@@ -9,13 +9,16 @@ void randVector(double *vector, int n);
 
 void printVector(double *vector, int length);
 
+VerticesGroup *divideGroupByS(VerticesGroup *group, double *s);
+
 int main() {
     spmat *A;
     Matrix *AMatrix;
+    VertexNode *node;
     int i, M, n = 50, gSize = 4;
     double *vector, *s;
-    int gVertices[] = {5,17,32,6};
-    VerticesGroup *group;
+    int gVertices[] = {5, 17, 32, 6};
+    VerticesGroup *group, *newGroup;
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
     s = malloc(gSize * sizeof(double));
@@ -43,6 +46,24 @@ int main() {
     printf("\ns vector:\n");
     powerIteration(group->bHatSubMatrix, vector, s);
     printVector(s, gSize);
+    newGroup = divideGroupByS(group, s);
+    node = group->first;
+    printf("\nNodes in first group:\n");
+    if (group->size > 0) {
+        do {
+            printf("%d ", node->index);
+            node = node->next;
+        } while (node != group->first);
+    }
+    node = newGroup->first;
+    printf("\nNodes in second group:\n");
+    if (newGroup->size > 0) {
+        do {
+            printf("%d ", node->index);
+            node = node->next;
+        } while (node != newGroup->first);
+    }
+
     return 0;
 }
 
@@ -70,4 +91,35 @@ void printVector(double *vector, int length) {
         printf("%.1f ", vector[i]);
     }
     printf(" )\n");
+}
+
+/**
+ * Divides a group into two, leaving some vertices in the original group
+ * and transferring the rest to a new VerticesGroup
+ * @param group
+ * @param s
+ * @return
+ */
+VerticesGroup *divideGroupByS(VerticesGroup *group, double *s) {
+    int createdNewGroup = 0, i, groupSize;
+    VerticesGroup *newGroup;
+    VertexNode *tmp, *node = group->first;
+    newGroup = createVerticesGroup();
+    if (group->size > 0) {
+        groupSize = group->size;
+        for (i = 0; i < groupSize; i++) {
+            tmp = node->next;
+            if (s[i] < 0) {
+                createdNewGroup = 1;
+                removeVertexFromGroup(group, node);
+                addVertexToGroup(newGroup, node->index);
+            }
+            node = tmp;
+        }
+    }
+    if (!createdNewGroup) {
+        free(newGroup);
+        newGroup = NULL;
+    }
+    return newGroup;
 }
