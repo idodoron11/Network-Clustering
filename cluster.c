@@ -16,17 +16,16 @@ int main() {
     spmat *A;
     Matrix *AMatrix;
     VertexNode *node;
-    int i, M, n = 50, gSize = 4;
+    int M, gSize = 4;
     double *vector, *s, lambda;
-    int gVertices[] = {5, 17, 32, 6};
+    int gVertices[] = {1, 3, 4, 9};
     VerticesGroup *group, *newGroup;
-    graph *G = constructGraphFromInput("graph.in");
-    n = G->n;
+    graph *G = constructGraphFromInput("C:\\Users\\royar\\Workspace\\C projects\\cproject-cluster\\graph.in");
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
     s = malloc(gSize * sizeof(double));
-    AMatrix = createMatrix(n);
-    /* A = generateRandomSymSpmat(n, 20, AMatrix); */
+    /*AMatrix = createMatrix(n);
+    A = generateRandomSymSpmat(n, 20, AMatrix); */
     A = G->spAdjMat;
     AMatrix = G->adjMat;
     M = G->M;
