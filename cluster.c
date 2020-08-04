@@ -34,7 +34,6 @@ int main() {
             node = node->next;
         } while (node != groupsLst->first);
     }
-    printMatrix(G->adjMat);
 
     return 0;
 }
@@ -135,7 +134,6 @@ void maximizeModularity(VerticesGroup *group, double *s) {
 }
 
 void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
-    double lambda;
     VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
     if (group->size == 1) {
         insertItem(groupsLst, group, 0);
@@ -143,18 +141,16 @@ void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     }
     calculateSubMatrix(G->adjMat, G->M, group);
     randVector(vector, group->size);
-    lambda = powerIteration(group->bHatSubMatrix, vector, s);
-    if(lambda <= 0)
+    powerIteration(group->bHatSubMatrix, vector, s);
+    /* here, i think we should split into cases depending on the eigenvalue returned by powerIteration.
+     * i'm currently leaving it as it is since it is not entirely clear. */
+    maximizeModularity(group, s);
+    divideGroupByS(group, s, &newGroupA, &newGroupB);
+    if (newGroupA == NULL || newGroupB == NULL) {
         insertItem(groupsLst, group, 0);
-    else {
-        maximizeModularity(group, s);
-        divideGroupByS(group, s, &newGroupA, &newGroupB);
-        if (newGroupA == NULL || newGroupB == NULL) {
-            insertItem(groupsLst, group, 0);
-        } else {
-            divisionAlgRec(G, newGroupA, groupsLst, vector, s);
-            divisionAlgRec(G, newGroupB, groupsLst, vector, s);
-        }
+    } else {
+        divisionAlgRec(G, newGroupA, groupsLst, vector, s);
+        divisionAlgRec(G, newGroupB, groupsLst, vector, s);
     }
 }
 
