@@ -6,6 +6,8 @@
 
 typedef struct vertexNode {
     int index;
+    /*Has the node's group changed during modularity maximization*/
+    int hasMoved;
     struct vertexNode *next;
     struct vertexNode *prev;
 } VertexNode;
@@ -15,8 +17,11 @@ typedef struct verticesGroup {
     int size;
     int *verticesArr;
     spmat *edgeSubMatrix;
+    /*a matrix that equals A-bHat*/
+    Matrix *edgesMinusBHatSubMatrix;
     Matrix *bSubMatrix;
     Matrix *bHatSubMatrix;
+
 } VerticesGroup;
 
 VerticesGroup *createVerticesGroup();
@@ -30,5 +35,7 @@ void removeVertexFromGroup(VerticesGroup *group, VertexNode *node);
 void addSequence(VerticesGroup *group, int *sequence, int length);
 
 void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group);
+
+double calculateModularity(VerticesGroup *group, double *s);
 
 #endif

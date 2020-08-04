@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <mem.h>
 #include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
@@ -10,16 +11,18 @@ void randVector(double *vector, int n);
 
 void printVector(double *vector, int length);
 
-VerticesGroup *divideGroupByS(VerticesGroup *group, double *s);
+void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB);
+
+void maximizeModularity(VerticesGroup *group, double *s);
 
 int main() {
     spmat *A;
     Matrix *AMatrix;
     VertexNode *node;
-    int M, gSize = 4;
+    int M, gSize = 4, i;
     double *vector, *s, lambda;
     int gVertices[] = {1, 3, 4, 9};
-    VerticesGroup *group, *newGroup;
+    VerticesGroup *group, *newGroupA = NULL, *newGroupB = NULL;
     graph *G = constructGraphFromInput("C:\\Users\\royar\\Workspace\\C projects\\cproject-cluster\\graph.in");
     srand(time(0));
     vector = malloc(gSize * sizeof(double));
@@ -49,22 +52,37 @@ int main() {
     lambda = powerIteration(group->bHatSubMatrix, vector, s);
     printVector(s, gSize);
     printf("\nlambda: %f\n", lambda);
-    newGroup = divideGroupByS(group, s);
-    node = group->first;
+    divideGroupByS(group, s, &newGroupA, &newGroupB);
+    node = newGroupA->first;
     printf("\nNodes in first group:\n");
-    if (group->size > 0) {
-        do {
-            printf("%d ", node->index);
-            node = node->next;
-        } while (node != group->first);
+    for (i = 0; i < newGroupA->size; i++) {
+        printf("%d ", node->index);
+        node = node->next;
     }
-    node = newGroup->first;
+    node = newGroupB->first;
     printf("\nNodes in second group:\n");
-    if (newGroup->size > 0) {
-        do {
-            printf("%d ", node->index);
-            node = node->next;
-        } while (node != newGroup->first);
+    for (i = 0; i < newGroupB->size; i++) {
+        printf("%d ", node->index);
+        node = node->next;
+    }
+    maximizeModularity(group, s);
+    freeVerticesGroup(newGroupA);
+    freeVerticesGroup(newGroupB);
+    newGroupA = NULL;
+    newGroupB = NULL;
+    divideGroupByS(group, s, &newGroupA, &newGroupB);
+    node = newGroupA->first;
+    printf("\nAfter maximization:");
+    printf("\nNodes in first group:\n");
+    for (i = 0; i < newGroupA->size; i++) {
+        printf("%d ", node->index);
+        node = node->next;
+    }
+    node = newGroupB->first;
+    printf("\nNodes in second group:\n");
+    for (i = 0; i < newGroupB->size; i++) {
+        printf("%d ", node->index);
+        node = node->next;
     }
 
     return 0;
@@ -97,32 +115,67 @@ void printVector(double *vector, int length) {
 }
 
 /**
- * Divides a group into two, leaving some vertices in the original group
- * and transferring the rest to a new VerticesGroup
- * @param group
- * @param s
+ * Divides a group into two
+ * @param group the group to split
+ * @param s the eigenvector to split by
+ * @param splitGroupA the first sub group, should be null
+ * @param splitGroupB the second sub group, should be null
  * @return
  */
-VerticesGroup *divideGroupByS(VerticesGroup *group, double *s) {
-    int createdNewGroup = 0, i, groupSize;
-    VerticesGroup *newGroup;
-    VertexNode *tmp, *node = group->first;
-    newGroup = createVerticesGroup();
+void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB) {
+    int i;
+    VertexNode *node = group->first;
+    *splitGroupA = createVerticesGroup();
     if (group->size > 0) {
-        groupSize = group->size;
-        for (i = 0; i < groupSize; i++) {
-            tmp = node->next;
+        for (i = 0; i < group->size; i++) {
             if (s[i] < 0) {
-                createdNewGroup = 1;
-                removeVertexFromGroup(group, node);
-                addVertexToGroup(newGroup, node->index);
+                if (*splitGroupB == NULL) {
+                    *splitGroupB = createVerticesGroup();
+                }
+                addVertexToGroup(*splitGroupB, node->index);
+            } else {
+                addVertexToGroup(*splitGroupA, node->index);
             }
-            node = tmp;
+            node = node->next;
         }
     }
-    if (!createdNewGroup) {
-        free(newGroup);
-        newGroup = NULL;
+}
+
+/**
+ * Maximize modularity by moving nodes between the sub groups
+ * @param group a group of vertices
+ * @param s the eigenvevtor, will be assigned the maximum split
+ */
+void maximizeModularity(VerticesGroup *group, double *s) {
+    int i, j, maxNode;
+    VertexNode *node, *maxNodeRef;
+    double modularity, maxModularity, maxIterationModularity;
+    double *maxS = malloc(group->size * sizeof(double));
+    memcpy(maxS, s, group->size);
+    maxModularity = calculateModularity(group, s);
+    for (i = 0; i < group->size; i++) {
+        node = group->first;
+        maxNodeRef = NULL;
+        for (j = 0; j < group->size; j++) {
+            if (!node->hasMoved) {
+                /*TODO: is it enough to change groups? is 0 possible?*/
+                s[j] = -s[j];
+                modularity = calculateModularity(group, s);
+                if (modularity > maxIterationModularity || maxNodeRef == NULL) {
+                    maxIterationModularity = modularity;
+                    maxNode = i;
+                    maxNodeRef = node;
+                }
+                s[j] = -s[j];
+            }
+            node = node->next;
+        }
+        s[maxNode] = -s[maxNode];
+        maxNodeRef->hasMoved = 1;
+        if (maxIterationModularity > maxModularity) {
+            maxModularity = maxIterationModularity;
+            memcpy(maxS, s, group->size);
+        }
     }
-    return newGroup;
+    memcpy(s, maxS, group->size);
 }

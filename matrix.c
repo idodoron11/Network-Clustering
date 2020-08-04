@@ -197,3 +197,19 @@ void printVect(double *vector, int length) {
     }
     printf(" )\n");
 }
+
+
+/**
+ * Multiply 2 vectors
+ * @param v1
+ * @param v2
+ * @return multiplication result
+ */
+double vectorMult(double *v1, double *v2) {
+    int i;
+    double res = 0;
+    for (i = 0; i < (int) (sizeof(*v1) / sizeof(double)); i++) {
+        res += v1[i] * v2[i];
+    }
+    return res;
+}
