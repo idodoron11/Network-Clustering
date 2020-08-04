@@ -16,7 +16,7 @@ int main() {
     LinkedListNode *node;
     VerticesGroup *group;
     VertexNode *vNode;
-    graph *G = constructGraphFromInput("C:\\Users\\royar\\Workspace\\C projects\\cproject-cluster\\graph.in");
+    graph *G = constructGraphFromInput("graph.in");
     srand(time(0));
     groupsLst = divisionAlgorithm(G);
     node = groupsLst->first;
@@ -34,6 +34,7 @@ int main() {
             node = node->next;
         } while (node != groupsLst->first);
     }
+    printMatrix(G->adjMat);
 
     return 0;
 }
@@ -109,13 +110,14 @@ void maximizeModularity(VerticesGroup *group, double *s) {
         node = group->first;
         maxNodeRef = NULL;
         for (j = 0; j < group->size; j++) {
+            if(s[j] == 0)
+                s[j] = 0.0001;
             if (!node->hasMoved) {
-                /*TODO: is it enough to change groups? is 0 possible?*/
                 s[j] = -s[j];
                 modularity = calculateModularity(group, s);
                 if (modularity > maxIterationModularity || maxNodeRef == NULL) {
                     maxIterationModularity = modularity;
-                    maxNode = i;
+                    maxNode = j;
                     maxNodeRef = node;
                 }
                 s[j] = -s[j];
@@ -133,6 +135,7 @@ void maximizeModularity(VerticesGroup *group, double *s) {
 }
 
 void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
+    double lambda;
     VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
     if (group->size == 1) {
         insertItem(groupsLst, group, 0);
@@ -140,14 +143,18 @@ void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     }
     calculateSubMatrix(G->adjMat, G->M, group);
     randVector(vector, group->size);
-    powerIteration(group->bHatSubMatrix, vector, s);
-    maximizeModularity(group, s);
-    divideGroupByS(group, s, &newGroupA, &newGroupB);
-    if (newGroupA == NULL || newGroupB == NULL) {
+    lambda = powerIteration(group->bHatSubMatrix, vector, s);
+    if(lambda <= 0)
         insertItem(groupsLst, group, 0);
-    } else {
-        divisionAlgRec(G, newGroupA, groupsLst, vector, s);
-        divisionAlgRec(G, newGroupB, groupsLst, vector, s);
+    else {
+        maximizeModularity(group, s);
+        divideGroupByS(group, s, &newGroupA, &newGroupB);
+        if (newGroupA == NULL || newGroupB == NULL) {
+            insertItem(groupsLst, group, 0);
+        } else {
+            divisionAlgRec(G, newGroupA, groupsLst, vector, s);
+            divisionAlgRec(G, newGroupB, groupsLst, vector, s);
+        }
     }
 }
 
