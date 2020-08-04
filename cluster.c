@@ -6,83 +6,33 @@
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
+#include "LinkedList.h"
 
-void randVector(double *vector, int n);
-
-void printVector(double *vector, int length);
-
-void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB);
-
-void maximizeModularity(VerticesGroup *group, double *s);
+LinkedList *divisionAlgorithm(graph *G);
 
 int main() {
-    spmat *A;
-    Matrix *AMatrix;
-    VertexNode *node;
-    int M, gSize = 4, i;
-    double *vector, *s, lambda;
-    int gVertices[] = {1, 3, 4, 9};
-    VerticesGroup *group, *newGroupA = NULL, *newGroupB = NULL;
+    int i = 1, j;
+    LinkedList *groupsLst;
+    LinkedListNode *node;
+    VerticesGroup *group;
+    VertexNode *vNode;
     graph *G = constructGraphFromInput("C:\\Users\\royar\\Workspace\\C projects\\cproject-cluster\\graph.in");
     srand(time(0));
-    vector = malloc(gSize * sizeof(double));
-    s = malloc(gSize * sizeof(double));
-    /*AMatrix = createMatrix(n);
-    A = generateRandomSymSpmat(n, 20, AMatrix); */
-    A = G->spAdjMat;
-    AMatrix = G->adjMat;
-    M = G->M;
-    group = createVerticesGroup();
-    addSequence(group, gVertices, gSize);
-    calculateSubMatrix(AMatrix, M, group);
-    randVector(vector, gSize);
-    printf("Edges matrix:\n");
-    printSpmat(A);
-    printf("\nEdges sub matrix:\n");
-    printSpmat(group->edgeSubMatrix);
-    printf("\nB sub matrix:\n");
-    printMatrix(group->bSubMatrix);
-    printf("\nB-hat sub matrix:\n");
-    printMatrix(group->bHatSubMatrix);
-    printf("\nShifted B-hat sub matrix:\n");
-    setMatrixShift(group->bHatSubMatrix, 1);
-    printMatrix(group->bHatSubMatrix);
-    setMatrixShift(group->bHatSubMatrix, 0);
-    printf("\ns vector:\n");
-    lambda = powerIteration(group->bHatSubMatrix, vector, s);
-    printVector(s, gSize);
-    printf("\nlambda: %f\n", lambda);
-    divideGroupByS(group, s, &newGroupA, &newGroupB);
-    node = newGroupA->first;
-    printf("\nNodes in first group:\n");
-    for (i = 0; i < newGroupA->size; i++) {
-        printf("%d ", node->index);
-        node = node->next;
-    }
-    node = newGroupB->first;
-    printf("\nNodes in second group:\n");
-    for (i = 0; i < newGroupB->size; i++) {
-        printf("%d ", node->index);
-        node = node->next;
-    }
-    maximizeModularity(group, s);
-    freeVerticesGroup(newGroupA);
-    freeVerticesGroup(newGroupB);
-    newGroupA = NULL;
-    newGroupB = NULL;
-    divideGroupByS(group, s, &newGroupA, &newGroupB);
-    node = newGroupA->first;
-    printf("\nAfter maximization:");
-    printf("\nNodes in first group:\n");
-    for (i = 0; i < newGroupA->size; i++) {
-        printf("%d ", node->index);
-        node = node->next;
-    }
-    node = newGroupB->first;
-    printf("\nNodes in second group:\n");
-    for (i = 0; i < newGroupB->size; i++) {
-        printf("%d ", node->index);
-        node = node->next;
+    groupsLst = divisionAlgorithm(G);
+    node = groupsLst->first;
+    if (node != NULL) {
+        do {
+            printf("Group %d:\n", i);
+            group = (VerticesGroup *) node->pointer;
+            vNode = group->first;
+            for (j = 0; j < group->size; j++) {
+                printf("%d ", vNode->index);
+                vNode = vNode->next;
+            }
+            printf("\n\n");
+            i++;
+            node = node->next;
+        } while (node != groupsLst->first);
     }
 
     return 0;
@@ -125,7 +75,6 @@ void printVector(double *vector, int length) {
 void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB) {
     int i;
     VertexNode *node = group->first;
-    *splitGroupA = createVerticesGroup();
     if (group->size > 0) {
         for (i = 0; i < group->size; i++) {
             if (s[i] < 0) {
@@ -134,6 +83,9 @@ void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA
                 }
                 addVertexToGroup(*splitGroupB, node->index);
             } else {
+                if (*splitGroupA == NULL) {
+                    *splitGroupA = createVerticesGroup();
+                }
                 addVertexToGroup(*splitGroupA, node->index);
             }
             node = node->next;
@@ -179,3 +131,39 @@ void maximizeModularity(VerticesGroup *group, double *s) {
     }
     memcpy(s, maxS, group->size);
 }
+
+void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
+    VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
+    if (group->size == 1) {
+        insertItem(groupsLst, group, 0);
+        return;
+    }
+    calculateSubMatrix(G->adjMat, G->M, group);
+    randVector(vector, group->size);
+    powerIteration(group->bHatSubMatrix, vector, s);
+    maximizeModularity(group, s);
+    divideGroupByS(group, s, &newGroupA, &newGroupB);
+    if (newGroupA == NULL || newGroupB == NULL) {
+        insertItem(groupsLst, group, 0);
+    } else {
+        divisionAlgRec(G, newGroupA, groupsLst, vector, s);
+        divisionAlgRec(G, newGroupB, groupsLst, vector, s);
+    }
+}
+
+LinkedList *divisionAlgorithm(graph *G) {
+    int i;
+    double *vector, *s;
+    LinkedList *groupsLst;
+    VerticesGroup *group;
+    vector = malloc(G->n * sizeof(double));
+    s = malloc(G->n * sizeof(double));
+    group = createVerticesGroup();
+    for (i = 0; i < G->n; i++) {
+        addVertexToGroup(group, i);
+    }
+    groupsLst = createLinkedList();
+    divisionAlgRec(G, group, groupsLst, vector, s);
+    return groupsLst;
+}
+

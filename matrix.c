@@ -205,10 +205,10 @@ void printVect(double *vector, int length) {
  * @param v2
  * @return multiplication result
  */
-double vectorMult(double *v1, double *v2) {
+double vectorMult(double *v1, double *v2, int size) {
     int i;
     double res = 0;
-    for (i = 0; i < (int) (sizeof(*v1) / sizeof(double)); i++) {
+    for (i = 0; i < size; i++) {
         res += v1[i] * v2[i];
     }
     return res;

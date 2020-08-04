@@ -136,9 +136,10 @@ double calculateModularity(VerticesGroup *group, double *s) {
     double *res, numRes;
     res = malloc(group->size * sizeof(double));
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
-    numRes = vectorMult(s, res);
+    numRes = vectorMult(s, res, group->size);
     matrixVectorMult(group->edgesMinusBHatSubMatrix, s, res);
-    numRes -= vectorMult(s, res);
+    numRes -= vectorMult(s, res, group->size);
+    numRes *= 0.5;
     free(res);
     return numRes;
 }

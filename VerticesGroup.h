@@ -17,7 +17,7 @@ typedef struct verticesGroup {
     int size;
     int *verticesArr;
     spmat *edgeSubMatrix;
-    /*a matrix that equals A-bHat*/
+    /*a matrix that equals bHat-A*/
     Matrix *edgesMinusBHatSubMatrix;
     Matrix *bSubMatrix;
     Matrix *bHatSubMatrix;
