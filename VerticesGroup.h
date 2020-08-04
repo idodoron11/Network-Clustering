@@ -18,6 +18,7 @@ typedef struct verticesGroup {
     int *verticesArr;
     spmat *edgeSubMatrix;
     /*a matrix that equals A-bHat*/
+    /* why do we need it? */
     Matrix *edgesMinusBHatSubMatrix;
     Matrix *bSubMatrix;
     Matrix *bHatSubMatrix;

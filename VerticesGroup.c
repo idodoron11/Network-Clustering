@@ -127,7 +127,8 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
 }
 
 /**
- * Calculate modularity delta of group's division given by an eigenvector
+ * Calculate modularity delta of group's division given by an eigenvector.
+ * We use the following equation to calculate the modularity: shorturl.at/deoJX.
  * @param group
  * @param s eigenvector
  * @return
@@ -139,6 +140,7 @@ double calculateModularity(VerticesGroup *group, double *s) {
     numRes = vectorMult(s, res);
     matrixVectorMult(group->edgesMinusBHatSubMatrix, s, res);
     numRes -= vectorMult(s, res);
+    numRes /= 2;
     free(res);
     return numRes;
 }
