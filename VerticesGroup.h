@@ -10,6 +10,7 @@ typedef struct vertexNode {
     int hasMoved;
     struct vertexNode *next;
     struct vertexNode *prev;
+    struct verticesGroup *groupPointer;
 } VertexNode;
 
 typedef struct verticesGroup {

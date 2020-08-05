@@ -50,6 +50,7 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
         node->next = node;
     }
     group->size++;
+    node->groupPointer = group;
     return node;
 }
 
