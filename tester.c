@@ -418,15 +418,25 @@ char testRandomGraph(){
 }
 
 int main() {
-    printf("Testing graph 1. Result: %d\n", testGraph1());
-    printf("Testing graph 2. Result: %d\n", testGraph2());
-    /*printf("Testing graph 3. Result: %d\n", testGraph3());*/
-    printf("Testing graph 4. Result: %d\n", testGraph4());
-    printf("Testing graph 5. Result: %d\n", testGraph5());
-    printf("Testing graph 6. Result: %d\n", testGraph6());
-    printf("Testing graph 7. Result: %d\n", testGraph7());
-    printf("Testing graph 8. Result: %d\n", testGraph8());
-    printf("Testing graph 9. Result: %d\n", testGraph9());
-    printf("Testing random graph. Result: %d\n", testRandomGraph());
+    printf("Testing graph 1.\n");
+    printf("Result: %d\n", testGraph1());
+    printf("Testing graph 2.\n");
+    printf("Result: %d\n", testGraph2());
+    /*printf("Testing graph 3.\n");
+    printf("Result: %d\n", testGraph3());*/
+    printf("Testing graph 4.\n");
+    printf("Result: %d\n", testGraph4());
+    printf("Testing graph 5.\n");
+    printf("Result: %d\n", testGraph5());
+    printf("Testing graph 6 (20 isolated vertices).\n");
+    printf("Result: %d\n", testGraph6());
+    printf("Testing graph 7 (complete graph over 20 vertices).\n");
+    printf("Result: %d\n", testGraph7());
+    printf("Testing graph 8.\n");
+    printf("Result: %d\n", testGraph8());
+    printf("Testing graph 9.\n");
+    printf("Result: %d\n", testGraph9());
+    printf("Testing random graph.\n");
+    printf("Result: %d\n", testRandomGraph());
     return 0;
 }
