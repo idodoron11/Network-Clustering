@@ -37,6 +37,7 @@ graph* constructGraphFromInput(char* inputFilePath){
 graph* constructGraphFromMatrix(double* adjMatrix, int n){
     graph* G = (graph*) malloc(sizeof(graph));
     int i, j;
+    assert(G != NULL);
     G->n = n;
     G->M = 0;
     G->spAdjMat = spmat_allocate_list(n);
