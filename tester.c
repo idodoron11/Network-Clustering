@@ -17,7 +17,7 @@
  * @return a graph consists of the communities given as an input.
  */
 graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
-    graph* G = (graph*) malloc(sizeof(graph));
+    graph* G;
     double* A = (double*) calloc(n*n, sizeof(double));
     int numberOfClusters = GroupList->length;
     LinkedListNode *node = GroupList->first;
@@ -25,7 +25,6 @@ graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
     VertexNode *vertexU, *vertexV;
     int i, j, k;
     double rnd;
-    assert(G != NULL);
     assert(A != NULL);
     srand(time(NULL));
 
@@ -63,7 +62,9 @@ graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
     }
 
     /* Adjacency matrix is ready. Now we create a graph out of it */
-    return constructGraphFromMatrix(A, n);
+    G = constructGraphFromMatrix(A, n);
+    free(A);
+    return G;
 }
 
 /**
@@ -130,9 +131,15 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
             for(i = 1; i < n; ++i)
                 printf(",%d", coloring2[i]);
             printf("]\n");
+            free(coloring1);
+            free(coloring2);
+            free(colorMapping);
             return 0;
         }
     }
+    free(coloring1);
+    free(coloring2);
+    free(colorMapping);
     return 1;
 }
 
