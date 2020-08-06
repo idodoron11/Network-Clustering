@@ -316,9 +316,34 @@ char testGraphFromFile(char *path){
     return result;
 }
 
+void printResultsFromOutputFile(char* output_file_path){
+    FILE *output_file = fopen(output_file_path, "rb");
+    int numberOfClusters, currentGroup, **groups;
+    unsigned int currentGroupSize, i;
+    assert(output_file != NULL);
+
+    assert(fread(&numberOfClusters, sizeof(int), 1, output_file) == 1);
+    groups = malloc(numberOfClusters * sizeof(int*));
+    assert(groups != NULL);
+    for(currentGroup = 0; currentGroup < numberOfClusters; ++currentGroup){
+        assert(fread(&currentGroupSize, sizeof(int), 1, output_file) == 1);
+        groups[currentGroup] = malloc(currentGroupSize * sizeof(int));
+        assert(groups[currentGroup] != NULL);
+        assert(fread(groups[currentGroup], sizeof(int), currentGroupSize, output_file) == currentGroupSize);
+        printf("Group %d is: ", currentGroup);
+        for(i = 0; i < currentGroupSize; ++i)
+            printf("%d, ", groups[currentGroup][i]);
+        printf("\n");
+        free(groups[currentGroup]);
+    }
+    free(groups);
+    fclose(output_file);
+}
+
 int main() {
     printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph1-adjMat.txt"));
+    printResultsFromOutputFile("output.in");
     printf("Testing graph 2 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph2-adjMat.txt"));
     /*printf("Testing graph 3 from file.\n");
@@ -337,5 +362,6 @@ int main() {
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph9-adjMat.txt"));
     printf("Testing random graph.\n");
     printf("Result: %d\n", testRandomGraph());
+
     return 0;
 }
