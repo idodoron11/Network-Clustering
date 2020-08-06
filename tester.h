@@ -19,4 +19,6 @@ char performTest(testGraph *TG);
 
 char testGraphFromFile(char *path);
 
+void printResultsFromOutputFile(char* output_file_path);
+
 #endif

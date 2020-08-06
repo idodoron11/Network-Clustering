@@ -143,6 +143,13 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
     return 1;
 }
 
+/**
+ * Creates a new graph object based on a list of edges.
+ * @param edges an integer 2d-array of size length X 2. Each row represent a single edge.
+ * @param length the number of edges
+ * @param n the number of vertices in the graph itself.
+ * @return the desired graph.
+ */
 graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
     double *adjMat = calloc(n*n, sizeof(double));
     int e, i, j;
@@ -159,6 +166,15 @@ graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
     return G;
 }
 
+/**
+ * Constructor of testGraph objects, that creates the graph by getting a list
+ * of edges as an input.
+ * @param edges an integer 2d-array of size length X 2. Each row represent a single edge.
+ * @param length the number of edges
+ * @param n the number of vertices in the graph itself.
+ * @param GroupList the list of groups the graph should be partitioned into by the division algorithm.
+ * @return a new testGraph object ready to be tested.
+ */
 testGraph *createTestGraph(int edges[][2], int length, int n, LinkedList *GroupList){
     testGraph *TG = malloc(sizeof(testGraph));
     assert(TG != NULL);
@@ -167,6 +183,10 @@ testGraph *createTestGraph(int edges[][2], int length, int n, LinkedList *GroupL
     return TG;
 }
 
+/**
+ * frees up memory allocated by a testGraph object.
+ * @param TG a testGraph object to destroy.
+ */
 void destroyTestGraph(testGraph *TG){
     int i = 0;
     LinkedListNode *groupNode = TG->GroupList->first;
@@ -181,11 +201,20 @@ void destroyTestGraph(testGraph *TG){
     free(TG);
 }
 
+/**
+ * This function takes a valid testGraph object and tests it.
+ * @param TG the testGraph object.
+ * @return 0-if the test fails. 1-otherwise.
+ */
 char performTest(testGraph *TG){
     LinkedList *result = divisionAlgorithm(TG->G);
     return checkGroupListsEquality(result, TG->GroupList, TG->G->n);
 }
 
+/**
+ * Creates a random graph and tests it.
+ * @return 0-if the test fails. 1-otherwise.
+ */
 char testRandomGraph(){
     LinkedList *GroupList;
     VerticesGroup * c[20];
@@ -219,6 +248,13 @@ char testRandomGraph(){
     return result;
 }
 
+/**
+ * This function creates a new testGraph object from an input text file.
+ * It makes it easier to "feed" the tester with new inputs.
+ * Read 'tests/readme.md' file if you want to create or modify test input files.
+ * @param path the location of the input text file.
+ * @return a new testGraph object.
+ */
 testGraph *createTestGraphFromFile(char* path){
     FILE* file = fopen(path, "r");
     char c;
@@ -307,6 +343,14 @@ testGraph *createTestGraphFromFile(char* path){
     return TG;
 }
 
+/**
+ * This function takes a test input file, converts it into a graph,
+ * runs division algorithm on it and checks whether or not the output
+ * matches the expected result.
+ * Read 'tests/readme.md' file if you want to create or modify test input files.
+ * @param path the location of the input text file.
+ * @return 0-if the test fails. 1-if the test succeeds.
+ */
 char testGraphFromFile(char *path){
     testGraph *TG = createTestGraphFromFile(path);
     char result;
@@ -316,6 +360,11 @@ char testGraphFromFile(char *path){
     return result;
 }
 
+/**
+ * This function is useful if you want to print an output file,
+ * to manually make sure it is valid or for any other purpose.
+ * @param output_file_path the location of the output file.
+ */
 void printResultsFromOutputFile(char* output_file_path){
     FILE *output_file = fopen(output_file_path, "rb");
     int numberOfClusters, currentGroup, **groups;
