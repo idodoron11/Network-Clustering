@@ -17,4 +17,6 @@ void destroyTestGraph(testGraph *TG);
 
 char performTest(testGraph *TG);
 
+char testGraphFromFile(char *path);
+
 #endif
