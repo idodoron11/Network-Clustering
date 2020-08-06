@@ -1,20 +1,23 @@
 ---
-title: פורמט קובץ בדיקה
+title: Test File Format
 ---
 
-הקובץ כולו מורכב ממספרים המופרדים על ידי רווחים ‘ ‘ וירידות שורה ‘/n’.
+The whole file consists of integers, split by spaces ‘ ‘ and line-breaks ‘\\n’.
 
-השורה הראשונה בקובץ מכילה את מימד מטריצת השכנויות (n).
+The first line (1) contains the dimension n of the adjacency matrix.
 
-השורות 2,3,...,n+1 מייצגות את מטריצת השכנויות. כלומר בכל שורה יש n מספרים
-המופרדים על ידי רווחים, ומייצגים את כניסות המטריצה באותה השורה.
+Lines 2,...,n+1 represent the adjacency matrix. Namely, each row has n numbers,
+split by spaces, which represent the corresponding row entries of the adjacency
+matrix.
 
-השורה ה-n+2 מכילה את מספר ה-communities שיש בגרף, אותו נסמן ב-k.
+Line n+2 contains the number of communities (clusters) in the input graph,
+denoted by k.
 
-השורות n+2+1,...,n+2+k מייצגות - כל אחת - קבוצת צמתים בגרף. בכל אחת מהן, איברי
-הקבוצה מופרדים על ידי רווחים.
+Lines, (n+2)+1,...,(n+2)+k represent - each - a vertices set in the input graph.
+In each of these lines, the corresponding set members are divided by spaces.
 
  
 
-\* אין חשיבות לכך שמטריצת השכנויות רשומה ב-n שורות. אם יותר נוח, אפשר לייצג את
-המטריצה הזאת על ידי שורה אחת ארוכה באורך n\*n.
+\* It is unimportant to list the entries of the adjacency matrix in n separate
+rows, though it makes the file more human-readable. If it is more convenient,
+you may represent the matrix using one big row of n\*n entries.
