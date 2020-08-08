@@ -113,8 +113,6 @@ void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
         insertItem(groupsLst, group, 0);
         return;
     }
-    /* here, i think we should split into cases depending on the eigenvalue returned by powerIteration.
-     * i'm currently leaving it as it is since it is not entirely clear. */
     maximizeModularity(group, s);
     divideGroupByS(group, s, &newGroupA, &newGroupB);
     if (newGroupA == NULL || newGroupB == NULL) {
