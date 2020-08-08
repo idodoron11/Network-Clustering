@@ -181,11 +181,9 @@ void printMatrix(Matrix *mat) {
         delimiter2 = "";
         for (j = 0; j < mat->n; j++) {
             val = readVal(mat, i, j);
-            if (val >= 0) {
-                printf("%s", delimiter2);
-                delimiter2 = ",";
-            }
-            printf("%.1f ", val);
+            printf("%s", delimiter2);
+            delimiter2 = ",";
+            printf("%.4f", val);
         }
         printf("]");
     }
