@@ -4,6 +4,7 @@
 #include <math.h>
 
 void printVect(double *vector, int length);
+
 /**
  * Generate a square matrix object
  * @param n size of matrix is nxn
@@ -52,15 +53,14 @@ void setVal(Matrix *mat, int r, int c, double val) {
     double oldVal = mat->values[r][c];
     int j;
     mat->values[r][c] = val;
-    mat->rowSums[r] += val-oldVal;
+    mat->rowSums[r] += val - oldVal;
     mat->colAbsSums[c] += fabs(val) - fabs(oldVal);
-    if(c == mat->highestColSumIndex && fabs(val) < fabs(oldVal)){
-        for(j = 0; j < mat->n; ++j){
-            if(mat->colAbsSums[j] > mat->colAbsSums[mat->highestColSumIndex])
+    if (c == mat->highestColSumIndex && fabs(val) < fabs(oldVal)) {
+        for (j = 0; j < mat->n; ++j) {
+            if (mat->colAbsSums[j] > mat->colAbsSums[mat->highestColSumIndex])
                 mat->highestColSumIndex = j;
         }
-    }
-    else if(c != mat->highestColSumIndex && mat->colAbsSums[c] > mat->colAbsSums[mat->highestColSumIndex])
+    } else if (c != mat->highestColSumIndex && mat->colAbsSums[c] > mat->colAbsSums[mat->highestColSumIndex])
         mat->highestColSumIndex = c;
 }
 
@@ -69,7 +69,7 @@ void setVal(Matrix *mat, int r, int c, double val) {
  * @param mat
  * @return norm-1 of mat, which is the maximum of colSum[i], for i=1,2,...,n.
  */
-double matrixNorm1(Matrix *mat){
+double matrixNorm1(Matrix *mat) {
     return mat->colAbsSums[mat->highestColSumIndex];
 }
 
@@ -78,7 +78,7 @@ double matrixNorm1(Matrix *mat){
  * @param mat
  * @param status should be 0 (unshift) or 1 (shift).
  */
-void setMatrixShift(Matrix *mat, char status){
+void setMatrixShift(Matrix *mat, char status) {
     mat->isShifted = status;
 }
 
@@ -87,7 +87,7 @@ void setMatrixShift(Matrix *mat, char status){
  * @param mat
  * @return True iff mat is shifted, namely mat->isShifted != 0;
  */
-char isMatrixShifted(Matrix *mat){
+char isMatrixShifted(Matrix *mat) {
     return mat->isShifted != 0;
 }
 
@@ -99,7 +99,7 @@ char isMatrixShifted(Matrix *mat){
  * @return value
  */
 double readVal(Matrix *mat, int r, int c) {
-    if(r == c && mat->isShifted != 0)
+    if (r == c && mat->isShifted != 0)
         return mat->values[r][c] + mat->colAbsSums[mat->highestColSumIndex];
     else
         return mat->values[r][c];
@@ -146,15 +146,14 @@ double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
         /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
         for (i = 0; i < mat->n; i++) {
             /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
+            x += vector[i] * vectorResult[i];
+            y += vector[i] * vector[i];
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
             if (dif >= eps) {
                 con = 1;
             }
-            x += vector[i] * vectorResult[i];
-            y += vector[i] * vector[i];
             vector[i] = vectorResult[i];
-
         }
     }
     setMatrixShift(mat, originalShiftStatus);
@@ -185,6 +184,34 @@ void printMatrix(Matrix *mat) {
 }
 
 /**
+ * Print matrix Wolfram-style
+ * @param mat
+ */
+void printMatrixPy(Matrix *mat) {
+    int i, j;
+    double val;
+    printf("[");
+    for (i = 0; i < mat->n; i++) {
+        if (i > 0) {
+            printf(",");
+        }
+        printf("[");
+        for (j = 0; j < mat->n; j++) {
+            val = readVal(mat, i, j);
+            if (j > 0) {
+                printf(",");
+            }
+            if (j == mat->n / 2) {
+                printf("\n");
+            }
+            printf("%f", val);
+        }
+        printf("]\n");
+    }
+    printf("]\n");
+}
+
+/**
  * Print vector
  * @param vector
  * @param length
@@ -196,4 +223,20 @@ void printVect(double *vector, int length) {
         printf("%f ", vector[i]);
     }
     printf(" )\n");
+}
+
+
+/**
+ * Multiply 2 vectors
+ * @param v1
+ * @param v2
+ * @return multiplication result
+ */
+double vectorMult(double *v1, double *v2, int size) {
+    int i;
+    double res = 0;
+    for (i = 0; i < size; i++) {
+        res += v1[i] * v2[i];
+    }
+    return res;
 }

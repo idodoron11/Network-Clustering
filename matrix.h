@@ -31,4 +31,8 @@ char isMatrixShifted(Matrix *mat);
 
 void printMatrix(Matrix *mat);
 
+void printMatrixPy(Matrix *mat);
+
+double vectorMult(double *v1, double *v2, int size);
+
 #endif
