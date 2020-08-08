@@ -146,15 +146,14 @@ double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
         /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
         for (i = 0; i < mat->n; i++) {
             /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
+            x += vector[i] * vectorResult[i];
+            y += vector[i] * vector[i];
             vectorResult[i] /= vectorSize;
             dif = fabs(vectorResult[i] - vector[i]);
             if (dif >= eps) {
                 con = 1;
             }
-            x += vector[i] * vectorResult[i];
-            y += vector[i] * vector[i];
             vector[i] = vectorResult[i];
-
         }
     }
     setMatrixShift(mat, originalShiftStatus);
@@ -182,6 +181,34 @@ void printMatrix(Matrix *mat) {
         }
         printf("\n");
     }
+}
+
+/**
+ * Print matrix Wolfram-style
+ * @param mat
+ */
+void printMatrixPy(Matrix *mat) {
+    int i, j;
+    double val;
+    printf("[");
+    for (i = 0; i < mat->n; i++) {
+        if (i > 0) {
+            printf(",");
+        }
+        printf("[");
+        for (j = 0; j < mat->n; j++) {
+            val = readVal(mat, i, j);
+            if (j > 0) {
+                printf(",");
+            }
+            if (j == mat->n / 2) {
+                printf("\n");
+            }
+            printf("%f", val);
+        }
+        printf("]\n");
+    }
+    printf("]\n");
 }
 
 /**
