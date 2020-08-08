@@ -18,4 +18,6 @@ void maximizeModularity(VerticesGroup *group, double *s);
 
 void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s);
 
+void saveOutputToFile(LinkedList *groupLst, char *output_path);
+
 #endif

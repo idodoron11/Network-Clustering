@@ -165,7 +165,7 @@ double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
 }
 
 /**
- * Print matrix
+ * Print matrix (python style)
  * @param mat
  */
 void printMatrix(Matrix *mat) {

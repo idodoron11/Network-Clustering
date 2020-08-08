@@ -392,7 +392,7 @@ void printResultsFromOutputFile(char* output_file_path){
 int main() {
     printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph1-adjMat.txt"));
-    printResultsFromOutputFile("output.in");
+    printResultsFromOutputFile("out");
     printf("Testing graph 2 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph2-adjMat.txt"));
     /*printf("Testing graph 3 from file.\n");

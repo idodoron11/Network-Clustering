@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "VerticesGroup.h"
 #include "matrix.h"
 #include "spmat.h"
@@ -87,7 +88,6 @@ void addSequence(VerticesGroup *group, int *sequence, int length) {
  * @return Fills group->bSubMatrix and group->bHatSubMatrix.
  */
 void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
-    VertexNode *node;
     double *row, expectedEdges;
     int i = 0, j;
     if (group->size != 0) {
@@ -95,14 +95,8 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
         group->edgesMinusBHatSubMatrix = createMatrix(group->size);
         group->bSubMatrix = createMatrix(group->size);
         group->bHatSubMatrix = createMatrix(group->size);
-        group->verticesArr = malloc(sizeof(int) * group->size);
         row = malloc(sizeof(double) * group->size);
-        node = group->first;
-        do {
-            group->verticesArr[i] = node->index;
-            i++;
-            node = node->next;
-        } while (node != group->first);
+        fillVerticesArr(group);
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(A, group->verticesArr[i], group->verticesArr[j]);
@@ -124,6 +118,18 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
 
         free(row);
     }
+}
+
+void fillVerticesArr(VerticesGroup *group){
+    VertexNode *node = group->first;
+    int i = 0;
+    group->verticesArr = malloc(sizeof(int) * group->size);
+    assert(group->verticesArr != NULL);
+    do {
+        group->verticesArr[i] = node->index;
+        ++i;
+        node = node->next;
+    } while (node != group->first);
 }
 
 /**
