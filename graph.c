@@ -34,6 +34,26 @@ graph* constructGraphFromInput(char* inputFilePath){
     return G;
 }
 
+graph* constructGraphFromMatrix(double* adjMatrix, int n){
+    graph* G = (graph*) malloc(sizeof(graph));
+    int i, j;
+    assert(G != NULL);
+    G->n = n;
+    G->M = 0;
+    G->spAdjMat = spmat_allocate_list(n);
+    G->adjMat = createMatrix(n);
+
+    for(i=0; i < n; ++i){
+        for(j=0; j < n; ++j) {
+            setVal(G->adjMat, i, j, adjMatrix[i*n+j]);
+        }
+        G->M += G->adjMat->rowSums[i];
+        G->spAdjMat->add_row(G->spAdjMat, G->adjMat->values[i], i);
+    }
+
+    return G;
+}
+
 void destroyGraph(graph* G){
     G->spAdjMat->free(G->spAdjMat);
     freeMatrix(G->adjMat);

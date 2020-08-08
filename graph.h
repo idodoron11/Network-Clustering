@@ -20,13 +20,19 @@ typedef struct _graph {
 } graph;
 
 /**
- * Creates a new graph object.
- * @param n number of vertices
- * @param m number of edges
- * @param input a path to an input file of a graph
- * @return a reference to a new graph object, defined by the given adjacency matrix.
+ * Creates a new graph object from an input file.
+ * @param inputFilePath a path to an input file of a graph
+ * @return a reference to a new graph object, defined by the given input file.
  */
 graph* constructGraphFromInput(char* inputFilePath);
+
+/**
+ * Creates a nee graph object from an input matrix.
+ * @param adjMatrix the adjacency matrix given as an input.
+ * @param n the number of vertices.
+ * @return a reference to a new graph object, defined by the given adjacency matrix.
+ */
+graph* constructGraphFromMatrix(double* adjMatrix, int n);
 
 /**
  * Frees up any memory resources that have been dynamically allocated by the graph construction.

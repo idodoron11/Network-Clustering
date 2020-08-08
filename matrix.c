@@ -171,16 +171,22 @@ double powerIteration(Matrix *mat, double *vector, double *vectorResult) {
 void printMatrix(Matrix *mat) {
     int i, j;
     double val;
+    char *delimiter1 = "[";
+    char *delimiter2 = "";
+    printf("[");
     for (i = 0; i < mat->n; i++) {
+        printf("%s", delimiter1);
+        delimiter1 = ",\n[";
+        delimiter2 = "";
         for (j = 0; j < mat->n; j++) {
             val = readVal(mat, i, j);
-            if (val >= 0) {
-                printf(" ");
-            }
-            printf("%.1f ", val);
+            printf("%s", delimiter2);
+            delimiter2 = ",";
+            printf("%.4f", val);
         }
-        printf("\n");
+        printf("]");
     }
+    printf("]\n");
 }
 
 /**
