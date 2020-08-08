@@ -75,7 +75,7 @@ void maximizeModularity(VerticesGroup *group, double *s) {
         node = group->first;
         maxNodeRef = NULL;
         for (j = 0; j < group->size; j++) {
-            if(s[j] == 0)
+            if (s[j] == 0)
                 s[j] = 0.0001;
             if (!node->hasMoved) {
                 s[j] = -s[j];
@@ -101,15 +101,18 @@ void maximizeModularity(VerticesGroup *group, double *s) {
 
 void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
     VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
+    double lambda;
     if (group->size == 1) {
         insertItem(groupsLst, group, 0);
         return;
     }
     calculateSubMatrix(G->adjMat, G->M, group);
     randVector(vector, group->size);
-    powerIteration(group->bHatSubMatrix, vector, s);
-    /* here, i think we should split into cases depending on the eigenvalue returned by powerIteration.
-     * i'm currently leaving it as it is since it is not entirely clear. */
+    lambda = powerIteration(group->bHatSubMatrix, vector, s);
+    if (lambda <= 0) {
+        insertItem(groupsLst, group, 0);
+        return;
+    }
     maximizeModularity(group, s);
     divideGroupByS(group, s, &newGroupA, &newGroupB);
     if (newGroupA == NULL || newGroupB == NULL) {
