@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "VerticesGroup.h"
 #include "matrix.h"
 #include "spmat.h"
+#include "ErrorHandler.h"
 
 VerticesGroup *createVerticesGroup() {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
@@ -124,7 +124,7 @@ void fillVerticesArr(VerticesGroup *group){
     VertexNode *node = group->first;
     int i = 0;
     group->verticesArr = malloc(sizeof(int) * group->size);
-    assert(group->verticesArr != NULL);
+    assertMemoryAllocation(group->verticesArr);
     do {
         group->verticesArr[i] = node->index;
         ++i;

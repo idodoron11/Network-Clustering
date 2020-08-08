@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include <assert.h>
 #include "tester.h"
+#include "ErrorHandler.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -25,13 +25,14 @@ graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
     VertexNode *vertexU, *vertexV;
     int i, j, k;
     double rnd;
-    assert(A != NULL);
+    assertMemoryAllocation(A);
+    assertMemoryAllocation(A);
     srand(time(NULL));
 
     for(i = 0; i < numberOfClusters; ++i){
         currentGroup = node->pointer;
-        assert(currentGroup != NULL);
-        assert(currentGroup->size > 0);
+        assertBooleanStatement(currentGroup != NULL);
+        assertBooleanStatement(currentGroup->size > 0);
         vertexU = currentGroup->first;
         vertexV = vertexU->next;
 
@@ -91,9 +92,9 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
     coloring1 = (int*) malloc(n * sizeof(int));
     coloring2 = (int*) malloc(n * sizeof(int));
     colorMapping = (int*) malloc(numberOfGroups * sizeof(int));
-    assert(coloring1 != NULL);
-    assert(coloring2 != NULL);
-    assert(colorMapping != NULL);
+    assertMemoryAllocation(coloring1);
+    assertMemoryAllocation(coloring2);
+    assertMemoryAllocation(colorMapping);
     for(i=0; i < numberOfGroups; ++i)
         colorMapping[i] = -1;
 
@@ -154,7 +155,7 @@ graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
     double *adjMat = calloc(n*n, sizeof(double));
     int e, i, j;
     graph *G;
-    assert(adjMat != NULL);
+    assertMemoryAllocation(adjMat);
     for(e = 0; e < length; ++e){
         i = edges[e][0];
         j = edges[e][1];
@@ -177,7 +178,7 @@ graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
  */
 testGraph *createTestGraph(int edges[][2], int length, int n, LinkedList *GroupList){
     testGraph *TG = malloc(sizeof(testGraph));
-    assert(TG != NULL);
+    assertMemoryAllocation(TG);
     TG->G = createGraphFromEdgesGroup(edges, length, n);
     TG->GroupList = GroupList;
     return TG;
@@ -267,8 +268,8 @@ testGraph *createTestGraphFromFile(char* path){
     LinkedList *groupList;
     testGraph *TG = malloc(sizeof(testGraph));
     graph *G = malloc(sizeof(graph));
-    assert(TG != NULL);
-    assert(G != NULL);
+    assertMemoryAllocation(TG);
+    assertMemoryAllocation(G);
     if (file == NULL){
         printf("Could not open file %s",path);
         return NULL;
@@ -283,7 +284,7 @@ testGraph *createTestGraphFromFile(char* path){
                 i = 0;
                 ++count;
                 adjMatrix = malloc(n*n*sizeof(double));
-                assert(adjMatrix != NULL);
+                assertMemoryAllocation(adjMatrix);
             } else if (i < 9) {
                 word[i] = c;
                 ++i;
@@ -308,7 +309,7 @@ testGraph *createTestGraphFromFile(char* path){
                 i = 0;
                 ++count;
                 group = malloc(numberOfClusters * sizeof(VerticesGroup));
-                assert(group != NULL);
+                assertMemoryAllocation(group);
                 group[0] = createVerticesGroup();
             } else if (i < 9) {
                 word[i] = c;
@@ -354,7 +355,7 @@ testGraph *createTestGraphFromFile(char* path){
 char testGraphFromFile(char *path){
     testGraph *TG = createTestGraphFromFile(path);
     char result;
-    assert(TG != NULL);
+    assertMemoryAllocation(TG);
     result = performTest(TG);
     destroyTestGraph(TG);
     return result;
@@ -369,16 +370,17 @@ void printResultsFromOutputFile(char* output_file_path){
     FILE *output_file = fopen(output_file_path, "rb");
     int numberOfClusters, currentGroup, **groups;
     unsigned int currentGroupSize, i;
-    assert(output_file != NULL);
+    assertFileOpen(output_file, output_file_path);
 
-    assert(fread(&numberOfClusters, sizeof(int), 1, output_file) == 1);
+    assertFileRead(fread(&numberOfClusters, sizeof(int), 1, output_file), 1, output_file_path);
     groups = malloc(numberOfClusters * sizeof(int*));
-    assert(groups != NULL);
+    assertMemoryAllocation(groups);
     for(currentGroup = 0; currentGroup < numberOfClusters; ++currentGroup){
-        assert(fread(&currentGroupSize, sizeof(int), 1, output_file) == 1);
+        assertFileRead(fread(&currentGroupSize, sizeof(int), 1, output_file), 1, output_file_path);
         groups[currentGroup] = malloc(currentGroupSize * sizeof(int));
-        assert(groups[currentGroup] != NULL);
-        assert(fread(groups[currentGroup], sizeof(int), currentGroupSize, output_file) == currentGroupSize);
+        assertMemoryAllocation(groups[currentGroup]);
+        assertFileRead(fread(groups[currentGroup], sizeof(int), currentGroupSize, output_file), currentGroupSize,
+                       output_file_path);
         printf("Group %d is: ", currentGroup);
         for(i = 0; i < currentGroupSize; ++i)
             printf("%d, ", groups[currentGroup][i]);

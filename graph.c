@@ -1,25 +1,25 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include "graph.h"
+#include "ErrorHandler.h"
 
 graph* constructGraphFromInput(char* inputFilePath){
     graph* G = (graph*) malloc(sizeof(graph));
     int n, i, j, k;
     int* list;
     FILE* graph_file = fopen(inputFilePath, "rb");
-    assert(graph_file != NULL);
-    assert(fread(&n, sizeof(int), 1, graph_file) == 1);
+    assertMemoryAllocation(graph_file);
+    assertFileRead(fread(&n, sizeof(int), 1, graph_file), 1, inputFilePath);
     list = malloc(sizeof(int) * n);
-    assert(list != NULL);
+    assertMemoryAllocation(list);
     G->n = n;
     G->M = 0;
     G->spAdjMat = spmat_allocate_list(n);
     G->adjMat = createMatrix(n);
 
     for(i=0; i < n; ++i){
-        assert(fread(&k, sizeof(int), 1, graph_file) == 1);
-        assert(fread(list, sizeof(int), k, graph_file) == (unsigned int) k);
+        assertFileRead(fread(&k, sizeof(int), 1, graph_file), 1, inputFilePath);
+        assertFileRead(fread(list, sizeof(int), k, graph_file), k, inputFilePath);
         G->M += k;
         while(k>0){
             --k;
@@ -37,7 +37,7 @@ graph* constructGraphFromInput(char* inputFilePath){
 graph* constructGraphFromMatrix(double* adjMatrix, int n){
     graph* G = (graph*) malloc(sizeof(graph));
     int i, j;
-    assert(G != NULL);
+    assertMemoryAllocation(G);
     G->n = n;
     G->M = 0;
     G->spAdjMat = spmat_allocate_list(n);

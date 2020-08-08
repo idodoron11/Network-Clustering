@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mem.h>
-#include <assert.h>
 #include "division.h"
+#include "ErrorHandler.h"
 
 /**
  * Generate a random vector
@@ -145,14 +145,15 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path){
     LinkedListNode *currentNode = groupLst->first;
     VerticesGroup *currentGroup;
     int i;
-    assert(output_file != NULL);
-    assert(fwrite(&groupLst->length, sizeof(int), 1, output_file) == 1);
+    assertFileOpen(output_file, output_path);
+    assertFileWrite(fwrite(&groupLst->length, sizeof(int), 1, output_file), 1, output_path);
     for(i = 0; i < groupLst->length; ++i){
         currentGroup = currentNode->pointer;
-        assert(fwrite(&currentGroup->size, sizeof(int), 1, output_file) == 1);
+        assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
         if(currentGroup->verticesArr == NULL)
             fillVerticesArr(currentGroup);
-        assert(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file) == (unsigned int)currentGroup->size);
+        assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
+                        currentGroup->size, output_path);
         currentNode = currentNode->next;
     }
     fclose(output_file);
