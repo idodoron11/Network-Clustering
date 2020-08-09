@@ -15,6 +15,7 @@ LinkedList *createLinkedList(){
 
 /**
  * Destroys a given list and frees up its allocated memory.
+ * Does NOT free the pointers nodes are pointing to.
  * @param list a linked list.
  */
 void freeLinkedList(LinkedList *list){
@@ -28,6 +29,23 @@ void freeLinkedList(LinkedList *list){
         } while (node != list->first);
     }
     free(list);
+}
+
+/**
+ * Destroys a given GROUP list and frees up its allocated memory.
+ * It also destroys every group in the list.
+ * @param list a linked list, containing pointers to VerticesGroups.
+ */
+void deepFreeGroupList(LinkedList *groupList){
+    LinkedListNode *node = groupList->first;
+    VerticesGroup *group;
+    int i;
+    for(i = 0; i < groupList->length; ++i){
+        group = node->pointer;
+        freeVerticesGroup(group);
+        node = node->next;
+    }
+    freeLinkedList(groupList);
 }
 
 /**

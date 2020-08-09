@@ -99,6 +99,7 @@ void maximizeModularity(VerticesGroup *group, double *s) {
         }
     }
     memcpy(s, maxS, group->size);
+    free(maxS);
 }
 
 void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
@@ -140,6 +141,8 @@ LinkedList *divisionAlgorithm(graph *G) {
     }
     groupsLst = createLinkedList();
     divisionAlgRec(G, group, groupsLst, vector, s);
+    free(vector);
+    free(s);
     return groupsLst;
 }
 

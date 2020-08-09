@@ -35,6 +35,7 @@ void freeVerticesGroup(VerticesGroup *group) {
     if (group->edgeSubMatrix != NULL) {
         group->edgeSubMatrix->free(group->edgeSubMatrix);
     }
+    free(group);
 }
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index) {

@@ -83,6 +83,7 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
     VerticesGroup *G1, *G2;
     VertexNode *vertex1, *vertex2;
     int *coloring1, *coloring2, *colorMapping;
+    int n1 = 0,  n2 = 0;
     int numberOfGroups = GroupList1->length;
     if(numberOfGroups != GroupList2->length) {
         printf("The first partition consists of %d groups, while the second consists of %d groups.\n", GroupList1->length, GroupList2->length);
@@ -102,6 +103,8 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
         G2 = node2->pointer;
         vertex1 = G1->first;
         vertex2 = G2->first;
+        n1 += G1->size;
+        n2 += G2->size;
         for(j = 0; j < G1->size; ++j){
             coloring1[vertex1->index] = i;
             vertex1 = vertex1->next;
@@ -112,6 +115,14 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
         }
         node1 = node1->next;
         node2 = node2->next;
+    }
+    if(n1 != n2) {
+        printf("The two partitions have different total number of vertices.\n"
+               "The first consists of %d vertices, while the second consists of %d.\n", n1, n2);
+        free(colorMapping);
+        free(coloring2);
+        free(coloring1);
+        return 0;
     }
     for(j = 0; j < n; ++j){
         if(colorMapping[coloring1[j]] == -1)
@@ -219,13 +230,13 @@ char testRandomGraph(){
     LinkedList *GroupList;
     VerticesGroup * c[20];
     testGraph* TG = malloc(sizeof(testGraph));
-    assertMemoryAllocation(TG);
     int n = 20;
     int C1[5] = {0,1,2,3,4};
     int C2[10] = {5,6,7,8,9,10,11,12,13,14};
     int C3[5] = {19,18,17,16,15};
     graph *G;
     char result;
+    assertMemoryAllocation(TG);
 
     /* random community graph */
     GroupList = createLinkedList();
@@ -374,10 +385,10 @@ void printResultsFromOutputFile(char* output_file_path){
     assertFileOpen(output_file, output_file_path);
 
     assertFileRead(fread(&numberOfClusters, sizeof(int), 1, output_file), 1, output_file_path);
+    printf("There are %d clusters.\n", numberOfClusters);
     groups = malloc(numberOfClusters * sizeof(int*));
     assertMemoryAllocation(groups);
     for(currentGroup = 0; currentGroup < numberOfClusters; ++currentGroup){
-        assertFileRead(fread(&currentGroupSize, sizeof(int), 1, output_file), 1, output_file_path);
         assertFileRead(fread(&currentGroupSize, sizeof(int), 1, output_file), 1, output_file_path);
         groups[currentGroup] = malloc(currentGroupSize * sizeof(int));
         assertMemoryAllocation(groups[currentGroup]);
@@ -396,7 +407,7 @@ void printResultsFromOutputFile(char* output_file_path){
 int main() {
     printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph1-adjMat.txt"));
-    printResultsFromOutputFile("out");
+    /*printResultsFromOutputFile("out");*/
     printf("Testing graph 2 from file.\n");
     printf("Result: %d\n", testGraphFromFile("D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graph2-adjMat.txt"));
     /*printf("Testing graph 3 from file.\n");
