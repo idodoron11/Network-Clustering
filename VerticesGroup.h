@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include "spmat.h"
+#include "graph.h"
 
 typedef struct vertexNode {
     int index;
@@ -17,10 +18,11 @@ typedef struct verticesGroup {
     int size;
     int *verticesArr;
     spmat *edgeSubMatrix;
-    /*a matrix that equals bHat-A*/
-    Matrix *edgesMinusBHatSubMatrix;
-    Matrix *bSubMatrix;
-    Matrix *bHatSubMatrix;
+    /* TODO: no need to save the modularitySubMatrix */
+    Matrix *modularitySubMatrix;
+    double *modularityRowSums;
+    double *modularityAbsColSum;
+    int highestColSumIndex;
 
 } VerticesGroup;
 
@@ -30,12 +32,14 @@ void freeVerticesGroup(VerticesGroup *group);
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index);
 
-void removeVertexFromGroup(VerticesGroup *group, VertexNode *node);
+void calculateModularitySubMatrix(Graph *G, VerticesGroup *group);
 
-void addSequence(VerticesGroup *group, int *sequence, int length);
+double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides);
 
-void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group);
+double calculateModularity(Graph *G, VerticesGroup *group, double *s);
 
-double calculateModularity(VerticesGroup *group, double *s);
+double getModularityMatrixNorm1(VerticesGroup *group);
+
+double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *vectorResult);
 
 #endif

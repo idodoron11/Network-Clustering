@@ -5,19 +5,22 @@
 #include "spmat.h"
 
 typedef struct _graph {
-    /* Number of vertices.
+    /* number of vertices.
      * V={1,2,...,n} */
-    int	n;
+    int n;
 
-    /* Adjacency matrix of size nXn
+    /* adjacency matrix of size nXn
      * E={(i,j) s.t. spAdjMat[i*n + j]=1} */
-    Matrix* adjMat;
-    spmat* spAdjMat;
+    Matrix *adjMat;
+    spmat *spAdjMat;
+    /* the degrees of the graph's vertices */
+    int *degrees;
+    /* sum of vertices' degrees */
+    int degreeSum;
+    /* "K", a symmetric matrix, each entry i,j equals degrees[i]*degrees[j]/degreeSum */
+    Matrix *expectedEdges;
 
-    /* Sum of Degrees */
-    int M;
-
-} graph;
+} Graph;
 
 /**
  * Creates a new graph object.
@@ -26,13 +29,13 @@ typedef struct _graph {
  * @param input a path to an input file of a graph
  * @return a reference to a new graph object, defined by the given adjacency matrix.
  */
-graph* constructGraphFromInput(char* inputFilePath);
+Graph *constructGraphFromInput(char *inputFilePath);
 
 /**
  * Frees up any memory resources that have been dynamically allocated by the graph construction.
  * @param G a pointer to a graph
  */
-void destroyGraph(graph* G);
+void destroyGraph(Graph *G);
 
 /**
  * Returns the value kept in the (i,j) entry of G's adjacency matrix.
@@ -41,19 +44,12 @@ void destroyGraph(graph* G);
  * @param j the vertex to which the edge enters. Should satisfy 0 <= j < G->n.
  * @return 1 if the edge (i,j) exists, and 0 otherwise.
  */
-int getEdge(graph* G, int i, int j);
+int getEdge(Graph *G, int i, int j);
 
 /**
  * Prints a representation of G.
  * @param G a not too large graph.
  */
-void printGraph(graph* G);
-
-/**
- * @param G a graph.
- * @param i a vertex in G. should satisfy 0 <= i < G->n.
- * @return The degree of vertex i, namely the number of undirected edges it's connected to.
- */
-int getDegree(graph* G, int i);
+void printGraph(Graph *G);
 
 #endif /*GRAPH_H*/

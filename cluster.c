@@ -14,7 +14,8 @@ int main() {
     LinkedListNode *node;
     VerticesGroup *group;
     VertexNode *vNode;
-    graph *G = constructGraphFromInput("graph.in");
+    Graph *G = constructGraphFromInput(
+            "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\graph.in");
     srand(time(0));
     groupsLst = divisionAlgorithm(G);
     node = groupsLst->first;

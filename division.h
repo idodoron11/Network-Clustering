@@ -6,16 +6,16 @@
 #include "VerticesGroup.h"
 #include "LinkedList.h"
 
-LinkedList *divisionAlgorithm(graph *G);
+LinkedList *divisionAlgorithm(Graph *G);
 
 void randVector(double *vector, int n);
 
 void printVector(double *vector, int length);
 
-void divideGroupByS(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB);
+void divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB);
 
-void maximizeModularity(VerticesGroup *group, double *s);
+void maximizeModularity(Graph *G, VerticesGroup *group, double *s);
 
-void divisionAlgRec(graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s);
+void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s);
 
 #endif

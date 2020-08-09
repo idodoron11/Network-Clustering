@@ -1,16 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "VerticesGroup.h"
 #include "matrix.h"
 #include "spmat.h"
+#include "defs.h"
 
 VerticesGroup *createVerticesGroup() {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
     group->size = 0;
-    group->edgesMinusBHatSubMatrix = NULL;
     group->edgeSubMatrix = NULL;
-    group->bSubMatrix = NULL;
-    group->bHatSubMatrix = NULL;
+    group->modularitySubMatrix = NULL;
+    group->modularityRowSums = NULL;
+    group->modularityAbsColSum = NULL;
     return group;
 }
 
@@ -24,14 +26,13 @@ void freeVerticesGroup(VerticesGroup *group) {
             node = temp;
         } while (node != group->first);
     }
-    if (group->bHatSubMatrix != NULL) {
-        freeMatrix(group->bHatSubMatrix);
-    }
-    if (group->edgesMinusBHatSubMatrix != NULL) {
-        freeMatrix(group->edgesMinusBHatSubMatrix);
-    }
+
     if (group->edgeSubMatrix != NULL) {
+        /* the modulary was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
+        freeMatrix(group->modularitySubMatrix);
+        free(group->modularityRowSums);
+        free(group->modularityAbsColSum);
     }
 }
 
@@ -53,49 +54,31 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
     return node;
 }
 
-void removeVertexFromGroup(VerticesGroup *group, VertexNode *node) {
-    if (group->first == node) {
-        if (group->size == 1) {
-            group->first = NULL;
-        } else {
-            group->first = node->next;
-        }
-    }
-    node->prev->next = node->next;
-    node->next->prev = node->prev;
-    group->size--;
-    free(node);
+/**
+ * Get the 1-norm of the modularity matrix
+ * @param group vertices group
+ * @return 1-norm
+ */
+double getModularityMatrixNorm1(VerticesGroup *group) {
+    return group->modularityAbsColSum[group->highestColSumIndex];
 }
 
 /**
- * Adds a sequence of indices to the group.
- * @param group the group to which nodes are added.
- * @param sequence a sequence of integers, representing nodes in a graph.
- * @param length the length of the input sequence.
+ * Calculate the modularity sub matrix in the VerticesGroup object
+ * @param G graph object
+ * @param group vertices group containing the modularity sub matrix
  */
-void addSequence(VerticesGroup *group, int *sequence, int length) {
-    int i;
-    for (i = 0; i < length; ++i)
-        addVertexToGroup(group, sequence[i]);
-}
-
-/**
- * Create sub matrix
- * @param A edges matrix
- * @param M degrees sum
- * @param group
- * @return Fills group->bSubMatrix and group->bHatSubMatrix.
- */
-void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
+void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
     VertexNode *node;
-    double *row, expectedEdges;
+    double *row, modularityEntry;
     int i = 0, j;
     if (group->size != 0) {
-        group->edgeSubMatrix = spmat_allocate_list(group->size);
-        group->edgesMinusBHatSubMatrix = createMatrix(group->size);
-        group->bSubMatrix = createMatrix(group->size);
-        group->bHatSubMatrix = createMatrix(group->size);
         group->verticesArr = malloc(sizeof(int) * group->size);
+        group->edgeSubMatrix = spmat_allocate_list(group->size);
+        group->modularitySubMatrix = createMatrix(group->size);
+        group->modularityRowSums = calloc(group->size, sizeof(double));
+        group->modularityAbsColSum = calloc(group->size, sizeof(double));
+        group->highestColSumIndex = 0;
         row = malloc(sizeof(double) * group->size);
         node = group->first;
         do {
@@ -105,20 +88,25 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
         } while (node != group->first);
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
-                row[j] = readVal(A, group->verticesArr[i], group->verticesArr[j]);
-                /* For each vertex v: A[v][0] + ... + A[v][n-1] = deg(v) */
-                expectedEdges = A->rowSums[group->verticesArr[i]] * A->rowSums[group->verticesArr[j]] / M;
-                setVal(group->edgesMinusBHatSubMatrix, i, j, -expectedEdges);
-                setVal(group->bSubMatrix, i, j, row[j] - expectedEdges);
-                /* the case where delta(i,j)=0 */
+                row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
+                modularityEntry = row[j] - readVal(G->expectedEdges, i, j);
+                setVal(group->modularitySubMatrix, i, j, modularityEntry);
+                group->modularityRowSums[i] += modularityEntry;
                 if (i != j) {
-                    setVal(group->bHatSubMatrix, i, j, row[j] - expectedEdges);
+                    /* the case of non diagonal values.
+                     * the modularity matrix is symmetric, so we can add row sums instead of columns */
+                    group->modularityAbsColSum[i] += fabs(modularityEntry);
                 }
             }
-            /* the case where i=j and so delta(i,j)=1. we subtract deg(i) from B[g][i][j]. */
-            setVal(group->bHatSubMatrix, i, i, readVal(group->bSubMatrix, i, i) - group->bSubMatrix->rowSums[i]);
-            setVal(group->edgesMinusBHatSubMatrix, i, i,
-                   readVal(group->edgesMinusBHatSubMatrix, i, i) - group->bSubMatrix->rowSums[i]);
+            /* handle diagonal values */
+            modularityEntry = readVal(group->modularitySubMatrix, i, i) - group->modularityRowSums[i];
+            setVal(group->modularitySubMatrix, i, i, modularityEntry);
+            group->modularityAbsColSum[i] += fabs(modularityEntry);
+            if (group->modularityAbsColSum[i] >= getModularityMatrixNorm1(group)) {
+                /* replace highest column absolute sum */
+                group->highestColSumIndex = i;
+            }
+            /* TODO: improve instead of adding row at a time */
             group->edgeSubMatrix->add_row(group->edgeSubMatrix, row, i);
         }
 
@@ -127,19 +115,84 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
 }
 
 /**
+ * Multiply the modularity matrix of a sub group of vertices by an eigenvector: s_t*B*s
+ * @param group the vertices group of the modularity matrix
+ * @param s eigenvector to multiply by
+ * @param res the vector multiplication result, should be allocated
+ * @param bothSides boolean, if set to 0 will only multiply by s on the right,
+ * storing the result in res and returning the the norm of res
+ * @return multiplication result (or the vector's norm if bothSides=0)
+ */
+double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides) {
+    int i;
+    double numRes = 0;
+    /* the common value of all rows of the multiplication of the expectedEdges (K) matrix by s */
+    double degreesCommon = 0, modularityNorm1 = getModularityMatrixNorm1(group);
+    group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
+    for (i = 0; i < group->size; i++) {
+        degreesCommon += G->degrees[i] * s[i];
+        res[i] += (modularityNorm1 - group->modularityRowSums[i]) * s[i];
+    }
+    for (i = 0; i < group->size; i++) {
+        res[i] -= G->degrees[i] * degreesCommon / G->degreeSum;
+        if (bothSides) {
+            numRes += s[i] * res[i];
+        } else {
+            numRes += res[i] * res[i];
+        }
+    }
+    if (!bothSides) {
+        /* if the result is a vector, we return its norm */
+        numRes = sqrt(numRes);
+    }
+    return numRes;
+}
+
+/**
  * Calculate modularity delta of group's division given by an eigenvector
  * @param group
  * @param s eigenvector
- * @return
+ * @return modularity
  */
-double calculateModularity(VerticesGroup *group, double *s) {
+double calculateModularity(Graph *G, VerticesGroup *group, double *s) {
     double *res, numRes;
     res = malloc(group->size * sizeof(double));
-    group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
-    numRes = vectorMult(s, res, group->size);
-    matrixVectorMult(group->edgesMinusBHatSubMatrix, s, res);
-    numRes -= vectorMult(s, res, group->size);
+    numRes = multiplyModularityByVector(G, group, s, res, 1);
     numRes *= 0.5;
     free(res);
     return numRes;
+}
+
+/**
+ * Perform the power iteration algorithm
+ * @param group a vertices group, containing the modularity sub matrix
+ * @param vector initial vector for the algorithm
+ * @param vectorResult the eigenvector found by the algorithm, should be allocated
+ * @return the eigenvalue of the eigenvector 'vectorResult'.
+ */
+double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *vectorResult) {
+    int i, con = 1;
+    double vectorNorm, dif, lambda, x, y;
+    while (con) {
+        x = y = 0;
+        vectorNorm = multiplyModularityByVector(G, group, vector, vectorResult, 0);
+        con = 0;
+        /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
+        for (i = 0; i < group->size; i++) {
+            /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
+            x += vector[i] * vectorResult[i];
+            y += vector[i] * vector[i];
+            vectorResult[i] /= vectorNorm;
+            dif = fabs(vectorResult[i] - vector[i]);
+            if (IS_POSITIVE(dif)) {
+                con = 1;
+            }
+            vector[i] = vectorResult[i];
+        }
+    }
+
+    /* compute the corresponding eigenvalue (with respect to the un-shifted B_hat) */
+    lambda = x / y;
+    lambda -= getModularityMatrixNorm1(group);
+    return lambda;
 }
