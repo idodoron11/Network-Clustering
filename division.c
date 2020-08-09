@@ -70,6 +70,7 @@ void maximizeModularity(VerticesGroup *group, double *s) {
     VertexNode *node, *maxNodeRef;
     double modularity, maxModularity, maxIterationModularity;
     double *maxS = malloc(group->size * sizeof(double));
+    assertMemoryAllocation(maxS);
     memcpy(maxS, s, group->size);
     maxModularity = calculateModularity(group, s);
     for (i = 0; i < group->size; i++) {
@@ -130,7 +131,9 @@ LinkedList *divisionAlgorithm(graph *G) {
     LinkedList *groupsLst;
     VerticesGroup *group;
     vector = malloc(G->n * sizeof(double));
+    assertMemoryAllocation(vector);
     s = malloc(G->n * sizeof(double));
+    assertMemoryAllocation(s);
     group = createVerticesGroup();
     for (i = 0; i < G->n; i++) {
         addVertexToGroup(group, i);

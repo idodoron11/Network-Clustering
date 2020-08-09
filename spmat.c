@@ -30,8 +30,11 @@ nodeRef row_to_list(double const *row, int n) {
         if (row[i] != 0) {
             if (head == NULL) {
                 head = tail = malloc(sizeof(node));
+                assertMemoryAllocation(tail);
+                assertBooleanStatement(head == tail);
             } else {
                 tail->next = malloc(sizeof(node));
+                assertMemoryAllocation(tail->next);
                 tail = tail->next;
             }
             tail->value = row[i];

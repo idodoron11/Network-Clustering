@@ -7,6 +7,7 @@
 
 VerticesGroup *createVerticesGroup() {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
+    assertMemoryAllocation(group);
     group->size = 0;
     group->edgesMinusBHatSubMatrix = NULL;
     group->edgeSubMatrix = NULL;
@@ -38,6 +39,7 @@ void freeVerticesGroup(VerticesGroup *group) {
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
     VertexNode *node = malloc(sizeof(VertexNode));
+    assertMemoryAllocation(node);
     node->index = index;
     node->hasMoved = 0;
     if (group->size != 0) {
@@ -96,6 +98,7 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
         group->bSubMatrix = createMatrix(group->size);
         group->bHatSubMatrix = createMatrix(group->size);
         row = malloc(sizeof(double) * group->size);
+        assertMemoryAllocation(row);
         fillVerticesArr(group);
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
@@ -141,6 +144,7 @@ void fillVerticesArr(VerticesGroup *group){
 double calculateModularity(VerticesGroup *group, double *s) {
     double *res, numRes;
     res = malloc(group->size * sizeof(double));
+    assertMemoryAllocation(res);
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
     numRes = vectorMult(s, res, group->size);
     matrixVectorMult(group->edgesMinusBHatSubMatrix, s, res);

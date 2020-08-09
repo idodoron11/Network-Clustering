@@ -8,7 +8,8 @@ graph* constructGraphFromInput(char* inputFilePath){
     int n, i, j, k;
     int* list;
     FILE* graph_file = fopen(inputFilePath, "rb");
-    assertMemoryAllocation(graph_file);
+    assertMemoryAllocation(G);
+    assertFileOpen(graph_file, inputFilePath);
     assertFileRead(fread(&n, sizeof(int), 1, graph_file), 1, inputFilePath);
     list = malloc(sizeof(int) * n);
     assertMemoryAllocation(list);

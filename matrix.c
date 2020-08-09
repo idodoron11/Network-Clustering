@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "matrix.h"
+#include "ErrorHandler.h"
 #include <math.h>
 
 void printVect(double *vector, int length);
@@ -13,15 +14,18 @@ void printVect(double *vector, int length);
 Matrix *createMatrix(int n) {
     int i;
     Matrix *mat = malloc(sizeof(Matrix));
+    assertMemoryAllocation(mat);
     mat->n = n;
     mat->values = malloc(sizeof(double *) * n);
+    assertMemoryAllocation(mat->values);
     for (i = 0; i < n; i++) {
         mat->values[i] = calloc(n, sizeof(double));
+        assertMemoryAllocation(mat->values[i]);
     }
     mat->rowSums = calloc(n, sizeof(double));
-    /* If the matrix is non-symmetric, colSum[i] doesn't necessarily have to be rowSum[i].
-     * Yet, if we know the matrix is symmetric in advance, it might be a little waste of memory. */
+    assertMemoryAllocation(mat->rowSums);
     mat->colAbsSums = calloc(n, sizeof(double));
+    assertMemoryAllocation(mat->colAbsSums);
     mat->highestColSumIndex = 0;
     mat->isShifted = 0;
     return mat;

@@ -26,7 +26,6 @@ graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
     int i, j, k;
     double rnd;
     assertMemoryAllocation(A);
-    assertMemoryAllocation(A);
     srand(time(NULL));
 
     for(i = 0; i < numberOfClusters; ++i){
@@ -220,6 +219,7 @@ char testRandomGraph(){
     LinkedList *GroupList;
     VerticesGroup * c[20];
     testGraph* TG = malloc(sizeof(testGraph));
+    assertMemoryAllocation(TG);
     int n = 20;
     int C1[5] = {0,1,2,3,4};
     int C2[10] = {5,6,7,8,9,10,11,12,13,14};
@@ -268,6 +268,7 @@ testGraph *createTestGraphFromFile(char* path){
     LinkedList *groupList;
     testGraph *TG = malloc(sizeof(testGraph));
     graph *G = malloc(sizeof(graph));
+    assertFileOpen(file, path);
     assertMemoryAllocation(TG);
     assertMemoryAllocation(G);
     if (file == NULL){
@@ -376,6 +377,7 @@ void printResultsFromOutputFile(char* output_file_path){
     groups = malloc(numberOfClusters * sizeof(int*));
     assertMemoryAllocation(groups);
     for(currentGroup = 0; currentGroup < numberOfClusters; ++currentGroup){
+        assertFileRead(fread(&currentGroupSize, sizeof(int), 1, output_file), 1, output_file_path);
         assertFileRead(fread(&currentGroupSize, sizeof(int), 1, output_file), 1, output_file_path);
         groups[currentGroup] = malloc(currentGroupSize * sizeof(int));
         assertMemoryAllocation(groups[currentGroup]);
