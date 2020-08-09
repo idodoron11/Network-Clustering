@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mem.h>
+#include <assert.h>
 #include "division.h"
 
 /**
@@ -137,4 +138,22 @@ LinkedList *divisionAlgorithm(graph *G) {
     groupsLst = createLinkedList();
     divisionAlgRec(G, group, groupsLst, vector, s);
     return groupsLst;
+}
+
+void saveOutputToFile(LinkedList *groupLst, char *output_path){
+    FILE *output_file = fopen(output_path, "wb");
+    LinkedListNode *currentNode = groupLst->first;
+    VerticesGroup *currentGroup;
+    int i;
+    assert(output_file != NULL);
+    assert(fwrite(&groupLst->length, sizeof(int), 1, output_file) == 1);
+    for(i = 0; i < groupLst->length; ++i){
+        currentGroup = currentNode->pointer;
+        assert(fwrite(&currentGroup->size, sizeof(int), 1, output_file) == 1);
+        if(currentGroup->verticesArr == NULL)
+            fillVerticesArr(currentGroup);
+        assert(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file) == (unsigned int)currentGroup->size);
+        currentNode = currentNode->next;
+    }
+    fclose(output_file);
 }

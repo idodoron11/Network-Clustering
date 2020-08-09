@@ -38,4 +38,6 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group);
 
 double calculateModularity(VerticesGroup *group, double *s);
 
+void fillVerticesArr(VerticesGroup *group);
+
 #endif

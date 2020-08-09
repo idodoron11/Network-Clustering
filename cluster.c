@@ -33,6 +33,8 @@ int main() {
         } while (node != groupsLst->first);
     }
 
+    saveOutputToFile(groupsLst, "out");
+
     return 0;
 }
 
