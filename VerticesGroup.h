@@ -18,7 +18,6 @@ typedef struct verticesGroup {
     int size;
     int *verticesArr;
     spmat *edgeSubMatrix;
-    /* TODO: no need to save the modularitySubMatrix */
     double *modularityRowSums;
     double *modularityAbsColSum;
     int highestColSumIndex;
