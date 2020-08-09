@@ -345,6 +345,17 @@ testGraph *createTestGraphFromFile(char* path){
             }
         }
     }
+    if(i>0){
+        word[i] = '\0';
+        value = atoi(word);
+        i = 0;
+        ++count;
+        addVertexToGroup(group[j], value);
+        if(c == '\n') {
+            ++j;
+            group[j] = createVerticesGroup();
+        }
+    }
     fclose(file);
     groupList = createLinkedList();
     for(i = 0; i < numberOfClusters; ++i)
