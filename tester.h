@@ -3,11 +3,11 @@
 #include "division.h"
 
 typedef struct _testGraph{
-    graph *G;
+    Graph *G;
     LinkedList *GroupList;
 } testGraph;
 
-graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise);
+Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise);
 
 char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int n);
 

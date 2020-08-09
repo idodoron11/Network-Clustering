@@ -14,6 +14,7 @@ VerticesGroup *createVerticesGroup() {
     group->edgeSubMatrix = NULL;
     group->modularityRowSums = NULL;
     group->modularityAbsColSum = NULL;
+    group->verticesArr = NULL;
     group->isVerticesArrSorted = 0;
     return group;
 }
@@ -83,8 +84,8 @@ double getModularityMatrixNorm1(VerticesGroup *group) {
  * @param G graph object
  * @param group vertices group containing the modularity sub matrix
  */
-void calculateSubMatrix(Graph *G, VerticesGroup *group) {
-    double *row, expectedEdges, modularityEntry;
+void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
+    double *row, modularityEntry;
     int i = 0, j;
     if (group->size != 0) {
         group->edgeSubMatrix = spmat_allocate_list(group->size);

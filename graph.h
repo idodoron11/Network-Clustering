@@ -34,7 +34,7 @@ Graph *constructGraphFromInput(char *inputFilePath);
  * @param n the number of vertices.
  * @return a reference to a new graph object, defined by the given adjacency matrix.
  */
-graph* constructGraphFromMatrix(double* adjMatrix, int n);
+Graph* constructGraphFromMatrix(double* adjMatrix, int n);
 
 /**
  * Frees up any memory resources that have been dynamically allocated by the graph construction.

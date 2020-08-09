@@ -16,8 +16,8 @@
  * @param noise a number between 0 to 100 (inclusive).
  * @return a graph consists of the communities given as an input.
  */
-graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
-    graph* G;
+Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
+    Graph* G;
     double* A = (double*) calloc(n*n, sizeof(double));
     int numberOfClusters = GroupList->length;
     LinkedListNode *node = GroupList->first;
@@ -161,10 +161,10 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
  * @param n the number of vertices in the graph itself.
  * @return the desired graph.
  */
-graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
+Graph *createGraphFromEdgesGroup(int edges[][2], int length, int n){
     double *adjMat = calloc(n*n, sizeof(double));
     int e, i, j;
-    graph *G;
+    Graph *G;
     assertMemoryAllocation(adjMat);
     for(e = 0; e < length; ++e){
         i = edges[e][0];
@@ -234,7 +234,7 @@ char testRandomGraph(){
     int C1[5] = {0,1,2,3,4};
     int C2[10] = {5,6,7,8,9,10,11,12,13,14};
     int C3[5] = {19,18,17,16,15};
-    graph *G;
+    Graph *G;
     char result;
     assertMemoryAllocation(TG);
 
@@ -278,7 +278,7 @@ testGraph *createTestGraphFromFile(char* path){
     VerticesGroup **group;
     LinkedList *groupList;
     testGraph *TG = malloc(sizeof(testGraph));
-    graph *G = malloc(sizeof(graph));
+    Graph *G = malloc(sizeof(graph));
     assertFileOpen(file, path);
     assertMemoryAllocation(TG);
     assertMemoryAllocation(G);

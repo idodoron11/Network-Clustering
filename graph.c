@@ -48,7 +48,6 @@ Graph* constructGraphFromMatrix(double* adjMatrix, int n){
     assertMemoryAllocation(G);
     G->n = n;
     G->degreeSum = 0;
-    G->spAdjMat = spmat_allocate_list(n);
     G->adjMat = createMatrix(n);
     G->degrees = malloc(sizeof(int) * n);
     assertMemoryAllocation(G->degrees);
@@ -60,7 +59,6 @@ Graph* constructGraphFromMatrix(double* adjMatrix, int n){
             G->degrees[i] += adjMatrix[i*n+j];
         }
         G->degreeSum += G->degrees[i];
-        G->spAdjMat->add_row(G->spAdjMat, G->adjMat->values[i], i);
     }
 
     return G;
