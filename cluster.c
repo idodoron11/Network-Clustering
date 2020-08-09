@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
@@ -36,4 +35,3 @@ int main() {
 
     return 0;
 }
-

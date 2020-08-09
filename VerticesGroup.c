@@ -10,7 +10,6 @@ VerticesGroup *createVerticesGroup() {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
     group->size = 0;
     group->edgeSubMatrix = NULL;
-    group->modularitySubMatrix = NULL;
     group->modularityRowSums = NULL;
     group->modularityAbsColSum = NULL;
     return group;
@@ -30,7 +29,6 @@ void freeVerticesGroup(VerticesGroup *group) {
     if (group->edgeSubMatrix != NULL) {
         /* the modulary was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
-        freeMatrix(group->modularitySubMatrix);
         free(group->modularityRowSums);
         free(group->modularityAbsColSum);
     }
@@ -75,7 +73,6 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
     if (group->size != 0) {
         group->verticesArr = malloc(sizeof(int) * group->size);
         group->edgeSubMatrix = spmat_allocate_list(group->size);
-        group->modularitySubMatrix = createMatrix(group->size);
         group->modularityRowSums = calloc(group->size, sizeof(double));
         group->modularityAbsColSum = calloc(group->size, sizeof(double));
         group->highestColSumIndex = 0;
@@ -90,18 +87,16 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
                 modularityEntry = row[j] - readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
-                setVal(group->modularitySubMatrix, i, j, modularityEntry);
                 group->modularityRowSums[i] += modularityEntry;
                 if (i != j) {
                     /* the case of non diagonal values.
                      * the modularity matrix is symmetric, so we can add row sums instead of columns */
                     group->modularityAbsColSum[i] += fabs(modularityEntry);
+                } else {
+                    /* handle diagonal values by subtracting the row sum (f) */
+                    group->modularityAbsColSum[i] += fabs(modularityEntry - group->modularityRowSums[i]);
                 }
             }
-            /* handle diagonal values */
-            modularityEntry = readVal(group->modularitySubMatrix, i, i) - group->modularityRowSums[i];
-            setVal(group->modularitySubMatrix, i, i, modularityEntry);
-            group->modularityAbsColSum[i] += fabs(modularityEntry);
             if (group->modularityAbsColSum[i] >= getModularityMatrixNorm1(group)) {
                 /* replace highest column absolute sum */
                 group->highestColSumIndex = i;
