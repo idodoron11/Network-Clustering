@@ -89,7 +89,7 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
-                modularityEntry = row[j] - readVal(G->expectedEdges, i, j);
+                modularityEntry = row[j] - readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
                 setVal(group->modularitySubMatrix, i, j, modularityEntry);
                 group->modularityRowSums[i] += modularityEntry;
                 if (i != j) {
@@ -177,9 +177,7 @@ double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *ve
         x = y = 0;
         vectorNorm = multiplyModularityByVector(G, group, vector, vectorResult, 0);
         con = 0;
-        /* printf("\n\n\ni\tvectorResult[i]\tvectorResult[i]/vectorSize\tvector[i]\tdiff\tsum\n"); */
         for (i = 0; i < group->size; i++) {
-            /* printf("%d\t%f\t%f\t%f\t%f\t%f\n", i,vectorResult[i], vectorResult[i]/vectorSize,vector[i], fabs(vectorResult[i]/vectorSize - vector[i]), vectorResult[i]/vectorSize + vector[i]); */
             x += vector[i] * vectorResult[i];
             y += vector[i] * vector[i];
             vectorResult[i] /= vectorNorm;
