@@ -15,7 +15,6 @@ Graph *constructGraphFromInput(char *inputFilePath) {
     assert(list != NULL);
     G->n = n;
     G->degreeSum = 0;
-    G->spAdjMat = spmat_allocate_list(n);
     G->adjMat = createMatrix(n);
     G->expectedEdges = createMatrix(n);
 
@@ -28,7 +27,6 @@ Graph *constructGraphFromInput(char *inputFilePath) {
             --k;
             setVal(G->adjMat, i, list[k], 1);
         }
-        G->spAdjMat->add_row(G->spAdjMat, G->adjMat->values[i], i);
     }
 
     for (i = 0; i < n; i++) {
@@ -43,7 +41,6 @@ Graph *constructGraphFromInput(char *inputFilePath) {
 }
 
 void destroyGraph(Graph *G) {
-    G->spAdjMat->free(G->spAdjMat);
     freeMatrix(G->adjMat);
     free(G);
 }

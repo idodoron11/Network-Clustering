@@ -12,7 +12,6 @@ typedef struct _graph {
     /* adjacency matrix of size nXn
      * E={(i,j) s.t. spAdjMat[i*n + j]=1} */
     Matrix *adjMat;
-    spmat *spAdjMat;
     /* the degrees of the graph's vertices */
     int *degrees;
     /* sum of vertices' degrees */
