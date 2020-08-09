@@ -5,13 +5,16 @@
 #include "matrix.h"
 #include "spmat.h"
 #include "defs.h"
+#include "ErrorHandler.h"
 
 VerticesGroup *createVerticesGroup() {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
+    assertMemoryAllocation(group);
     group->size = 0;
     group->edgeSubMatrix = NULL;
     group->modularityRowSums = NULL;
     group->modularityAbsColSum = NULL;
+    group->isVerticesArrSorted = 0;
     return group;
 }
 
@@ -32,10 +35,12 @@ void freeVerticesGroup(VerticesGroup *group) {
         free(group->modularityRowSums);
         free(group->modularityAbsColSum);
     }
+    free(group);
 }
 
 VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
     VertexNode *node = malloc(sizeof(VertexNode));
+    assertMemoryAllocation(node);
     node->index = index;
     node->hasMoved = 0;
     if (group->size != 0) {
@@ -53,6 +58,18 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
 }
 
 /**
+ * Adds a sequence of indices to the group.
+ * @param group the group to which nodes are added.
+ * @param sequence a sequence of integers, representing nodes in a graph.
+ * @param length the length of the input sequence.
+ */
+void addSequence(VerticesGroup *group, int *sequence, int length) {
+    int i;
+    for (i = 0; i < length; ++i)
+        addVertexToGroup(group, sequence[i]);
+}
+
+/**
  * Get the 1-norm of the modularity matrix
  * @param group vertices group
  * @return 1-norm
@@ -66,23 +83,18 @@ double getModularityMatrixNorm1(VerticesGroup *group) {
  * @param G graph object
  * @param group vertices group containing the modularity sub matrix
  */
-void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
-    VertexNode *node;
-    double *row, modularityEntry;
+void calculateSubMatrix(Graph *G, VerticesGroup *group) {
+    double *row, expectedEdges, modularityEntry;
     int i = 0, j;
     if (group->size != 0) {
-        group->verticesArr = malloc(sizeof(int) * group->size);
+        group->edgeSubMatrix = spmat_allocate_list(group->size);
         group->edgeSubMatrix = spmat_allocate_list(group->size);
         group->modularityRowSums = calloc(group->size, sizeof(double));
         group->modularityAbsColSum = calloc(group->size, sizeof(double));
         group->highestColSumIndex = 0;
         row = malloc(sizeof(double) * group->size);
-        node = group->first;
-        do {
-            group->verticesArr[i] = node->index;
-            i++;
-            node = node->next;
-        } while (node != group->first);
+        assertMemoryAllocation(row);
+        fillVerticesArr(group);
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
@@ -107,6 +119,23 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
 
         free(row);
     }
+}
+
+void fillVerticesArr(VerticesGroup *group){
+    VertexNode *node = group->first;
+    int i = 0;
+    char isSorted = 1;
+    int prevIndex = node->index;
+    group->verticesArr = malloc(sizeof(int) * group->size);
+    assertMemoryAllocation(group->verticesArr);
+    do {
+        if(node->index < prevIndex)
+            isSorted = 0;
+        group->verticesArr[i] = node->index;
+        ++i;
+        node = node->next;
+    } while (node != group->first);
+    group->isVerticesArrSorted = isSorted;
 }
 
 /**
@@ -152,6 +181,7 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
 double calculateModularity(Graph *G, VerticesGroup *group, double *s) {
     double *res, numRes;
     res = malloc(group->size * sizeof(double));
+    assertMemoryAllocation(res);
     numRes = multiplyModularityByVector(G, group, s, res, 1);
     numRes *= 0.5;
     free(res);

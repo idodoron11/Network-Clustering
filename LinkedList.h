@@ -18,6 +18,8 @@ LinkedList *createLinkedList();
 
 void freeLinkedList(LinkedList *list);
 
+void deepFreeGroupList(LinkedList *groupList);
+
 void *insertItem(LinkedList *list, void *pointer, int index);
 
 void removeItem(LinkedList *list, LinkedListNode *item);

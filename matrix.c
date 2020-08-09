@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include "VerticesGroup.h"
 #include "defs.h"
+#include "ErrorHandler.h"
 #include <math.h>
 
 void printVect(double *vector, int length);
@@ -15,10 +16,13 @@ void printVect(double *vector, int length);
 Matrix *createMatrix(int n) {
     int i;
     Matrix *mat = malloc(sizeof(Matrix));
+    assertMemoryAllocation(mat);
     mat->n = n;
     mat->values = malloc(sizeof(double *) * n);
+    assertMemoryAllocation(mat->values);
     for (i = 0; i < n; i++) {
         mat->values[i] = calloc(n, sizeof(double));
+        assertMemoryAllocation(mat->values[i]);
     }
     return mat;
 }
@@ -59,22 +63,28 @@ double readVal(Matrix *mat, int r, int c) {
 }
 
 /**
- * Print matrix
+ * Print matrix (python style)
  * @param mat
  */
 void printMatrix(Matrix *mat) {
     int i, j;
     double val;
+    char *delimiter1 = "[";
+    char *delimiter2 = "";
+    printf("[");
     for (i = 0; i < mat->n; i++) {
+        printf("%s", delimiter1);
+        delimiter1 = ",\n[";
+        delimiter2 = "";
         for (j = 0; j < mat->n; j++) {
             val = readVal(mat, i, j);
-            if (val >= 0) {
-                printf(" ");
-            }
-            printf("%.1f ", val);
+            printf("%s", delimiter2);
+            delimiter2 = ",";
+            printf("%.4f", val);
         }
-        printf("\n");
+        printf("]");
     }
+    printf("]\n");
 }
 
 /**

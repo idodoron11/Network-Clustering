@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "spmat.h"
 #include "matrix.h"
+#include "ErrorHandler.h"
 
 /* linked list implementation starts here */
 struct linked_list {
@@ -30,8 +30,11 @@ nodeRef row_to_list(double const *row, int n) {
         if (row[i] != 0) {
             if (head == NULL) {
                 head = tail = malloc(sizeof(node));
+                assertMemoryAllocation(tail);
+                assertBooleanStatement(head == tail);
             } else {
                 tail->next = malloc(sizeof(node));
+                assertMemoryAllocation(tail->next);
                 tail = tail->next;
             }
             tail->value = row[i];
@@ -102,14 +105,14 @@ void list_mult(const struct _spmat *A, const double *v, double *result);
 spmat *spmat_allocate_array(int n, int nnz) {
     register spmat *mat = malloc(sizeof(spmat));
     register matrix_pointers *pointers = malloc(sizeof(matrix_pointers));
-    assert(mat != NULL);
-    assert(pointers != NULL);
+    assertMemoryAllocation(mat);
+    assertMemoryAllocation(pointers);
     pointers->rowptr = (int *) calloc(n + 1, sizeof(int));
-    assert(pointers->rowptr != NULL);
+    assertMemoryAllocation(pointers->rowptr);
     pointers->colind = (int *) calloc(nnz, sizeof(int));
-    assert(pointers->colind != NULL);
+    assertMemoryAllocation(pointers->colind);
     pointers->values = (double *) calloc(nnz, sizeof(double));
-    assert(pointers->values != NULL);
+    assertMemoryAllocation(pointers->values);
     (pointers->rowptr)[n] = nnz; /* This is where we keep the number of non-zero items is the spmat */
     pointers->nextValueIndex = 0;
 
@@ -199,8 +202,8 @@ void array_mult(const struct _spmat *A, const double *v, double *result) {
 spmat *spmat_allocate_list(int n) {
     register spmat *mat = malloc(sizeof(spmat));
     register nodeRef *row_lists = (nodeRef *) malloc(n * sizeof(nodeRef));
-    assert(mat != NULL);
-    assert(row_lists != NULL);
+    assertMemoryAllocation(mat);
+    assertMemoryAllocation(row_lists);
     mat->n = n;
     mat->add_row = list_add_row;
     mat->free = list_free;
@@ -232,7 +235,7 @@ void list_add_row(struct _spmat *A, const double *row, int i) {
 void list_free(struct _spmat *A) {
     register nodeRef *row_lists;
     register int i;
-    assert(A != NULL);
+    assertMemoryAllocation(A);
     row_lists = (nodeRef *) A->private;
     for (i = 0; i < A->n; ++i)
         empty_list(row_lists[i]);

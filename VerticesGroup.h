@@ -17,6 +17,7 @@ typedef struct verticesGroup {
     VertexNode *first;
     int size;
     int *verticesArr;
+    char isVerticesArrSorted;
     spmat *edgeSubMatrix;
     double *modularityRowSums;
     double *modularityAbsColSum;
@@ -39,5 +40,7 @@ double calculateModularity(Graph *G, VerticesGroup *group, double *s);
 double getModularityMatrixNorm1(VerticesGroup *group);
 
 double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *vectorResult);
+
+void fillVerticesArr(VerticesGroup *group);
 
 #endif

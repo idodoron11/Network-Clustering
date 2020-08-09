@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "LinkedList.h"
+#include "ErrorHandler.h"
 
 /**
  * Creates a new empty linked list.
@@ -7,12 +8,14 @@
  */
 LinkedList *createLinkedList(){
     LinkedList *list = malloc(sizeof(LinkedList));
+    assertMemoryAllocation(list);
     list->length = 0;
     return list;
 }
 
 /**
  * Destroys a given list and frees up its allocated memory.
+ * Does NOT free the pointers nodes are pointing to.
  * @param list a linked list.
  */
 void freeLinkedList(LinkedList *list){
@@ -29,6 +32,23 @@ void freeLinkedList(LinkedList *list){
 }
 
 /**
+ * Destroys a given GROUP list and frees up its allocated memory.
+ * It also destroys every group in the list.
+ * @param list a linked list, containing pointers to VerticesGroups.
+ */
+void deepFreeGroupList(LinkedList *groupList){
+    LinkedListNode *node = groupList->first;
+    VerticesGroup *group;
+    int i;
+    for(i = 0; i < groupList->length; ++i){
+        group = node->pointer;
+        freeVerticesGroup(group);
+        node = node->next;
+    }
+    freeLinkedList(groupList);
+}
+
+/**
  * Inserts a new item to a given list.
  * In case this list functions as a list of VerticesGroups, 'value' should be a pointer to a 'VerticesGroup'.
  * @param list the list where the item should be inserted.
@@ -38,6 +58,7 @@ void freeLinkedList(LinkedList *list){
  */
 void *insertItem(LinkedList *list, void *pointer, int index){
     LinkedListNode *node = malloc(sizeof(LinkedListNode));
+    assertMemoryAllocation(node);
     node->pointer = pointer;
     node->index = index;
     if (list->length != 0) {
