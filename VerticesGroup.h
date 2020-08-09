@@ -16,6 +16,7 @@ typedef struct verticesGroup {
     VertexNode *first;
     int size;
     int *verticesArr;
+    char isVerticesArrSorted;
     spmat *edgeSubMatrix;
     /*a matrix that equals bHat-A*/
     Matrix *edgesMinusBHatSubMatrix;

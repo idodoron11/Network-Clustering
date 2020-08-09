@@ -13,6 +13,7 @@ VerticesGroup *createVerticesGroup() {
     group->edgeSubMatrix = NULL;
     group->bSubMatrix = NULL;
     group->bHatSubMatrix = NULL;
+    group->isVerticesArrSorted = 0;
     return group;
 }
 
@@ -127,13 +128,18 @@ void calculateSubMatrix(Matrix *A, int M, VerticesGroup *group) {
 void fillVerticesArr(VerticesGroup *group){
     VertexNode *node = group->first;
     int i = 0;
+    char isSorted = 1;
+    int prevIndex = node->index;
     group->verticesArr = malloc(sizeof(int) * group->size);
     assertMemoryAllocation(group->verticesArr);
     do {
+        if(node->index < prevIndex)
+            isSorted = 0;
         group->verticesArr[i] = node->index;
         ++i;
         node = node->next;
     } while (node != group->first);
+    group->isVerticesArrSorted = isSorted;
 }
 
 /**

@@ -4,6 +4,7 @@
 #include <mem.h>
 #include "division.h"
 #include "ErrorHandler.h"
+#include "quicksort.h"
 
 /**
  * Generate a random vector
@@ -151,6 +152,7 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path){
     LinkedListNode *currentNode = groupLst->first;
     VerticesGroup *currentGroup;
     int i;
+    int *verticesArr;
     assertFileOpen(output_file, output_path);
     assertFileWrite(fwrite(&groupLst->length, sizeof(int), 1, output_file), 1, output_path);
     for(i = 0; i < groupLst->length; ++i){
@@ -158,8 +160,17 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path){
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
         if(currentGroup->verticesArr == NULL)
             fillVerticesArr(currentGroup);
-        assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
-                        currentGroup->size, output_path);
+        if(currentGroup->isVerticesArrSorted)
+            assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
+                            currentGroup->size, output_path);
+        else{
+            verticesArr = malloc(sizeof(int) * currentGroup->size);
+            memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);
+            quickSortArray(verticesArr, currentGroup->size);
+            assertFileWrite(fwrite(verticesArr, sizeof(int), currentGroup->size, output_file),
+                            currentGroup->size, output_path);
+            free(verticesArr);
+        }
         currentNode = currentNode->next;
     }
     fclose(output_file);
