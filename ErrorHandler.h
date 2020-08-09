@@ -19,6 +19,8 @@ void assertFileRead(int readAmount, int expected, char *filename);
 
 void assertFileWrite(int writeAmount, int expected, char *filename);
 
-void assertBooleanStatement(char statement);
+void assertBooleanStatementIsTrue(char statement);
+
+void assertBooleanStatement(char statement, char expectedBooleanValue);
 
 #endif

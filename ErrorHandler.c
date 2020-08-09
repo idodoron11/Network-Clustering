@@ -30,8 +30,15 @@ void assertFileWrite(int writeAmount, int expected, char *filename){
 
 }
 
-void assertBooleanStatement(char statement){
+void assertBooleanStatementIsTrue(char statement){
     if(statement == 0){
+        printf("%s\n", GeneralErr);
+        exit(5);
+    }
+}
+
+void assertBooleanStatement(char statement, char expectedBooleanValue){
+    if((statement == 0 && expectedBooleanValue != 0) || (statement != 0 && expectedBooleanValue == 0)){
         printf("%s\n", GeneralErr);
         exit(5);
     }
