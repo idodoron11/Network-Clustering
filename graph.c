@@ -51,6 +51,7 @@ Graph* constructGraphFromMatrix(double* adjMatrix, int n){
     G->adjMat = createMatrix(n);
     G->degrees = malloc(sizeof(int) * n);
     assertMemoryAllocation(G->degrees);
+    G->expectedEdges = createMatrix(n);
 
     for(i=0; i < n; ++i){
         G->degrees[i] = 0;
@@ -59,6 +60,12 @@ Graph* constructGraphFromMatrix(double* adjMatrix, int n){
             G->degrees[i] += adjMatrix[i*n+j];
         }
         G->degreeSum += G->degrees[i];
+    }
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+        }
     }
 
     return G;

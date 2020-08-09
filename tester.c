@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "tester.h"
 #include "ErrorHandler.h"
+#include "VerticesGroup.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -278,7 +279,7 @@ testGraph *createTestGraphFromFile(char* path){
     VerticesGroup **group;
     LinkedList *groupList;
     testGraph *TG = malloc(sizeof(testGraph));
-    Graph *G = malloc(sizeof(graph));
+    Graph *G = malloc(sizeof(Graph));
     assertFileOpen(file, path);
     assertMemoryAllocation(TG);
     assertMemoryAllocation(G);

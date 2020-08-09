@@ -43,4 +43,6 @@ double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *ve
 
 void fillVerticesArr(VerticesGroup *group);
 
+void addSequence(VerticesGroup *group, int *sequence, int length);
+
 #endif
