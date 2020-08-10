@@ -117,14 +117,14 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     int i;
     double lambda;
     if (group->size == 1) {
-        insertItem(groupsLst, group, 0);
+        insertItem(groupsLst, group);
         return;
     }
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
     lambda = powerIteration(G, group, vector, s);
     if (lambda <= 0) {
-        insertItem(groupsLst, group, 0);
+        insertItem(groupsLst, group);
         return;
     }
     /* turn s eigenvector into +1 and -1 */
@@ -134,7 +134,7 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     maximizeModularity(G, group, s);
     divideGroupByEigenvector(group, s, &newGroupA, &newGroupB);
     if (newGroupA == NULL || newGroupB == NULL) {
-        insertItem(groupsLst, group, 0);
+        insertItem(groupsLst, group);
     } else {
         divisionAlgRec(G, newGroupA, groupsLst, vector, s);
         divisionAlgRec(G, newGroupB, groupsLst, vector, s);

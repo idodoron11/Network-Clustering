@@ -262,9 +262,9 @@ char testRandomGraph(){
     addSequence(c[1], C2, 10);
     addSequence(c[2], C3, 5);
 
-    insertItem(GroupList, c[0], 0);
-    insertItem(GroupList, c[1], 0);
-    insertItem(GroupList, c[2], 0);
+    insertItem(GroupList, c[0]);
+    insertItem(GroupList, c[1]);
+    insertItem(GroupList, c[2]);
 
     G = generateCommunitiesGraph(GroupList, n, 15);
     TG->GroupList = GroupList;
@@ -373,7 +373,7 @@ testGraph *createTestGraphFromFile(char* path){
     fclose(file);
     groupList = createLinkedList();
     for(i = 0; i < numberOfClusters; ++i)
-        insertItem(groupList, group[i], 0);
+        insertItem(groupList, group[i]);
     G = constructGraphFromMatrix(adjMatrix, n);
     TG->GroupList = groupList;
     TG->G = G;

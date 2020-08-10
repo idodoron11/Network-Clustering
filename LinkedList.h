@@ -5,7 +5,6 @@
 
 typedef struct _LinkedListNode {
     void *pointer;
-    int index;
     struct _LinkedListNode *next;
     struct _LinkedListNode *prev;
 } LinkedListNode;
@@ -20,7 +19,7 @@ void freeLinkedList(LinkedList *list);
 
 void deepFreeGroupList(LinkedList *groupList);
 
-void *insertItem(LinkedList *list, void *pointer, int index);
+void *insertItem(LinkedList *list, void *pointer);
 
 void removeItem(LinkedList *list, LinkedListNode *item);
 

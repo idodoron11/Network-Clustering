@@ -53,14 +53,12 @@ void deepFreeGroupList(LinkedList *groupList){
  * In case this list functions as a list of VerticesGroups, 'value' should be a pointer to a 'VerticesGroup'.
  * @param list the list where the item should be inserted.
  * @param pointer a pointer to some variable of any type. (casting). Can be NULL.
- * @param index an integer.
  * @return a pointer to the new LinkedListNode.
  */
-void *insertItem(LinkedList *list, void *pointer, int index){
+void *insertItem(LinkedList *list, void *pointer) {
     LinkedListNode *node = malloc(sizeof(LinkedListNode));
     assertMemoryAllocation(node);
     node->pointer = pointer;
-    node->index = index;
     if (list->length != 0) {
         node->next = list->first;
         node->prev = list->first->prev;
@@ -105,11 +103,11 @@ void removeItem(LinkedList *list, LinkedListNode *item){
 void printGroupList(LinkedList *groupList, int n){
     int L = groupList->length;
     int *coloring = malloc(sizeof(int) * n);
-    assertMemoryAllocation(coloring);
     int i, j;
     LinkedListNode *node = groupList->first;
     VerticesGroup *group;
     VertexNode *vertex;
+    assertMemoryAllocation(coloring);
 
     for(i = 0; i < L; ++i){
         group = node->pointer;
