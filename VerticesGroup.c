@@ -89,9 +89,11 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
     int i = 0, j;
     if (group->size != 0) {
         group->edgeSubMatrix = spmat_allocate_list(group->size);
-        group->edgeSubMatrix = spmat_allocate_list(group->size);
+        assertMemoryAllocation(group->edgeSubMatrix);
         group->modularityRowSums = calloc(group->size, sizeof(double));
+        assertMemoryAllocation(group->modularityRowSums);
         group->modularityAbsColSum = calloc(group->size, sizeof(double));
+        assertMemoryAllocation(group->modularityAbsColSum);
         group->highestColSumIndex = 0;
         row = malloc(sizeof(double) * group->size);
         assertMemoryAllocation(row);
@@ -99,6 +101,7 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
+                /* modularityEntry is B_hat[i][j] = A[i][j]-K[i][j], if we use the original notation. */
                 modularityEntry = row[j] - readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
                 group->modularityRowSums[i] += modularityEntry;
                 if (i != j) {
@@ -106,12 +109,17 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
                      * the modularity matrix is symmetric, so we can add row sums instead of columns */
                     group->modularityAbsColSum[i] += fabs(modularityEntry);
                 } else {
-                    /* handle diagonal values by subtracting the row sum (f) */
+                    /* handle diagonal values by subtracting the row sum (f).
+                     * Notice that modularityAbsColSum = B_hat[i][0] + ... + B_hat[i][n-1].
+                     * It does not equal to B[i][0] + ... + B[i][n-1] as the name suggests. */
                     group->modularityAbsColSum[i] += fabs(modularityEntry - group->modularityRowSums[i]);
                 }
             }
             if (group->modularityAbsColSum[i] >= getModularityMatrixNorm1(group)) {
-                /* replace highest column absolute sum */
+                /* replace highest column absolute sum
+                 * TODO:    I think it is a good idea to require group->modularityAbsColSum[i] to be
+                 *          strictly greater than getModularityMatrixNorm1(group), to avoid unnecessary
+                 *          changes in group->highestColSumIndex. */
                 group->highestColSumIndex = i;
             }
             /* TODO: improve instead of adding row at a time */
@@ -122,6 +130,13 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
     }
 }
 
+/**
+ * This function allocates space for group->verticesArr
+ * and fills it up with the group's vertices. It also
+ * tracks whether or not the array is considered sorted.
+ * (otherwise, we'll have to sort it later).
+ * @param group a non-empty VerticesGroup.
+ */
 void fillVerticesArr(VerticesGroup *group){
     VertexNode *node = group->first;
     int i = 0;
