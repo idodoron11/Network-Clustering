@@ -31,8 +31,8 @@ Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise){
 
     for(i = 0; i < numberOfClusters; ++i){
         currentGroup = node->pointer;
-        assertBooleanStatement(currentGroup != NULL);
-        assertBooleanStatement(currentGroup->size > 0);
+        assertBooleanStatementIsTrue(currentGroup != NULL);
+        assertBooleanStatementIsTrue(currentGroup->size > 0);
         vertexU = currentGroup->first;
         vertexV = vertexU->next;
 
