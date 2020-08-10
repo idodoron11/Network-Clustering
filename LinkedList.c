@@ -95,3 +95,37 @@ void removeItem(LinkedList *list, LinkedListNode *item){
         list->length = 0;
     }
 }
+
+/**
+ * Prints the vertex-coloring a given group-list defines over
+ * a n-vertices graph.
+ * @param groupList a partition of graph vertices into groups.
+ * @param n the number of vertices in the graph.
+ */
+void printGroupList(LinkedList *groupList, int n){
+    int L = groupList->length;
+    int *coloring = malloc(sizeof(int) * n);
+    int i, j;
+    LinkedListNode *node = groupList->first;
+    VerticesGroup *group;
+    VertexNode *vertex;
+
+    for(i = 0; i < L; ++i){
+        group = node->pointer;
+        vertex = group->first;
+        for(j = 0; j < group->size; ++j){
+            coloring[vertex->index] = i;
+            vertex = vertex->next;
+        }
+        node = node->next;
+    }
+
+    printf("[");
+    if(n>0)
+        printf("%d", coloring[0]);
+    for(i = 1; i < n; ++i)
+        printf(",%d", coloring[i]);
+    printf("]\n");
+
+    free(coloring);
+}

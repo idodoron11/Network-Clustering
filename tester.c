@@ -5,6 +5,8 @@
 #include <time.h>
 #include <stdio.h>
 
+void printColorings(int* coloring1, int* coloring2, int n);
+
 /**
  * This function receives a partition of {0,1,...,n-1} into disjoint groups G1,G2,...,GK, and
  * generates a new graph G over {0,1,...,n-1}, such that every subgraph G1 is an independent
@@ -88,6 +90,10 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
     int numberOfGroups = GroupList1->length;
     if(numberOfGroups != GroupList2->length) {
         printf("The first partition consists of %d groups, while the second consists of %d groups.\n", GroupList1->length, GroupList2->length);
+        printf("Coloring1: ");
+        printGroupList(GroupList1, n);
+        printf("Coloring2: ");
+        printGroupList(GroupList2, n);
         return 0;
     }
     coloring1 = (int*) malloc(n * sizeof(int));
@@ -120,6 +126,7 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
     if(n1 != n2) {
         printf("The two partitions have different total number of vertices.\n"
                "The first consists of %d vertices, while the second consists of %d.\n", n1, n2);
+        printColorings(coloring1, coloring2, n);
         free(colorMapping);
         free(coloring2);
         free(coloring1);
@@ -131,28 +138,31 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
         else if(colorMapping[coloring1[j]] == coloring2[j])
             continue;
         else {
-            printf("Coloring1: [");
-            if(n>0)
-                printf("%d", coloring1[0]);
-            for(i = 1; i < n; ++i)
-                printf(",%d", coloring1[i]);
-            printf("]\n");
-            printf("Coloring2: [");
-            if(n>0)
-                printf("%d", coloring2[0]);
-            for(i = 1; i < n; ++i)
-                printf(",%d", coloring2[i]);
-            printf("]\n");
-            free(coloring1);
-            free(coloring2);
-            free(colorMapping);
+            printColorings(coloring1, coloring2, n);
             return 0;
         }
     }
+    printColorings(coloring1, coloring2, n);
     free(coloring1);
     free(coloring2);
     free(colorMapping);
     return 1;
+}
+
+void printColorings(int* coloring1, int* coloring2, int n){
+    int i;
+    printf("Coloring1: [");
+    if(n>0)
+        printf("%d", coloring1[0]);
+    for(i = 1; i < n; ++i)
+        printf(",%d", coloring1[i]);
+    printf("]\n");
+    printf("Coloring2: [");
+    if(n>0)
+        printf("%d", coloring2[0]);
+    for(i = 1; i < n; ++i)
+        printf(",%d", coloring2[i]);
+    printf("]\n");
 }
 
 /**
