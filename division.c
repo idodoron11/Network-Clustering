@@ -184,6 +184,7 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path){
                             currentGroup->size, output_path);
         else{
             verticesArr = malloc(sizeof(int) * currentGroup->size);
+            assertMemoryAllocation(verticesArr);
             memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);
             quickSortArray(verticesArr, currentGroup->size);
             assertFileWrite(fwrite(verticesArr, sizeof(int), currentGroup->size, output_file),

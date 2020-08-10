@@ -105,6 +105,7 @@ void removeItem(LinkedList *list, LinkedListNode *item){
 void printGroupList(LinkedList *groupList, int n){
     int L = groupList->length;
     int *coloring = malloc(sizeof(int) * n);
+    assertMemoryAllocation(coloring);
     int i, j;
     LinkedListNode *node = groupList->first;
     VerticesGroup *group;

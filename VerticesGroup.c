@@ -31,7 +31,7 @@ void freeVerticesGroup(VerticesGroup *group) {
     }
 
     if (group->edgeSubMatrix != NULL) {
-        /* the modulary was calculated, so all related data should be freed */
+        /* the modularity was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
         free(group->modularityRowSums);
         free(group->modularityAbsColSum);

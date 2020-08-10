@@ -139,6 +139,9 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
             continue;
         else {
             printColorings(coloring1, coloring2, n);
+            free(coloring1);
+            free(coloring2);
+            free(colorMapping);
             return 0;
         }
     }
