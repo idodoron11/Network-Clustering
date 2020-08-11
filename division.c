@@ -53,15 +53,16 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * Maximize modularity by moving nodes between the sub groups
  * @param group a group of vertices
  * @param s the eigenvevtor, will be assigned the maximum split
+ * @param initialModularity the modularity of the group
  */
-void maximizeModularity(Graph *G, VerticesGroup *group, double *s) {
+void maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity) {
     int i, j, maxNode;
     VertexNode *node, *maxNodeRef;
     double modularity, maxModularity, maxIterationModularity;
     double *maxS = malloc(group->size * sizeof(double));
     assertMemoryAllocation(maxS);
     memcpy(maxS, s, group->size);
-    maxModularity = calculateModularity(G, group, s);
+    maxModularity = initialModularity;
     for (i = 0; i < group->size; i++) {
         node = group->first;
         maxNodeRef = NULL;
@@ -101,7 +102,7 @@ void maximizeModularity(Graph *G, VerticesGroup *group, double *s) {
 void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
     VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
     int i;
-    double lambda;
+    double lambda, modularity;
     if (group->size == 1) {
         insertItem(groupsLst, group);
         return;
@@ -117,7 +118,12 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     for (i = 0; i < group->size; i++) {
         s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
     }
-    maximizeModularity(G, group, s);
+    modularity = calculateModularity(G, group, s);
+    if (modularity <= 0) {
+        insertItem(groupsLst, group);
+        return;
+    }
+    maximizeModularity(G, group, s, modularity);
     divideGroupByEigenvector(group, s, &newGroupA, &newGroupB);
     if (newGroupA == NULL || newGroupB == NULL) {
         insertItem(groupsLst, group);
