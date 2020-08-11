@@ -119,7 +119,7 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
         s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
     }
     modularity = calculateModularity(G, group, s);
-    if (modularity <= 0) {
+    if (!IS_POSITIVE(modularity)) {
         insertItem(groupsLst, group);
         return;
     }
