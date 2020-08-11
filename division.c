@@ -110,7 +110,7 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
     lambda = powerIteration(G, group, vector, s);
-    if (lambda <= 0) {
+    if (!IS_POSITIVE(lambda)) {
         insertItem(groupsLst, group);
         return;
     }
