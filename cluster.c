@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "cluster.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
@@ -8,7 +9,7 @@
 #include "division.h"
 #include "defs.h"
 
-int main() {
+int cluster() {
     int i = 1, j;
     LinkedList *groupsLst;
     LinkedListNode *node;
@@ -20,14 +21,11 @@ int main() {
     node = groupsLst->first;
     if (node != NULL) {
         do {
-            printf("Group %d:\n", i);
             group = (VerticesGroup *) node->pointer;
             vNode = group->first;
             for (j = 0; j < group->size; j++) {
-                printf("%d ", vNode->index);
                 vNode = vNode->next;
             }
-            printf("\n\n");
             i++;
             node = node->next;
         } while (node != groupsLst->first);
