@@ -413,6 +413,8 @@ int main() {
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
     printf("Testing graph 9 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
+    printf("Testing graph 10 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
     printf("Testing random graph.\n");
     printf("Result: %d\n", testRandomGraph());
 
