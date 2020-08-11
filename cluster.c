@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
@@ -14,7 +13,8 @@ int main() {
     LinkedListNode *node;
     VerticesGroup *group;
     VertexNode *vNode;
-    graph *G = constructGraphFromInput("graph.in");
+    Graph *G = constructGraphFromInput(
+            "graph.in");
     srand(time(0));
     groupsLst = divisionAlgorithm(G);
     node = groupsLst->first;
@@ -37,4 +37,3 @@ int main() {
 
     return 0;
 }
-

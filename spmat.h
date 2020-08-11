@@ -22,6 +22,15 @@ typedef struct _spmat {
     void *private;
 } spmat;
 
+/* linked list implementation starts here */
+struct linked_list {
+    double value;
+    int colind;
+    struct linked_list *next;
+} linked_list;
+typedef struct linked_list node;
+typedef node *nodeRef;
+
 /* Allocates a new linked-lists sparse matrix of size n */
 spmat *spmat_allocate_list(int n);
 

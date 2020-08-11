@@ -1,32 +1,42 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include "graph.h"
+#include "ErrorHandler.h"
 
-graph* constructGraphFromInput(char* inputFilePath){
-    graph* G = (graph*) malloc(sizeof(graph));
+Graph *constructGraphFromInput(char *inputFilePath) {
+    Graph *G = (Graph *) malloc(sizeof(Graph));
     int n, i, j, k;
     int* list;
     FILE* graph_file = fopen(inputFilePath, "rb");
-    assert(graph_file != NULL);
-    assert(fread(&n, sizeof(int), 1, graph_file) == 1);
+    assertMemoryAllocation(G);
+    assertFileOpen(graph_file, inputFilePath);
+    assertFileRead(fread(&n, sizeof(int), 1, graph_file), 1, inputFilePath);
     list = malloc(sizeof(int) * n);
-    assert(list != NULL);
+    assertMemoryAllocation(list);
+    G->degrees = malloc(n * sizeof(int));
+    assertMemoryAllocation(list);
     G->n = n;
-    G->M = 0;
-    G->spAdjMat = spmat_allocate_list(n);
+    G->degreeSum = 0;
     G->adjMat = createMatrix(n);
+    G->expectedEdges = createMatrix(n);
 
     for(i=0; i < n; ++i){
-        assert(fread(&k, sizeof(int), 1, graph_file) == 1);
-        assert(fread(list, sizeof(int), k, graph_file) == (unsigned int) k);
-        G->M += k;
-        while(k>0){
+        assertFileRead(fread(&k, sizeof(int), 1, graph_file), 1, inputFilePath);
+        assertFileRead(fread(list, sizeof(int), k, graph_file), k, inputFilePath);
+        G->degreeSum += k;
+        G->degrees[i] = k;
+        while (k > 0) {
             --k;
-            j = list[k];
-            setVal(G->adjMat, i, j, 1);
+            setVal(G->adjMat, i, list[k], 1);
         }
-        G->spAdjMat->add_row(G->spAdjMat, G->adjMat->values[i], i);
+    }
+
+    if(G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
     }
     fclose(graph_file);
     free(list);
@@ -34,40 +44,38 @@ graph* constructGraphFromInput(char* inputFilePath){
     return G;
 }
 
-graph* constructGraphFromMatrix(double* adjMatrix, int n){
-    graph* G = (graph*) malloc(sizeof(graph));
+Graph* constructGraphFromMatrix(double* adjMatrix, int n){
+    Graph* G = (Graph*) malloc(sizeof(Graph));
     int i, j;
-    assert(G != NULL);
+    assertMemoryAllocation(G);
+    G->degrees = malloc(n * sizeof(int));
+    assertMemoryAllocation(G->degrees);
     G->n = n;
-    G->M = 0;
-    G->spAdjMat = spmat_allocate_list(n);
+    G->degreeSum = 0;
     G->adjMat = createMatrix(n);
+    G->expectedEdges = createMatrix(n);
 
     for(i=0; i < n; ++i){
+        G->degrees[i] = 0;
         for(j=0; j < n; ++j) {
             setVal(G->adjMat, i, j, adjMatrix[i*n+j]);
+            G->degrees[i] += adjMatrix[i*n+j];
         }
-        G->M += G->adjMat->rowSums[i];
-        G->spAdjMat->add_row(G->spAdjMat, G->adjMat->values[i], i);
+        G->degreeSum += G->degrees[i];
+    }
+
+    if(G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
     }
 
     return G;
 }
 
-void destroyGraph(graph* G){
-    G->spAdjMat->free(G->spAdjMat);
+void destroyGraph(Graph *G) {
     freeMatrix(G->adjMat);
     free(G);
-}
-
-int getEdge(graph* G, int i, int j){
-    return readVal(G->adjMat, i, j);
-}
-
-void printGraph(graph* G){
-    printMatrix(G->adjMat);
-}
-
-int getDegree(graph* G, int i){
-    return G->adjMat->rowSums[i];
 }
