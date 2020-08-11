@@ -1,4 +1,5 @@
 #include <process.h>
+#include <stdlib.h>
 #include "ErrorHandler.h"
 
 void assertMemoryAllocation(void *p){

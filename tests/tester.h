@@ -1,6 +1,6 @@
 #ifndef CLUSTER_TESTER_H
 #define CLUSTER_TESTER_H
-#include "division.h"
+#include "../division.h"
 
 typedef struct _testGraph{
     Graph *G;

@@ -4,14 +4,6 @@
 #include "matrix.h"
 #include "ErrorHandler.h"
 
-/* linked list implementation starts here */
-struct linked_list {
-    double value;
-    int colind;
-    struct linked_list *next;
-} linked_list;
-typedef struct linked_list node;
-typedef node *nodeRef;
 
 /* linked list operations */
 /**
@@ -265,22 +257,6 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
     }
 }
 
-double spmatValuesSum(spmat *spm) {
-    int i;
-    nodeRef *rows, node;
-    double sum = 0;
-    rows = (nodeRef *) spm->private;
-    for (i = 0; i < spm->n; i++) {
-        node = rows[i];
-        while (node != NULL) {
-            sum += node->value;
-            node = node->next;
-        }
-    }
-    return sum;
-}
-
-
 /**
  * Generate a random double
  * @param low inclusive
@@ -290,56 +266,3 @@ double spmatValuesSum(spmat *spm) {
 double drand(double low, double high) {
     return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
 }
-
-/**
- * Generate a random symmetric sparse matrix
- * @param n matrix of size nxn
- * @param percent probability of non-zero values
- * @param mat regular matrix representation, should be allocated
- */
-spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
-    int i, j;
-    double randNum;
-    spmat *spm = spmat_allocate_list(n);
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            if (i < j) {
-                randNum = drand(0, 100);
-                if (randNum <= percent) {
-                    setVal(mat, i, j, 1);
-                } else {
-                    setVal(mat, i, j, 0);
-                }
-                setVal(mat, j, i, readVal(mat, i, j));
-            } else if (i == j) {
-                setVal(mat, i, j, 0);
-            }
-        }
-        spm->add_row(spm, mat->values[i], i);
-    }
-
-    return spm;
-}
-
-/**
- * Print sparse matrix
- * @param spm
- */
-void printSpmat(spmat *spm) {
-    int i, j, col;
-    nodeRef *rows = (nodeRef *) spm->private;
-    for (i = 0; i < spm->n; i++) {
-        nodeRef node = rows[i];
-        for (j = 0; j < spm->n; j++) {
-            col = node != NULL ? node->colind : spm->n;
-            if (j < col) {
-                printf("%d ", 0);
-            } else {
-                printf("%d ", (int) node->value);
-                node = node->next;
-            }
-        }
-        printf("\n");
-    }
-}
-

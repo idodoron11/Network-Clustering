@@ -79,15 +79,3 @@ void destroyGraph(Graph *G) {
     freeMatrix(G->adjMat);
     free(G);
 }
-
-int getEdge(Graph *G, int i, int j) {
-    return readVal(G->adjMat, i, j);
-}
-
-void printGraph(Graph *G) {
-    printMatrix(G->adjMat);
-}
-
-int getDegree(Graph* G, int i){
-    return G->degrees[i];
-}

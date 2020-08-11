@@ -20,20 +20,6 @@ void randVector(double *vector, int n) {
 }
 
 /**
- * Print vector
- * @param vector
- * @param length
- */
-void printVector(double *vector, int length) {
-    int i;
-    printf("( ");
-    for (i = 0; i < length; i++) {
-        printf("%.1f ", vector[i]);
-    }
-    printf(" )\n");
-}
-
-/**
  * Divides a group into two
  * @param group the group to split
  * @param s the eigenvector to split by
@@ -158,8 +144,8 @@ LinkedList *divisionAlgorithm(Graph *G) {
      * separately. Additionally, it is clear that G->degreeSum
      * == 0 iff all vertices are isolated. Thus each one of them
      * belongs to an independent cluster.*/
-    if(G->degreeSum == 0){
-        for(i = 0; i < G->n; ++i){
+    if (G->degreeSum == 0) {
+        for (i = 0; i < G->n; ++i) {
             group = createVerticesGroup();
             addVertexToGroup(group, i);
             insertItem(groupsLst, group);
@@ -181,7 +167,7 @@ LinkedList *divisionAlgorithm(Graph *G) {
     return groupsLst;
 }
 
-void saveOutputToFile(LinkedList *groupLst, char *output_path){
+void saveOutputToFile(LinkedList *groupLst, char *output_path) {
     FILE *output_file = fopen(output_path, "wb");
     LinkedListNode *currentNode = groupLst->first;
     VerticesGroup *currentGroup;
@@ -189,15 +175,15 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path){
     int *verticesArr;
     assertFileOpen(output_file, output_path);
     assertFileWrite(fwrite(&groupLst->length, sizeof(int), 1, output_file), 1, output_path);
-    for(i = 0; i < groupLst->length; ++i){
+    for (i = 0; i < groupLst->length; ++i) {
         currentGroup = currentNode->pointer;
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
-        if(currentGroup->verticesArr == NULL)
+        if (currentGroup->verticesArr == NULL)
             fillVerticesArr(currentGroup);
-        if(currentGroup->isVerticesArrSorted)
+        if (currentGroup->isVerticesArrSorted)
             assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
                             currentGroup->size, output_path);
-        else{
+        else {
             verticesArr = malloc(sizeof(int) * currentGroup->size);
             assertMemoryAllocation(verticesArr);
             memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);

@@ -15,8 +15,4 @@ void setVal(Matrix *mat, int r, int c, double val);
 
 double readVal(Matrix *mat, int r, int c);
 
-void printMatrix(Matrix *mat);
-
-void printMatrixPy(Matrix *mat);
-
 #endif
