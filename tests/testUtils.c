@@ -177,9 +177,21 @@ double calculateDivisionModularity(Graph *G, LinkedList *groupLst) {
         do {
             group = node->pointer;
             calculateModularitySubMatrix(G, group);
-            modularity += calculateModularity(G, group, s);
+            modularity += calculateModularityOfGroup(G, group);
             node = node->next;
         } while (node != groupLst->first);
+    }
+    return modularity;
+}
+
+double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
+    int i, j;
+    double modularity = 0;
+    calculateModularitySubMatrix(G, group);
+    for (i = 0; i < group->size; i++) {
+        for (j = 0; j < group->size; j++) {
+            modularity += readVal(G->adjMat, i, j) - readVal(G->expectedEdges, i, j);
+        }
     }
     return modularity;
 }

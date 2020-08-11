@@ -14,4 +14,6 @@ void printGroupList(LinkedList *groupList, int n);
 
 double calculateDivisionModularity(Graph *G, LinkedList *groupLst);
 
+double calculateModularityOfGroup(Graph *G, VerticesGroup *group);
+
 #endif
