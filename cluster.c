@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
 #include "LinkedList.h"
 #include "division.h"
+#include "defs.h"
 
 int main() {
     int i = 1, j;
@@ -14,7 +14,7 @@ int main() {
     LinkedListNode *node;
     VerticesGroup *group;
     VertexNode *vNode;
-    graph *G = constructGraphFromInput("graph.in");
+    Graph *G = constructGraphFromInput(GRAPH_FILE_PATH);
     srand(time(0));
     groupsLst = divisionAlgorithm(G);
     node = groupsLst->first;
@@ -37,4 +37,3 @@ int main() {
 
     return 0;
 }
-

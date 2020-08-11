@@ -1,15 +1,16 @@
 #ifndef CLUSTER_TESTER_H
 #define CLUSTER_TESTER_H
-#include "division.h"
 
-typedef struct _testGraph{
-    graph *G;
+#include "../division.h"
+
+typedef struct _testGraph {
+    Graph *G;
     LinkedList *GroupList;
 } testGraph;
 
-graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise);
+Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise);
 
-char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int n);
+char checkGroupListsEquality(LinkedList *GroupList1, testGraph *TG);
 
 testGraph *createTestGraph(int edges[][2], int length, int n, LinkedList *GroupList);
 
@@ -19,6 +20,6 @@ char performTest(testGraph *TG);
 
 char testGraphFromFile(char *path);
 
-void printResultsFromOutputFile(char* output_file_path);
+void printResultsFromOutputFile(char *output_file_path);
 
 #endif
