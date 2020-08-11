@@ -6,7 +6,7 @@
  * Creates a new empty linked list.
  * @return a pointer to the new list.
  */
-LinkedList *createLinkedList(){
+LinkedList *createLinkedList() {
     LinkedList *list = malloc(sizeof(LinkedList));
     assertMemoryAllocation(list);
     list->length = 0;
@@ -18,7 +18,7 @@ LinkedList *createLinkedList(){
  * Does NOT free the pointers nodes are pointing to.
  * @param list a linked list.
  */
-void freeLinkedList(LinkedList *list){
+void freeLinkedList(LinkedList *list) {
     LinkedListNode *temp;
     LinkedListNode *node = list->first;
     if (node != NULL) {
@@ -36,11 +36,11 @@ void freeLinkedList(LinkedList *list){
  * It also destroys every group in the list.
  * @param list a linked list, containing pointers to VerticesGroups.
  */
-void deepFreeGroupList(LinkedList *groupList){
+void deepFreeGroupList(LinkedList *groupList) {
     LinkedListNode *node = groupList->first;
     VerticesGroup *group;
     int i;
-    for(i = 0; i < groupList->length; ++i){
+    for (i = 0; i < groupList->length; ++i) {
         group = node->pointer;
         freeVerticesGroup(group);
         node = node->next;
@@ -78,18 +78,19 @@ void *insertItem(LinkedList *list, void *pointer) {
  * @param list a linked list
  * @param item a LinkedListNode pointer to some item in 'list'.
  */
-void removeItem(LinkedList *list, LinkedListNode *item){
+void removeItem(LinkedList *list, LinkedListNode *item) {
     LinkedListNode *oldPrev = item->prev;
-    LinkedListNode  *oldNext = item->next;
-    if(list->length > 1){
-        oldPrev->next = oldNext;
-        oldNext->prev = oldPrev;
-        free(item);
-        list->length--;
+    LinkedListNode *oldNext = item->next;
+    oldPrev->next = oldNext;
+    oldNext->prev = oldPrev;
+
+    if (item == list->first) {
+        if (list->length == 1) {
+            list->first = NULL;
+        } else {
+            list->first = oldNext;
+        }
     }
-    else if(list->length == 1){
-        free(item);
-        list->first = NULL;
-        list->length = 0;
-    }
+    free(item);
+    list->length--;
 }

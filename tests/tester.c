@@ -5,8 +5,7 @@
 #include <time.h>
 #include <stdio.h>
 
-#define GRAPHS_DIR "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\tests\\graphs"
-/*#define GRAPHS_DIR "D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graphs"*/
+#define GRAPHS_DIR "tests\\graphs"
 
 void printColorings(int *coloring1, int *coloring2, int n);
 

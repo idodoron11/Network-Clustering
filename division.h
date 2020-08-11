@@ -14,7 +14,8 @@ void divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **s
 
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity);
 
-void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s);
+void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
+                             VerticesGroup **newGroupB);
 
 void saveOutputToFile(LinkedList *groupLst, char *output_path);
 

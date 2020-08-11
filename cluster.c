@@ -11,7 +11,7 @@
 
 #define FILE_PATH_MAX_LENGTH 200
 
-int cluster(int argc, char **argv) {
+int main(int argc, char **argv) {
     int i = 1, j;
     LinkedList *groupsLst;
     LinkedListNode *node;

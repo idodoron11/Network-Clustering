@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "ErrorHandler.h"
 #include "quicksort.h"
+#include "LinkedList.h"
 
 /**
  * Generate a random vector
@@ -120,19 +121,15 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
  * @param vector an empty allocated array the size of the graph's vertices, used for power iteration
  * @param s an empty allocated array the size of the graph's vertices, used for storing an eigenvector
  */
-void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
-    VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
+void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
+                        VerticesGroup **newGroupB) {
     int i;
     double lambda, modularity, modularityAfterMax;
-    if (group->size == 1) {
-        insertItem(groupsLst, group);
-        return;
-    }
+
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
     lambda = powerIteration(G, group, vector, s);
     if (!IS_POSITIVE(lambda)) {
-        insertItem(groupsLst, group);
         return;
     }
     /* turn s eigenvector into +1 and -1 */
@@ -146,18 +143,11 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
         modularityAfterMax = maximizeModularity(G, group, s, modularity);
     } while (modularityAfterMax > modularity);
 
-    if (!IS_POSITIVE(modularity)) {
-        insertItem(groupsLst, group);
+    if (!IS_POSITIVE(modularityAfterMax)) {
         return;
     }
 
-    divideGroupByEigenvector(group, s, &newGroupA, &newGroupB);
-    if (newGroupA == NULL || newGroupB == NULL) {
-        insertItem(groupsLst, group);
-    } else {
-        divisionAlgRec(G, newGroupA, groupsLst, vector, s);
-        divisionAlgRec(G, newGroupB, groupsLst, vector, s);
-    }
+    divideGroupByEigenvector(group, s, newGroupA, newGroupB);
 }
 
 /**
@@ -168,8 +158,10 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
 LinkedList *divisionAlgorithm(Graph *G) {
     int i;
     double *vector, *s;
-    LinkedList *groupsLst = createLinkedList();
-    VerticesGroup *group;
+    LinkedList *P, *O;
+    VerticesGroup *group, *groupA, *groupB;
+    P = createLinkedList();
+    O = createLinkedList();
 
     /* Notice that the formula for the expected number of edges
      * between two given vertices requires division by zero if
@@ -181,9 +173,9 @@ LinkedList *divisionAlgorithm(Graph *G) {
         for (i = 0; i < G->n; ++i) {
             group = createVerticesGroup();
             addVertexToGroup(group, i);
-            insertItem(groupsLst, group);
+            insertItem(P, group);
         }
-        return groupsLst;
+        return P;
     }
 
     vector = malloc(G->n * sizeof(double));
@@ -194,10 +186,32 @@ LinkedList *divisionAlgorithm(Graph *G) {
     for (i = 0; i < G->n; i++) {
         addVertexToGroup(group, i);
     }
-    divisionAlgRec(G, group, groupsLst, vector, s);
+    insertItem(P, group);
+    while (P->first != NULL) {
+        groupA = NULL;
+        groupB = NULL;
+        group = P->first->pointer;
+        removeItem(P, P->first);
+        divisionAlgorithm2(G, group, vector, s, &groupA, &groupB);
+        if (groupA == NULL || groupB == NULL) {
+            insertItem(O, group);
+        } else {
+            if (groupA->size == 1) {
+                insertItem(O, groupA);
+            } else {
+                insertItem(P, groupA);
+            }
+            if (groupB->size == 1) {
+                insertItem(O, groupB);
+            } else {
+                insertItem(P, groupB);
+            }
+        }
+    }
+
     free(vector);
     free(s);
-    return groupsLst;
+    return O;
 }
 
 void saveOutputToFile(LinkedList *groupLst, char *output_path) {
