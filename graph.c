@@ -31,9 +31,11 @@ Graph *constructGraphFromInput(char *inputFilePath) {
         }
     }
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+    if(G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
         }
     }
     fclose(graph_file);
@@ -62,9 +64,11 @@ Graph* constructGraphFromMatrix(double* adjMatrix, int n){
         G->degreeSum += G->degrees[i];
     }
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+    if(G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
         }
     }
 

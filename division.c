@@ -149,8 +149,24 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
 LinkedList *divisionAlgorithm(Graph *G) {
     int i;
     double *vector, *s;
-    LinkedList *groupsLst;
+    LinkedList *groupsLst = createLinkedList();
     VerticesGroup *group;
+
+    /* Notice that the formula for the expected number of edges
+     * between two given vertices requires division by zero if
+     * G->degreeSum == 0. So we have to handle this case
+     * separately. Additionally, it is clear that G->degreeSum
+     * == 0 iff all vertices are isolated. Thus each one of them
+     * belongs to an independent cluster.*/
+    if(G->degreeSum == 0){
+        for(i = 0; i < G->n; ++i){
+            group = createVerticesGroup();
+            addVertexToGroup(group, i);
+            insertItem(groupsLst, group);
+        }
+        return groupsLst;
+    }
+
     vector = malloc(G->n * sizeof(double));
     assertMemoryAllocation(vector);
     s = malloc(G->n * sizeof(double));
@@ -159,7 +175,6 @@ LinkedList *divisionAlgorithm(Graph *G) {
     for (i = 0; i < G->n; i++) {
         addVertexToGroup(group, i);
     }
-    groupsLst = createLinkedList();
     divisionAlgRec(G, group, groupsLst, vector, s);
     free(vector);
     free(s);
