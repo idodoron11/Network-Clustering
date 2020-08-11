@@ -202,3 +202,29 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
     }
     fclose(output_file);
 }
+
+
+/**
+ * Calculate modularity of a graph's division
+ * @param groupLst
+ * @return modularity
+ */
+double calculateDivisionModularity(Graph *G, LinkedList *groupLst) {
+    double *s = malloc(sizeof(double) * G->n);
+    VerticesGroup *group;
+    double modularity = 0;
+    int i;
+    LinkedListNode *node = groupLst->first;
+    for (i = 0; i < G->n; i++) {
+        s[i] = 1;
+    }
+    if (node != NULL) {
+        do {
+            group = node->pointer;
+            calculateModularitySubMatrix(G, group);
+            modularity += calculateModularity(G, group, s);
+            node = node->next;
+        } while (node != groupLst->first);
+    }
+    return modularity;
+}

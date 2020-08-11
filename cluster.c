@@ -6,6 +6,7 @@
 #include "VerticesGroup.h"
 #include "LinkedList.h"
 #include "division.h"
+#include "defs.h"
 
 int main() {
     int i = 1, j;
@@ -13,8 +14,7 @@ int main() {
     LinkedListNode *node;
     VerticesGroup *group;
     VertexNode *vNode;
-    Graph *G = constructGraphFromInput(
-            "graph.in");
+    Graph *G = constructGraphFromInput(GRAPH_FILE_PATH);
     srand(time(0));
     groupsLst = divisionAlgorithm(G);
     node = groupsLst->first;

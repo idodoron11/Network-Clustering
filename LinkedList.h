@@ -23,6 +23,4 @@ void *insertItem(LinkedList *list, void *pointer);
 
 void removeItem(LinkedList *list, LinkedListNode *item);
 
-void printGroupList(LinkedList *groupList, int n);
-
 #endif

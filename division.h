@@ -18,4 +18,6 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
 
 void saveOutputToFile(LinkedList *groupLst, char *output_path);
 
+double calculateDivisionModularity(Graph *G, LinkedList *groupLst);
+
 #endif

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "tester.h"
 #include "../ErrorHandler.h"
-#include "../VerticesGroup.h"
+#include "testUtils.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -82,14 +82,20 @@ Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise) {
  * @param n The number of vertices G consists of.
  * @return 1-if the partitions are equivalent. 0-otherwise.
  */
-char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int n) {
-    int i = 0, j = 0;
+char checkGroupListsEquality(LinkedList *GroupList1, testGraph *TG) {
+    int i = 0, j = 0, n = TG->G->n;
+    double modularity;
+    LinkedList *GroupList2 = TG->GroupList;
     LinkedListNode *node1 = GroupList1->first, *node2 = GroupList2->first;
     VerticesGroup *G1, *G2;
     VertexNode *vertex1, *vertex2;
     int *coloring1, *coloring2, *colorMapping;
     int n1 = 0, n2 = 0;
     int numberOfGroups = GroupList1->length;
+    modularity = calculateDivisionModularity(TG->G, GroupList1);
+    printf("Found modularity: %f\n", modularity);
+    modularity = calculateDivisionModularity(TG->G, GroupList2);
+    printf("Expected modularity: %f\n", modularity);
     if (numberOfGroups != GroupList2->length) {
         printf("The first partition consists of %d groups, while the second consists of %d groups.\n",
                GroupList1->length, GroupList2->length);
@@ -97,6 +103,7 @@ char checkGroupListsEquality(LinkedList *GroupList1, LinkedList *GroupList2, int
         printGroupList(GroupList1, n);
         printf("Coloring2: ");
         printGroupList(GroupList2, n);
+
         return 0;
     }
     coloring1 = (int *) malloc(n * sizeof(int));
@@ -236,7 +243,7 @@ void destroyTestGraph(testGraph *TG) {
  */
 char performTest(testGraph *TG) {
     LinkedList *result = divisionAlgorithm(TG->G);
-    return checkGroupListsEquality(result, TG->GroupList, TG->G->n);
+    return checkGroupListsEquality(result, TG);
 }
 
 /**

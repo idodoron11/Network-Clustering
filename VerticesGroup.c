@@ -137,7 +137,7 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
  * (otherwise, we'll have to sort it later).
  * @param group a non-empty VerticesGroup.
  */
-void fillVerticesArr(VerticesGroup *group){
+void fillVerticesArr(VerticesGroup *group) {
     VertexNode *node = group->first;
     int i = 0;
     char isSorted = 1;
@@ -145,7 +145,7 @@ void fillVerticesArr(VerticesGroup *group){
     group->verticesArr = malloc(sizeof(int) * group->size);
     assertMemoryAllocation(group->verticesArr);
     do {
-        if(node->index < prevIndex)
+        if (node->index < prevIndex)
             isSorted = 0;
         group->verticesArr[i] = node->index;
         ++i;
@@ -168,6 +168,9 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
     double numRes = 0;
     /* the common value of all rows of the multiplication of the expectedEdges (K) matrix by s */
     double degreesCommon = 0, modularityNorm1 = getModularityMatrixNorm1(group);
+    if (G->degreeSum == 0) {
+        return 0;
+    }
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
     for (i = 0; i < group->size; i++) {
         degreesCommon += G->degrees[i] * s[i];
