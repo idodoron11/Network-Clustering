@@ -56,11 +56,7 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
     int count = 0;
     int rank1;
     int rank2;
-    char str[150];
-    FILE *resFile;
-    strcpy(str, DIR);
-    strcat(str, fileName);
-    resFile = fopen(str, "r");
+    FILE *resFile = fopen(fileName, "r");
 
     fread(&numOfGroups, sizeof(int), 1, resFile);
 
