@@ -56,9 +56,9 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
     int count = 0;
     int rank1;
     int rank2;
-    char str[80];
+    char str[150];
     FILE *resFile;
-    strcpy(str, fileName);
+    strcpy(str, DIR);
     strcat(str, fileName);
     resFile = fopen(str, "r");
 
