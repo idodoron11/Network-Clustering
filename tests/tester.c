@@ -5,7 +5,8 @@
 #include <time.h>
 #include <stdio.h>
 
-#define GRAPHS_DIR "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\tests\\graphs"
+/*#define GRAPHS_DIR "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\tests\\graphs"*/
+#define GRAPHS_DIR "D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graphs"
 
 void printColorings(int *coloring1, int *coloring2, int n);
 
@@ -291,95 +292,59 @@ char testRandomGraph() {
  * @param path the location of the input text file.
  * @return a new testGraph object.
  */
-testGraph *createTestGraphFromFile(char *path) {
-    FILE *file = fopen(path, "r");
-    char c;
-    char word[10];
-    int n;
-    int numberOfClusters;
-    int count = 0, value, i = 0, j = 0;
+testGraph *createTestGraphFromFile(char* path){
+    FILE* file = fopen(path, "r");
+    int n, value, numberOfClusters, i, j;
     double *adjMatrix;
-    VerticesGroup **group;
-    LinkedList *groupList;
+    char delimiter;
+    VerticesGroup *group;
+    LinkedList *groupList = createLinkedList();
     testGraph *TG = malloc(sizeof(testGraph));
     Graph *G = malloc(sizeof(Graph));
     assertFileOpen(file, path);
     assertMemoryAllocation(TG);
     assertMemoryAllocation(G);
-    if (file == NULL) {
-        printf("Could not open file %s", path);
-        return NULL;
+    assertFileOpen(file, path);
+
+    /* first value determines n */
+    assertFileRead(fscanf(file, "%d%c", &n, &delimiter), 2, path);
+    assertBooleanStatementIsTrue(delimiter == '\n');
+    adjMatrix = malloc(sizeof(double) * n * n);
+    assertMemoryAllocation(adjMatrix);
+
+    /* read matrix entry by entry */
+    for(i = 0; i < n; ++i){
+        for(j = 0; j < n; ++j){
+            assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
+            adjMatrix[i*n + j] = value;
+        }
+    }
+    assertBooleanStatementIsTrue(delimiter == '\n');
+
+    /* read number of clusters */
+    assertFileRead(fscanf(file, "%d%c", &numberOfClusters, &delimiter), 2, path);
+    assertBooleanStatementIsTrue(delimiter == '\n');
+
+    /* read groups one by one */
+    for(i = 0; i < numberOfClusters-1; ++i){
+        group = createVerticesGroup();
+        do {
+            assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
+            addVertexToGroup(group, value);
+        } while(delimiter == ' ');
+        assertBooleanStatementIsTrue(delimiter == '\n');
+        insertItem(groupList, group);
+    }
+    /* the last row might not end with ' ' or '\n' so we need to handle this differently */
+    if(i == numberOfClusters-1){
+        group = createVerticesGroup();
+        while(fscanf(file, "%d", &value) == 1)
+            addVertexToGroup(group, value);
+        insertItem(groupList, group);
     }
 
-    while ((c = fgetc(file)) != EOF) {
-        if (count == 0) {
-            if ((c == ' ' || c == '\n') && i > 0) {
-                word[i] = '\0';
-                n = atoi(word);
-                i = 0;
-                ++count;
-                adjMatrix = malloc(n * n * sizeof(double));
-                assertMemoryAllocation(adjMatrix);
-            } else if (i < 9) {
-                word[i] = c;
-                ++i;
-            }
-        } else if (count >= 1 && count <= n * n) {
-            if ((c == ' ' || c == '\n') && i > 0) {
-                word[i] = '\0';
-                value = atoi(word);
-                i = 0;
-                adjMatrix[count - 1] = value;
-                ++count;
-            } else if (i < 9) {
-                word[i] = c;
-                ++i;
-            }
-        } else if (count == 1 + n * n) {
-            if ((c == ' ' || c == '\n') && i > 0) {
-                word[i] = '\0';
-                numberOfClusters = atoi(word);
-                i = 0;
-                ++count;
-                group = malloc(numberOfClusters * sizeof(VerticesGroup));
-                assertMemoryAllocation(group);
-                group[0] = createVerticesGroup();
-            } else if (i < 9) {
-                word[i] = c;
-                ++i;
-            }
-        } else if (count >= 2 + n * n) {
-            if ((c == ' ' || c == '\n') && i > 0) {
-                word[i] = '\0';
-                value = atoi(word);
-                i = 0;
-                ++count;
-                addVertexToGroup(group[j], value);
-                if (c == '\n') {
-                    ++j;
-                    group[j] = createVerticesGroup();
-                }
-            } else if (i < 9) {
-                word[i] = c;
-                ++i;
-            }
-        }
-    }
-    if (i > 0) {
-        word[i] = '\0';
-        value = atoi(word);
-        i = 0;
-        ++count;
-        addVertexToGroup(group[j], value);
-        if (c == '\n') {
-            ++j;
-            group[j] = createVerticesGroup();
-        }
-    }
     fclose(file);
-    groupList = createLinkedList();
-    for (i = 0; i < numberOfClusters; ++i)
-        insertItem(groupList, group[i]);
+    assertBooleanStatementIsTrue(groupList->length == numberOfClusters);
     G = constructGraphFromMatrix(adjMatrix, n);
     TG->GroupList = groupList;
     TG->G = G;
