@@ -21,7 +21,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "../../cluster.h"
+
+#define DIR "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\tests\\neoTests\\"
 
 /**
 void printA(int* a, int size){
@@ -44,7 +47,6 @@ int equalArray(int *a1, int *a2, int size) {
 
 /** returns 1 iff correct **/
 int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, int size) {
-    FILE *resFile = fopen(fileName, "r");
     int numOfGroups;
     int rank;
     int *a1;
@@ -54,6 +56,11 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
     int count = 0;
     int rank1;
     int rank2;
+    char str[80];
+    FILE *resFile;
+    strcpy(str, fileName);
+    strcat(str, fileName);
+    resFile = fopen(str, "r");
 
     fread(&numOfGroups, sizeof(int), 1, resFile);
 
@@ -212,48 +219,48 @@ int main() {
 
     argv[0] = "name";
 
-    argv[1] = "3empty";
-    argv[2] = "3emptyOut";
+    argv[1] = DIR"3empty";
+    argv[2] = DIR"3emptyOut";
     cluster(argc, argv);
 
-    argv[1] = "30empty";
-    argv[2] = "30emptyOut";
+    argv[1] = DIR"30empty";
+    argv[2] = DIR"30emptyOut";
     cluster(argc, argv);
 
-    argv[1] = "3c";
-    argv[2] = "3cOut";
+    argv[1] = DIR"3c";
+    argv[2] = DIR"3cOut";
     cluster(argc, argv);
 
-    argv[1] = "30c";
-    argv[2] = "30cOut";
+    argv[1] = DIR"30c";
+    argv[2] = DIR"30cOut";
     cluster(argc, argv);
 
-    argv[1] = "30a";
-    argv[2] = "30aOut";
+    argv[1] = DIR"30a";
+    argv[2] = DIR"30aOut";
     cluster(argc, argv);
 
-    argv[1] = "300c";
-    argv[2] = "300cOut";
+    argv[1] = DIR"300c";
+    argv[2] = DIR"300cOut";
     cluster(argc, argv);
 
-    argv[1] = "300a";
-    argv[2] = "300aOut";
+    argv[1] = DIR"300a";
+    argv[2] = DIR"300aOut";
     cluster(argc, argv);
 
-    argv[1] = "20-30c";
-    argv[2] = "20-30cOut";
+    argv[1] = DIR"20-30c";
+    argv[2] = DIR"20-30cOut";
     cluster(argc, argv);
 
-    argv[1] = "20-30a";
-    argv[2] = "20-30aOut";
+    argv[1] = DIR"20-30a";
+    argv[2] = DIR"20-30aOut";
     cluster(argc, argv);
 
-    argv[1] = "60-100c";
-    argv[2] = "60-100cOut";
+    argv[1] = DIR"60-100c";
+    argv[2] = DIR"60-100cOut";
     cluster(argc, argv);
 
-    argv[1] = "60-100a";
-    argv[2] = "60-100aOut";
+    argv[1] = DIR"60-100a";
+    argv[2] = DIR"60-100aOut";
     cluster(argc, argv);
 
 
