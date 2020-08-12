@@ -129,7 +129,7 @@ void printSpmat(spmat *spm) {
  * @param groupList a partition of graph vertices into groups.
  * @param n the number of vertices in the graph.
  */
-void printGroupList(LinkedList *groupList, int n){
+void printGroupList(LinkedList *groupList, int n) {
     int L = groupList->length;
     int *coloring = malloc(sizeof(int) * n);
     int i, j;
@@ -138,10 +138,10 @@ void printGroupList(LinkedList *groupList, int n){
     VertexNode *vertex;
     assertMemoryAllocation(coloring);
 
-    for(i = 0; i < L; ++i){
+    for (i = 0; i < L; ++i) {
         group = node->pointer;
         vertex = group->first;
-        for(j = 0; j < group->size; ++j){
+        for (j = 0; j < group->size; ++j) {
             coloring[vertex->index] = i;
             vertex = vertex->next;
         }
@@ -149,9 +149,9 @@ void printGroupList(LinkedList *groupList, int n){
     }
 
     printf("[");
-    if(n>0)
+    if (n > 0)
         printf("%d", coloring[0]);
-    for(i = 1; i < n; ++i)
+    for (i = 1; i < n; ++i)
         printf(",%d", coloring[i]);
     printf("]\n");
 
@@ -194,4 +194,35 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
         }
     }
     return modularity;
+}
+
+LinkedList *createGroupsFromIndices(Graph *G, int *groups) {
+    LinkedList *lst = createLinkedList();
+    VerticesGroup *group;
+    int i, gIndex = 0, found;
+    do {
+        found = 0;
+        group = createVerticesGroup();
+        for (i = 0; i < G->n; i++) {
+            if (groups[i] == gIndex) {
+                addVertexToGroup(group, i);
+                found = 1;
+            }
+        }
+        if (found) {
+            insertItem(lst, group);
+        }
+        gIndex++;
+    } while (found);
+    return lst;
+}
+
+void compareExpected(char *inputPath, LinkedList *lst, int *expected) {
+    Graph *G;
+    LinkedList *expectedLst;
+    G = constructGraphFromInput(inputPath);
+    expectedLst = createGroupsFromIndices(G, expected);
+    printf("%s:\n", inputPath);
+    printf("Found modularity: %f", calculateDivisionModularity(G, lst));
+    printf("\nExpected modularity: %f\n\n", calculateDivisionModularity(G, expectedLst));
 }

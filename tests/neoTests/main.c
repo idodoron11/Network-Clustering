@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../cluster.h"
+#include "../testUtils.h"
 
 /**
 void printA(int* a, int size){
@@ -73,7 +74,7 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
             if (temp >= size || temp < 0) {
                 return 0;
             }
-            a1[temp] = 1;
+            a1[temp] = 0;
             count++;
         }
 
@@ -139,8 +140,8 @@ int main() {
     int i;
 
     /** ---------------------- making res arrays that we know are results ---------------------- **/
-    int threeEmpty[] = {1, 1, 1};
-    int threeC[] = {1, 1, 1};
+    int threeEmpty[] = {0, 0, 0};
+    int threeC[] = {0, 0, 0};
     int thirtyC[30];
     int thirtyA[30];
     int thirtyEmpty[30];
@@ -156,24 +157,24 @@ int main() {
     int allGood = 1;
 
     for (i = 0; i < 30; i++) {
-        thirtyEmpty[i] = 1;
+        thirtyEmpty[i] = 0;
     }
 
 
     for (i = 0; i < 30; i++) {
-        thirtyC[i] = 1;
+        thirtyC[i] = 0;
     }
 
     for (i = 0; i < 30; i++) {
-        thirtyA[i] = 1;
+        thirtyA[i] = 0;
     }
 
     for (i = 0; i < 300; i++) {
-        threeHundredC[i] = 1;
+        threeHundredC[i] = 0;
     }
 
     for (i = 0; i < 300; i++) {
-        threeHundredA[i] = 1;
+        threeHundredA[i] = 0;
     }
 
     for (i = 0; i < 50; i++) {
@@ -214,47 +215,47 @@ int main() {
 
     argv[1] = "3empty";
     argv[2] = "3emptyOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), threeEmpty);
 
     argv[1] = "30empty";
     argv[2] = "30emptyOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), thirtyEmpty);
 
     argv[1] = "3c";
     argv[2] = "3cOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), threeC);
 
     argv[1] = "30c";
     argv[2] = "30cOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), thirtyC);
 
     argv[1] = "30a";
     argv[2] = "30aOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), thirtyA);
 
     argv[1] = "300c";
     argv[2] = "300cOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), threeHundredC);
 
     argv[1] = "300a";
     argv[2] = "300aOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), threeHundredA);
 
     argv[1] = "20-30c";
     argv[2] = "20-30cOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), twentyThirty1);
 
     argv[1] = "20-30a";
     argv[2] = "20-30aOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), twentyThirty2);
 
     argv[1] = "60-100c";
     argv[2] = "60-100cOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), sixtyHundred1);
 
     argv[1] = "60-100a";
     argv[2] = "60-100aOut";
-    cluster(argc, argv);
+    compareExpected(argv[1], cluster(argc, argv), sixtyHundred2);
 
 
     /** ---------- checking if outFiles from our code is the same as expected result arrays ---------- **/

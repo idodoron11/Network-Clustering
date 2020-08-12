@@ -16,4 +16,6 @@ double calculateDivisionModularity(Graph *G, LinkedList *groupLst);
 
 double calculateModularityOfGroup(Graph *G, VerticesGroup *group);
 
+void compareExpected(char *inputPath, LinkedList *lst, int *expected);
+
 #endif

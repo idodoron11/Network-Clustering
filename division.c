@@ -166,16 +166,15 @@ LinkedList *divisionAlgorithm(Graph *G) {
     /* Notice that the formula for the expected number of edges
      * between two given vertices requires division by zero if
      * G->degreeSum == 0. So we have to handle this case
-     * separately. Additionally, it is clear that G->degreeSum
-     * == 0 iff all vertices are isolated. Thus each one of them
-     * belongs to an independent cluster.*/
+     * separately. In this case, there is no need to divide to groups
+     * since the max modularity is 0.*/
     if (G->degreeSum == 0) {
+        group = createVerticesGroup();
+        insertItem(O, group);
         for (i = 0; i < G->n; ++i) {
-            group = createVerticesGroup();
             addVertexToGroup(group, i);
-            insertItem(P, group);
         }
-        return P;
+        return O;
     }
 
     vector = malloc(G->n * sizeof(double));
