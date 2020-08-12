@@ -11,7 +11,7 @@
 
 #define FILE_PATH_MAX_LENGTH 200
 
-LinkedList *cluster(int argc, char **argv) {
+int main(int argc, char **argv) {
     int i = 1, j;
     LinkedList *groupsLst;
     LinkedListNode *node;
@@ -65,5 +65,5 @@ LinkedList *cluster(int argc, char **argv) {
     if (argc != 3)
         free(output_file_path);
 
-    return groupsLst;
+    return 0;
 }

@@ -21,7 +21,6 @@ typedef struct verticesGroup {
     spmat *edgeSubMatrix;
     double *modularityRowSums;
     double *modularityAbsColSum;
-    Matrix *bHatSubMatrix;
     int highestColSumIndex;
 
 } VerticesGroup;

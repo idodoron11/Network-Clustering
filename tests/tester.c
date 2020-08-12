@@ -4,6 +4,8 @@
 #include "testUtils.h"
 #include <time.h>
 #include <stdio.h>
+#include <math.h>
+#include <assert.h>
 
 #define GRAPHS_DIR "tests\\graphs"
 
@@ -399,12 +401,12 @@ void printResultsFromOutputFile(char *output_file_path) {
     fclose(output_file);
 }
 
-void testMatrixMult() {
+/*void testMatrixMult() {
     Graph *G;
     VerticesGroup *group;
-    int n = 20, i;
+    int n = 200, i;
     Matrix *mat = createMatrix(n);
-    double *s, *res;
+    double *s, *res, numRes1, numRes2;
     s = malloc(n * sizeof(double));
     res = malloc(n * sizeof(double));
     generateRandomSymSpmat(n, 20, mat);
@@ -415,13 +417,71 @@ void testMatrixMult() {
         s[i] = (drand(0, 100) > 50) ? 1 : -1;
     }
     calculateModularitySubMatrix(G, group);
-    multiplyModularityByVector(G, group, s, res, 1, 1);
+    numRes1 = multiplyModularityByVector(G, group, s, res, 1, 0);
+    numRes2 = multiplyModularityByVectorNormal(group, s, res, 1);
     destroyGraph(G);
     freeVerticesGroup(group);
+    assert(fabs(numRes1 - numRes2) < 0.01);
+}*/
+
+void testModularityChange() {
+    Graph *G;
+    VerticesGroup *group, *groupA, *groupB;
+    int n = 200, i;
+    Matrix *mat = createMatrix(n);
+    double *s, aModularity, bModularity, modularity;
+    s = malloc(n * sizeof(double));
+    generateRandomSymSpmat(n, 20, mat);
+    G = constructGraphFromAdjMat(mat);
+    group = createVerticesGroup();
+    groupA = createVerticesGroup();
+    groupB = createVerticesGroup();
+    for (i = 0; i < n; i++) {
+        addVertexToGroup(group, i);
+        if (drand(0, 100) < 20) {
+            addVertexToGroup(groupA, i);
+            s[i] = -1;
+        } else {
+            addVertexToGroup(groupB, i);
+            s[i] = 1;
+        }
+    }
+    calculateModularitySubMatrix(G, group);
+    modularity = calculateModularity(G, group, s);
+    aModularity = calculateModularityOfGroup(G, groupA);
+    bModularity = calculateModularityOfGroup(G, groupB);
+    assert(fabs(modularity - (aModularity + bModularity)) < 0.001);
 }
 
 int main() {
+    srand(time(0));
+    /*for (i = 0; i < 10; i++) {
+        testMatrixMult();
+    }*/
+    testModularityChange();
 
-
+    printf("Testing graph 1 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));
+    /*printResultsFromOutputFile("out");*/
+    printf("Testing graph 2 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph2-adjMat.txt"));
+    /*printf("Testing graph 3 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph3-adjMat.txt"));*/
+    printf("Testing graph 4 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph4-adjMat.txt"));
+    printf("Testing graph 5 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph5-adjMat.txt"));
+    printf("Testing graph 6 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph6-adjMat.txt"));
+    printf("Testing graph 7 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph7-adjMat.txt"));
+    printf("Testing graph 8 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
+    printf("Testing graph 9 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
+    printf("Testing graph 10 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
+    printf("Testing random graph.\n");
+    printf("Result: %d\n", testRandomGraph());
     return 0;
 }

@@ -191,7 +191,8 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
     calculateModularitySubMatrix(G, group);
     for (i = 0; i < group->size; i++) {
         for (j = 0; j < group->size; j++) {
-            modularity += readVal(G->adjMat, i, j) - readVal(G->expectedEdges, i, j);
+            modularity += readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
+                          readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
         }
     }
     return modularity;
@@ -285,26 +286,4 @@ Graph *constructGraphFromAdjMat(Matrix *mat) {
     }
 
     return G;
-}
-
-double multiplyModularityByVectorNormal(VerticesGroup *group, double *s, double *res, int bothSides) {
-    int i;
-    double numRes = 0;
-
-    matrixVectorMult(group->bHatSubMatrix, s, res);
-
-    for (i = 0; i < group->size; i++) {
-        if (bothSides) {
-            numRes += s[i] * res[i];
-        } else {
-            numRes += res[i] * res[i];
-        }
-    }
-    if (!bothSides) {
-        /* if the result is a vector, we return its norm */
-        numRes = sqrt(numRes);
-    }
-
-
-    return numRes;
 }
