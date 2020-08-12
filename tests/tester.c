@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #define GRAPHS_DIR "tests\\graphs"
+/*#define GRAPHS_DIR "..\\tests\\graphs"*/
 
 void printColorings(int *coloring1, int *coloring2, int n);
 
@@ -421,7 +422,29 @@ void testMatrixMult() {
 }
 
 int main() {
-
+    printf("Testing graph 1 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));
+    /*printResultsFromOutputFile("out");*/
+    printf("Testing graph 2 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph2-adjMat.txt"));
+    /*printf("Testing graph 3 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph3-adjMat.txt"));*/
+    printf("Testing graph 4 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph4-adjMat.txt"));
+    printf("Testing graph 5 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph5-adjMat.txt"));
+    printf("Testing graph 6 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph6-adjMat.txt"));
+    printf("Testing graph 7 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph7-adjMat.txt"));
+    printf("Testing graph 8 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
+    printf("Testing graph 9 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
+    printf("Testing graph 10 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
+    printf("Testing random graph.\n");
+    printf("Result: %d\n", testRandomGraph());
 
     return 0;
 }
