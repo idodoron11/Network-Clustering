@@ -226,10 +226,10 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
         if (currentGroup->verticesArr == NULL)
             fillVerticesArr(currentGroup);
-        if (currentGroup->isVerticesArrSorted)
+        if (currentGroup->isVerticesArrSorted) {
             assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
                             currentGroup->size, output_path);
-        else {
+        } else {
             verticesArr = malloc(sizeof(int) * currentGroup->size);
             assertMemoryAllocation(verticesArr);
             memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);

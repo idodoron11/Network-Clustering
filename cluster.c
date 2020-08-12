@@ -61,6 +61,7 @@ LinkedList *cluster(int argc, char **argv) {
         }
     }
     saveOutputToFile(groupsLst, output_file_path);
+
     if (argc != 3)
         free(output_file_path);
 

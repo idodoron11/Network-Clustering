@@ -54,7 +54,7 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
     int count = 0;
     int rank1;
     int rank2;
-    FILE *resFile = fopen(fileName, "r");
+    FILE *resFile = fopen(fileName, "rb");
 
     fread(&numOfGroups, sizeof(int), 1, resFile);
 
@@ -70,7 +70,7 @@ int check(char *fileName, int *array1, int *array2, int numberOfGroupsExpected, 
         }
 
         a1 = (int *) malloc(sizeof(int) * size);
-        while (fread(&temp, sizeof(int), 1, resFile)) {
+        while (fread(&temp, sizeof(int), 1, resFile) == 1) {
             if (temp >= size || temp < 0) {
                 return 0;
             }
@@ -223,39 +223,39 @@ int main() {
 
     argv[1] = "3c";
     argv[2] = "3cOut";
-    compareExpected(argv[1], cluster(argc, argv), threeC);
+    /*compareExpected(argv[1], cluster(argc, argv), threeC);*/
 
     argv[1] = "30c";
     argv[2] = "30cOut";
-    compareExpected(argv[1], cluster(argc, argv), thirtyC);
+    /*compareExpected(argv[1], cluster(argc, argv), thirtyC);*/
 
     argv[1] = "30a";
     argv[2] = "30aOut";
-    compareExpected(argv[1], cluster(argc, argv), thirtyA);
+    /*compareExpected(argv[1], cluster(argc, argv), thirtyA);*/
 
     argv[1] = "300c";
     argv[2] = "300cOut";
-    compareExpected(argv[1], cluster(argc, argv), threeHundredC);
+    /*compareExpected(argv[1], cluster(argc, argv), threeHundredC);*/
 
     argv[1] = "300a";
     argv[2] = "300aOut";
-    compareExpected(argv[1], cluster(argc, argv), threeHundredA);
+    /*compareExpected(argv[1], cluster(argc, argv), threeHundredA);*/
 
     argv[1] = "20-30c";
     argv[2] = "20-30cOut";
-    compareExpected(argv[1], cluster(argc, argv), twentyThirty1);
+    /*compareExpected(argv[1], cluster(argc, argv), twentyThirty1);*/
 
     argv[1] = "20-30a";
     argv[2] = "20-30aOut";
-    compareExpected(argv[1], cluster(argc, argv), twentyThirty2);
+    /*compareExpected(argv[1], cluster(argc, argv), twentyThirty2);*/
 
     argv[1] = "60-100c";
     argv[2] = "60-100cOut";
-    compareExpected(argv[1], cluster(argc, argv), sixtyHundred1);
+    /*compareExpected(argv[1], cluster(argc, argv), sixtyHundred1);*/
 
     argv[1] = "60-100a";
     argv[2] = "60-100aOut";
-    compareExpected(argv[1], cluster(argc, argv), sixtyHundred2);
+    /*compareExpected(argv[1], cluster(argc, argv), sixtyHundred2);*/
 
 
     /** ---------- checking if outFiles from our code is the same as expected result arrays ---------- **/
