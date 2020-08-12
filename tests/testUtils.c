@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "testUtils.h"
 #include "../spmat.h"
 #include "../ErrorHandler.h"
@@ -225,4 +226,85 @@ void compareExpected(char *inputPath, LinkedList *lst, int *expected) {
     printf("%s:\n", inputPath);
     printf("Found modularity: %f", calculateDivisionModularity(G, lst));
     printf("\nExpected modularity: %f\n\n", calculateDivisionModularity(G, expectedLst));
+}
+
+Graph *constructGraphFromMatrix(double *adjMatrix, int n) {
+    Graph *G = (Graph *) malloc(sizeof(Graph));
+    int i, j;
+    assertMemoryAllocation(G);
+    G->degrees = malloc(n * sizeof(int));
+    assertMemoryAllocation(G->degrees);
+    G->n = n;
+    G->degreeSum = 0;
+    G->adjMat = createMatrix(n);
+    G->expectedEdges = createMatrix(n);
+
+    for (i = 0; i < n; ++i) {
+        G->degrees[i] = 0;
+        for (j = 0; j < n; ++j) {
+            setVal(G->adjMat, i, j, adjMatrix[i * n + j]);
+            G->degrees[i] += adjMatrix[i * n + j];
+        }
+        G->degreeSum += G->degrees[i];
+    }
+
+    if (G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
+    }
+
+    return G;
+}
+
+Graph *constructGraphFromAdjMat(Matrix *mat) {
+    Graph *G = (Graph *) malloc(sizeof(Graph));
+    int i, j;
+    G->degrees = malloc(mat->n * sizeof(int));
+    G->n = mat->n;
+    G->degreeSum = 0;
+    G->adjMat = mat;
+    G->expectedEdges = createMatrix(mat->n);
+
+    for (i = 0; i < mat->n; ++i) {
+        G->degrees[i] = 0;
+        for (j = 0; j < mat->n; ++j) {
+            G->degrees[i] += readVal(G->adjMat, i, j);
+        }
+        G->degreeSum += G->degrees[i];
+    }
+
+    if (G->degreeSum != 0) {
+        for (i = 0; i < mat->n; i++) {
+            for (j = 0; j < mat->n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
+    }
+
+    return G;
+}
+
+double multiplyModularityByVectorNormal(VerticesGroup *group, double *s, double *res, int bothSides) {
+    int i;
+    double numRes = 0;
+
+    matrixVectorMult(group->bHatSubMatrix, s, res);
+
+    for (i = 0; i < group->size; i++) {
+        if (bothSides) {
+            numRes += s[i] * res[i];
+        } else {
+            numRes += res[i] * res[i];
+        }
+    }
+    if (!bothSides) {
+        /* if the result is a vector, we return its norm */
+        numRes = sqrt(numRes);
+    }
+
+
+    return numRes;
 }

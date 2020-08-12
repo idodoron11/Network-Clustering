@@ -291,8 +291,8 @@ char testRandomGraph() {
  * @param path the location of the input text file.
  * @return a new testGraph object.
  */
-testGraph *createTestGraphFromFile(char* path){
-    FILE* file = fopen(path, "r");
+testGraph *createTestGraphFromFile(char *path) {
+    FILE *file = fopen(path, "r");
     int n, value, numberOfClusters, i, j;
     double *adjMatrix;
     char delimiter;
@@ -312,10 +312,10 @@ testGraph *createTestGraphFromFile(char* path){
     assertMemoryAllocation(adjMatrix);
 
     /* read matrix entry by entry */
-    for(i = 0; i < n; ++i){
-        for(j = 0; j < n; ++j){
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < n; ++j) {
             assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
-            adjMatrix[i*n + j] = value;
+            adjMatrix[i * n + j] = value;
         }
     }
     assertBooleanStatementIsTrue(delimiter == '\n');
@@ -325,19 +325,19 @@ testGraph *createTestGraphFromFile(char* path){
     assertBooleanStatementIsTrue(delimiter == '\n');
 
     /* read groups one by one */
-    for(i = 0; i < numberOfClusters-1; ++i){
+    for (i = 0; i < numberOfClusters - 1; ++i) {
         group = createVerticesGroup();
         do {
             assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
             addVertexToGroup(group, value);
-        } while(delimiter == ' ');
+        } while (delimiter == ' ');
         assertBooleanStatementIsTrue(delimiter == '\n');
         insertItem(groupList, group);
     }
     /* the last row might not end with ' ' or '\n' so we need to handle this differently */
-    if(i == numberOfClusters-1){
+    if (i == numberOfClusters - 1) {
         group = createVerticesGroup();
-        while(fscanf(file, "%d", &value) == 1)
+        while (fscanf(file, "%d", &value) == 1)
             addVertexToGroup(group, value);
         insertItem(groupList, group);
     }
@@ -399,30 +399,29 @@ void printResultsFromOutputFile(char *output_file_path) {
     fclose(output_file);
 }
 
+void testMatrixMult() {
+    Graph *G;
+    VerticesGroup *group;
+    int n = 20, i;
+    Matrix *mat = createMatrix(n);
+    double *s, *res;
+    s = malloc(n * sizeof(double));
+    res = malloc(n * sizeof(double));
+    generateRandomSymSpmat(n, 20, mat);
+    G = constructGraphFromAdjMat(mat);
+    group = createVerticesGroup();
+    for (i = 0; i < n; i++) {
+        addVertexToGroup(group, i);
+        s[i] = (drand(0, 100) > 50) ? 1 : -1;
+    }
+    calculateModularitySubMatrix(G, group);
+    multiplyModularityByVector(G, group, s, res, 1, 1);
+    destroyGraph(G);
+    freeVerticesGroup(group);
+}
+
 int main() {
-    printf("Testing graph 1 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));
-    /*printResultsFromOutputFile("out");*/
-    printf("Testing graph 2 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph2-adjMat.txt"));
-    /*printf("Testing graph 3 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph3-adjMat.txt"));*/
-    printf("Testing graph 4 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph4-adjMat.txt"));
-    printf("Testing graph 5 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph5-adjMat.txt"));
-    printf("Testing graph 6 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph6-adjMat.txt"));
-    printf("Testing graph 7 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph7-adjMat.txt"));
-    printf("Testing graph 8 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
-    printf("Testing graph 9 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
-    printf("Testing graph 10 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
-    printf("Testing random graph.\n");
-    printf("Result: %d\n", testRandomGraph());
+
 
     return 0;
 }

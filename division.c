@@ -6,7 +6,7 @@
 #include "defs.h"
 #include "ErrorHandler.h"
 #include "quicksort.h"
-#include "LinkedList.h"
+#include "tests/testUtils.h"
 
 /**
  * Generate a random vector
@@ -113,13 +113,13 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
 }
 
 /**
- * Recursion of the division algorithm.
- * Divides a group into two if possible, and recursively operates on the sub groups.
+ * Divide a group into two.
  * @param G graph object
  * @param group vertices group
- * @param groupsLst a list of indivisible sub groups
  * @param vector an empty allocated array the size of the graph's vertices, used for power iteration
  * @param s an empty allocated array the size of the graph's vertices, used for storing an eigenvector
+ * @param newGroupA the first divided group will be assigned to this parameter (or left as NULL)
+ * @param newGroupB the second divided group will be assigned to this parameter (or left as NULL)
  */
 void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
                         VerticesGroup **newGroupB) {

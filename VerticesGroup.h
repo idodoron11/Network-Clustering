@@ -21,6 +21,7 @@ typedef struct verticesGroup {
     spmat *edgeSubMatrix;
     double *modularityRowSums;
     double *modularityAbsColSum;
+    Matrix *bHatSubMatrix;
     int highestColSumIndex;
 
 } VerticesGroup;
@@ -33,7 +34,7 @@ VertexNode *addVertexToGroup(VerticesGroup *group, int index);
 
 void calculateModularitySubMatrix(Graph *G, VerticesGroup *group);
 
-double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides);
+double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides, int withNorm);
 
 double calculateModularity(Graph *G, VerticesGroup *group, double *s);
 

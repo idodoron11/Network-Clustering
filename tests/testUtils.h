@@ -18,4 +18,14 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group);
 
 void compareExpected(char *inputPath, LinkedList *lst, int *expected);
 
+/**
+ * Creates a nee graph object from an input matrix.
+ * @param adjMatrix the adjacency matrix given as an input.
+ * @param n the number of vertices.
+ * @return a reference to a new graph object, defined by the given adjacency matrix.
+ */
+Graph* constructGraphFromMatrix(double* adjMatrix, int n);
+
+Graph *constructGraphFromAdjMat(Matrix *mat);
+
 #endif
