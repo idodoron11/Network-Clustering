@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "../../cluster.h"
+#include "../cluster.h"
 #include "../testUtils.h"
 
 /**

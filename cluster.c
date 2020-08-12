@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "cluster.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"
