@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "ErrorHandler.h"
 #include "quicksort.h"
+#include "tests/testUtils.h"
 
 /**
  * Generate a random vector
@@ -50,18 +51,31 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
 }
 
 /**
+ * Copy double array into another array
+ * @param dst destination array
+ * @param src source array
+ * @param len number of elements to copy
+ */
+void copyArr(double *dst, double *src, int len) {
+    int i;
+    for (i = 0; i < len; i++) {
+        dst[i] = src[i];
+    }
+}
+
+/**
  * Maximize modularity by moving nodes between the sub groups
  * @param group a group of vertices
  * @param s the eigenvevtor, will be assigned the maximum split
  * @param initialModularity the modularity of the group
  */
-void maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity) {
+double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity) {
     int i, j, maxNode;
     VertexNode *node, *maxNodeRef;
     double modularity, maxModularity, maxIterationModularity;
     double *maxS = malloc(group->size * sizeof(double));
     assertMemoryAllocation(maxS);
-    memcpy(maxS, s, group->size);
+    copyArr(maxS, s, group->size);
     maxModularity = initialModularity;
     for (i = 0; i < group->size; i++) {
         node = group->first;
@@ -83,54 +97,57 @@ void maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initia
         maxNodeRef->hasMoved = 1;
         if (maxIterationModularity > maxModularity) {
             maxModularity = maxIterationModularity;
-            memcpy(maxS, s, group->size);
+            copyArr(maxS, s, group->size);
         }
     }
-    memcpy(s, maxS, group->size);
+    copyArr(s, maxS, group->size);
     free(maxS);
+    if (maxModularity > initialModularity) {
+        node = group->first;
+        for (i = 0; i < group->size; i++) {
+            node->hasMoved = 0;
+            node = node->next;
+        }
+    }
+    return maxModularity;
 }
 
 /**
- * Recursion of the division algorithm.
- * Divides a group into two if possible, and recursively operates on the sub groups.
+ * Divide a group into two.
  * @param G graph object
  * @param group vertices group
- * @param groupsLst a list of indivisible sub groups
  * @param vector an empty allocated array the size of the graph's vertices, used for power iteration
  * @param s an empty allocated array the size of the graph's vertices, used for storing an eigenvector
+ * @param newGroupA the first divided group will be assigned to this parameter (or left as NULL)
+ * @param newGroupB the second divided group will be assigned to this parameter (or left as NULL)
  */
-void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, double *vector, double *s) {
-    VerticesGroup *newGroupA = NULL, *newGroupB = NULL;
+void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
+                        VerticesGroup **newGroupB) {
     int i;
-    double lambda, modularity;
-    if (group->size == 1) {
-        insertItem(groupsLst, group);
-        return;
-    }
+    double lambda, modularity, modularityAfterMax;
+
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
     lambda = powerIteration(G, group, vector, s);
     if (!IS_POSITIVE(lambda)) {
-        insertItem(groupsLst, group);
         return;
     }
     /* turn s eigenvector into +1 and -1 */
     for (i = 0; i < group->size; i++) {
         s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
     }
-    modularity = calculateModularity(G, group, s);
-    if (!IS_POSITIVE(modularity)) {
-        insertItem(groupsLst, group);
+
+    modularityAfterMax = calculateModularity(G, group, s);
+    do {
+        modularity = modularityAfterMax;
+        modularityAfterMax = maximizeModularity(G, group, s, modularity);
+    } while (modularityAfterMax > modularity);
+
+    if (!IS_POSITIVE(modularityAfterMax)) {
         return;
     }
-    maximizeModularity(G, group, s, modularity);
-    divideGroupByEigenvector(group, s, &newGroupA, &newGroupB);
-    if (newGroupA == NULL || newGroupB == NULL) {
-        insertItem(groupsLst, group);
-    } else {
-        divisionAlgRec(G, newGroupA, groupsLst, vector, s);
-        divisionAlgRec(G, newGroupB, groupsLst, vector, s);
-    }
+
+    divideGroupByEigenvector(group, s, newGroupA, newGroupB);
 }
 
 /**
@@ -141,22 +158,23 @@ void divisionAlgRec(Graph *G, VerticesGroup *group, LinkedList *groupsLst, doubl
 LinkedList *divisionAlgorithm(Graph *G) {
     int i;
     double *vector, *s;
-    LinkedList *groupsLst = createLinkedList();
-    VerticesGroup *group;
+    LinkedList *P, *O;
+    VerticesGroup *group, *groupA, *groupB;
+    P = createLinkedList();
+    O = createLinkedList();
 
     /* Notice that the formula for the expected number of edges
      * between two given vertices requires division by zero if
      * G->degreeSum == 0. So we have to handle this case
-     * separately. Additionally, it is clear that G->degreeSum
-     * == 0 iff all vertices are isolated. Thus each one of them
-     * belongs to an independent cluster.*/
+     * separately. In this case, there is no need to divide to groups
+     * since the max modularity is 0.*/
     if (G->degreeSum == 0) {
+        group = createVerticesGroup();
+        insertItem(O, group);
         for (i = 0; i < G->n; ++i) {
-            group = createVerticesGroup();
             addVertexToGroup(group, i);
-            insertItem(groupsLst, group);
         }
-        return groupsLst;
+        return O;
     }
 
     vector = malloc(G->n * sizeof(double));
@@ -167,10 +185,32 @@ LinkedList *divisionAlgorithm(Graph *G) {
     for (i = 0; i < G->n; i++) {
         addVertexToGroup(group, i);
     }
-    divisionAlgRec(G, group, groupsLst, vector, s);
+    insertItem(P, group);
+    while (P->first != NULL) {
+        groupA = NULL;
+        groupB = NULL;
+        group = P->first->pointer;
+        removeItem(P, P->first);
+        divisionAlgorithm2(G, group, vector, s, &groupA, &groupB);
+        if (groupA == NULL || groupB == NULL) {
+            insertItem(O, group);
+        } else {
+            if (groupA->size == 1) {
+                insertItem(O, groupA);
+            } else {
+                insertItem(P, groupA);
+            }
+            if (groupB->size == 1) {
+                insertItem(O, groupB);
+            } else {
+                insertItem(P, groupB);
+            }
+        }
+    }
+
     free(vector);
     free(s);
-    return groupsLst;
+    return O;
 }
 
 void saveOutputToFile(LinkedList *groupLst, char *output_path) {
@@ -186,10 +226,10 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
         if (currentGroup->verticesArr == NULL)
             fillVerticesArr(currentGroup);
-        if (currentGroup->isVerticesArrSorted)
+        if (currentGroup->isVerticesArrSorted) {
             assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
                             currentGroup->size, output_path);
-        else {
+        } else {
             verticesArr = malloc(sizeof(int) * currentGroup->size);
             assertMemoryAllocation(verticesArr);
             memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);
@@ -201,30 +241,4 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
         currentNode = currentNode->next;
     }
     fclose(output_file);
-}
-
-
-/**
- * Calculate modularity of a graph's division
- * @param groupLst
- * @return modularity
- */
-double calculateDivisionModularity(Graph *G, LinkedList *groupLst) {
-    double *s = malloc(sizeof(double) * G->n);
-    VerticesGroup *group;
-    double modularity = 0;
-    int i;
-    LinkedListNode *node = groupLst->first;
-    for (i = 0; i < G->n; i++) {
-        s[i] = 1;
-    }
-    if (node != NULL) {
-        do {
-            group = node->pointer;
-            calculateModularitySubMatrix(G, group);
-            modularity += calculateModularity(G, group, s);
-            node = node->next;
-        } while (node != groupLst->first);
-    }
-    return modularity;
 }

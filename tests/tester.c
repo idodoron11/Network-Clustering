@@ -4,9 +4,10 @@
 #include "testUtils.h"
 #include <time.h>
 #include <stdio.h>
+#include <math.h>
+#include <assert.h>
 
-/*#define GRAPHS_DIR "C:\\Users\\royar\\Source\\Workspaces\\Workspace\\C projects\\cproject-cluster\\tests\\graphs"*/
-#define GRAPHS_DIR "D:\\Users\\idodo\\OneDrive - mail.tau.ac.il\\Studies\\Tel Aviv University\\Semester 4\\Software Project\\Homework\\Project\\Project\\tests\\graphs"
+#define GRAPHS_DIR "tests\\graphs"
 
 void printColorings(int *coloring1, int *coloring2, int n);
 
@@ -292,8 +293,8 @@ char testRandomGraph() {
  * @param path the location of the input text file.
  * @return a new testGraph object.
  */
-testGraph *createTestGraphFromFile(char* path){
-    FILE* file = fopen(path, "r");
+testGraph *createTestGraphFromFile(char *path) {
+    FILE *file = fopen(path, "r");
     int n, value, numberOfClusters, i, j;
     double *adjMatrix;
     char delimiter;
@@ -313,10 +314,10 @@ testGraph *createTestGraphFromFile(char* path){
     assertMemoryAllocation(adjMatrix);
 
     /* read matrix entry by entry */
-    for(i = 0; i < n; ++i){
-        for(j = 0; j < n; ++j){
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < n; ++j) {
             assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
-            adjMatrix[i*n + j] = value;
+            adjMatrix[i * n + j] = value;
         }
     }
     assertBooleanStatementIsTrue(delimiter == '\n');
@@ -326,19 +327,19 @@ testGraph *createTestGraphFromFile(char* path){
     assertBooleanStatementIsTrue(delimiter == '\n');
 
     /* read groups one by one */
-    for(i = 0; i < numberOfClusters-1; ++i){
+    for (i = 0; i < numberOfClusters - 1; ++i) {
         group = createVerticesGroup();
         do {
             assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
             addVertexToGroup(group, value);
-        } while(delimiter == ' ');
+        } while (delimiter == ' ');
         assertBooleanStatementIsTrue(delimiter == '\n');
         insertItem(groupList, group);
     }
     /* the last row might not end with ' ' or '\n' so we need to handle this differently */
-    if(i == numberOfClusters-1){
+    if (i == numberOfClusters - 1) {
         group = createVerticesGroup();
-        while(fscanf(file, "%d", &value) == 1)
+        while (fscanf(file, "%d", &value) == 1)
             addVertexToGroup(group, value);
         insertItem(groupList, group);
     }
@@ -400,7 +401,65 @@ void printResultsFromOutputFile(char *output_file_path) {
     fclose(output_file);
 }
 
+/*void testMatrixMult() {
+    Graph *G;
+    VerticesGroup *group;
+    int n = 200, i;
+    Matrix *mat = createMatrix(n);
+    double *s, *res, numRes1, numRes2;
+    s = malloc(n * sizeof(double));
+    res = malloc(n * sizeof(double));
+    generateRandomSymSpmat(n, 20, mat);
+    G = constructGraphFromAdjMat(mat);
+    group = createVerticesGroup();
+    for (i = 0; i < n; i++) {
+        addVertexToGroup(group, i);
+        s[i] = (drand(0, 100) > 50) ? 1 : -1;
+    }
+    calculateModularitySubMatrix(G, group);
+    numRes1 = multiplyModularityByVector(G, group, s, res, 1, 0);
+    numRes2 = multiplyModularityByVectorNormal(group, s, res, 1);
+    destroyGraph(G);
+    freeVerticesGroup(group);
+    assert(fabs(numRes1 - numRes2) < 0.01);
+}*/
+
+void testModularityChange() {
+    Graph *G;
+    VerticesGroup *group, *groupA, *groupB;
+    int n = 200, i;
+    Matrix *mat = createMatrix(n);
+    double *s, aModularity, bModularity, modularity;
+    s = malloc(n * sizeof(double));
+    generateRandomSymSpmat(n, 20, mat);
+    G = constructGraphFromAdjMat(mat);
+    group = createVerticesGroup();
+    groupA = createVerticesGroup();
+    groupB = createVerticesGroup();
+    for (i = 0; i < n; i++) {
+        addVertexToGroup(group, i);
+        if (drand(0, 100) < 20) {
+            addVertexToGroup(groupA, i);
+            s[i] = -1;
+        } else {
+            addVertexToGroup(groupB, i);
+            s[i] = 1;
+        }
+    }
+    calculateModularitySubMatrix(G, group);
+    modularity = calculateModularity(G, group, s);
+    aModularity = calculateModularityOfGroup(G, groupA);
+    bModularity = calculateModularityOfGroup(G, groupB);
+    assert(fabs(modularity - (aModularity + bModularity)) < 0.001);
+}
+
 int main() {
+    srand(time(0));
+    /*for (i = 0; i < 10; i++) {
+        testMatrixMult();
+    }*/
+    testModularityChange();
+
     printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));
     /*printResultsFromOutputFile("out");*/
@@ -420,8 +479,9 @@ int main() {
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
     printf("Testing graph 9 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
+    printf("Testing graph 10 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
     printf("Testing random graph.\n");
     printf("Result: %d\n", testRandomGraph());
-
     return 0;
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "testUtils.h"
 #include "../spmat.h"
 #include "../ErrorHandler.h"
@@ -129,7 +130,7 @@ void printSpmat(spmat *spm) {
  * @param groupList a partition of graph vertices into groups.
  * @param n the number of vertices in the graph.
  */
-void printGroupList(LinkedList *groupList, int n){
+void printGroupList(LinkedList *groupList, int n) {
     int L = groupList->length;
     int *coloring = malloc(sizeof(int) * n);
     int i, j;
@@ -138,10 +139,10 @@ void printGroupList(LinkedList *groupList, int n){
     VertexNode *vertex;
     assertMemoryAllocation(coloring);
 
-    for(i = 0; i < L; ++i){
+    for (i = 0; i < L; ++i) {
         group = node->pointer;
         vertex = group->first;
-        for(j = 0; j < group->size; ++j){
+        for (j = 0; j < group->size; ++j) {
             coloring[vertex->index] = i;
             vertex = vertex->next;
         }
@@ -149,11 +150,140 @@ void printGroupList(LinkedList *groupList, int n){
     }
 
     printf("[");
-    if(n>0)
+    if (n > 0)
         printf("%d", coloring[0]);
-    for(i = 1; i < n; ++i)
+    for (i = 1; i < n; ++i)
         printf(",%d", coloring[i]);
     printf("]\n");
 
     free(coloring);
+}
+
+
+/**
+ * Calculate modularity of a graph's division
+ * @param groupLst
+ * @return modularity
+ */
+double calculateDivisionModularity(Graph *G, LinkedList *groupLst) {
+    double *s = malloc(sizeof(double) * G->n);
+    VerticesGroup *group;
+    double modularity = 0;
+    int i;
+    LinkedListNode *node = groupLst->first;
+    for (i = 0; i < G->n; i++) {
+        s[i] = 1;
+    }
+    if (node != NULL) {
+        do {
+            group = node->pointer;
+            calculateModularitySubMatrix(G, group);
+            modularity += calculateModularityOfGroup(G, group);
+            node = node->next;
+        } while (node != groupLst->first);
+    }
+    return modularity;
+}
+
+double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
+    int i, j;
+    double modularity = 0;
+    calculateModularitySubMatrix(G, group);
+    for (i = 0; i < group->size; i++) {
+        for (j = 0; j < group->size; j++) {
+            modularity += readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
+                          readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
+        }
+    }
+    return modularity;
+}
+
+LinkedList *createGroupsFromIndices(Graph *G, int *groups) {
+    LinkedList *lst = createLinkedList();
+    VerticesGroup *group;
+    int i, gIndex = 0, found;
+    do {
+        found = 0;
+        group = createVerticesGroup();
+        for (i = 0; i < G->n; i++) {
+            if (groups[i] == gIndex) {
+                addVertexToGroup(group, i);
+                found = 1;
+            }
+        }
+        if (found) {
+            insertItem(lst, group);
+        }
+        gIndex++;
+    } while (found);
+    return lst;
+}
+
+void compareExpected(char *inputPath, LinkedList *lst, int *expected) {
+    Graph *G;
+    LinkedList *expectedLst;
+    G = constructGraphFromInput(inputPath);
+    expectedLst = createGroupsFromIndices(G, expected);
+    printf("%s:\n", inputPath);
+    printf("Found modularity: %f", calculateDivisionModularity(G, lst));
+    printf("\nExpected modularity: %f\n\n", calculateDivisionModularity(G, expectedLst));
+}
+
+Graph *constructGraphFromMatrix(double *adjMatrix, int n) {
+    Graph *G = (Graph *) malloc(sizeof(Graph));
+    int i, j;
+    assertMemoryAllocation(G);
+    G->degrees = malloc(n * sizeof(int));
+    assertMemoryAllocation(G->degrees);
+    G->n = n;
+    G->degreeSum = 0;
+    G->adjMat = createMatrix(n);
+    G->expectedEdges = createMatrix(n);
+
+    for (i = 0; i < n; ++i) {
+        G->degrees[i] = 0;
+        for (j = 0; j < n; ++j) {
+            setVal(G->adjMat, i, j, adjMatrix[i * n + j]);
+            G->degrees[i] += adjMatrix[i * n + j];
+        }
+        G->degreeSum += G->degrees[i];
+    }
+
+    if (G->degreeSum != 0) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
+    }
+
+    return G;
+}
+
+Graph *constructGraphFromAdjMat(Matrix *mat) {
+    Graph *G = (Graph *) malloc(sizeof(Graph));
+    int i, j;
+    G->degrees = malloc(mat->n * sizeof(int));
+    G->n = mat->n;
+    G->degreeSum = 0;
+    G->adjMat = mat;
+    G->expectedEdges = createMatrix(mat->n);
+
+    for (i = 0; i < mat->n; ++i) {
+        G->degrees[i] = 0;
+        for (j = 0; j < mat->n; ++j) {
+            G->degrees[i] += readVal(G->adjMat, i, j);
+        }
+        G->degreeSum += G->degrees[i];
+    }
+
+    if (G->degreeSum != 0) {
+        for (i = 0; i < mat->n; i++) {
+            for (j = 0; j < mat->n; j++) {
+                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
+            }
+        }
+    }
+
+    return G;
 }

@@ -44,37 +44,6 @@ Graph *constructGraphFromInput(char *inputFilePath) {
     return G;
 }
 
-Graph* constructGraphFromMatrix(double* adjMatrix, int n){
-    Graph* G = (Graph*) malloc(sizeof(Graph));
-    int i, j;
-    assertMemoryAllocation(G);
-    G->degrees = malloc(n * sizeof(int));
-    assertMemoryAllocation(G->degrees);
-    G->n = n;
-    G->degreeSum = 0;
-    G->adjMat = createMatrix(n);
-    G->expectedEdges = createMatrix(n);
-
-    for(i=0; i < n; ++i){
-        G->degrees[i] = 0;
-        for(j=0; j < n; ++j) {
-            setVal(G->adjMat, i, j, adjMatrix[i*n+j]);
-            G->degrees[i] += adjMatrix[i*n+j];
-        }
-        G->degreeSum += G->degrees[i];
-    }
-
-    if(G->degreeSum != 0) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-            }
-        }
-    }
-
-    return G;
-}
-
 void destroyGraph(Graph *G) {
     freeMatrix(G->adjMat);
     free(G);
