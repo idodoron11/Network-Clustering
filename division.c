@@ -70,39 +70,56 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
                           unsigned int *numberOfPositiveVertices) {
     int i, j, maxNode = 0;
     double modularity, maxModularity, maxIterationModularity;
-    double *maxS = malloc(group->size * sizeof(double));
+    int *indices = malloc(group->size * sizeof(int));
     char *hasMoved = calloc(group->size, sizeof(char));
-    assertMemoryAllocation(maxS);
+    int bestIteration;
+    char isMaxNodeValid = 0;
+    assertMemoryAllocation(indices);
     assertMemoryAllocation(hasMoved);
-    copyArr(maxS, s, group->size);
     maxModularity = initialModularity;
+
     for (i = 0; i < group->size; i++) {
+        isMaxNodeValid = 0;
         for (j = 0; j < group->size; j++) {
             if (hasMoved[j] == 0) {
                 s[j] = -s[j];
                 modularity = calculateModularity(G, group, s);
-                if (modularity > maxIterationModularity) {
+                if (isMaxNodeValid == 0 || modularity > maxIterationModularity) {
                     maxIterationModularity = modularity;
                     maxNode = j;
+                    isMaxNodeValid = 1;
                 }
                 s[j] = -s[j];
             }
         }
         s[maxNode] = -s[maxNode];
+        *numberOfPositiveVertices += s[maxNode] == 1.0 ? 1 : (-1);
+        indices[i] = maxNode;
         hasMoved[maxNode] = 1;
-        if (maxIterationModularity > maxModularity) {
+        if (i == 0 || maxIterationModularity > maxModularity) {
             maxModularity = maxIterationModularity;
-            *numberOfPositiveVertices = copyArr(maxS, s, group->size);
+            bestIteration = i;
         }
     }
-    copyArr(s, maxS, group->size);
-    free(maxS);
-    /* TODO: isn't maxModularity always greater or equal to initialModularity? */
+
+    /* this loop moves back vertices that were moved after the best iteration */
+    for(i = group->size - 1; i > bestIteration; --i){
+        j = indices[i];
+        s[j] = -s[j];
+        *numberOfPositiveVertices += s[j] == 1.0 ? 1 : (-1);
+    }
+
+    free(indices);
+
+    /* TODO: if maxModularity > initialModularity, this function will not
+     *  be called again. also, this function will free hasMoved before exit.
+     *  so why are we doing this? */
     if (maxModularity > initialModularity) {
         for (i = 0; i < group->size; i++) {
             hasMoved[i] = 0;
         }
     }
+    free(hasMoved);
     return maxModularity;
 }
 
