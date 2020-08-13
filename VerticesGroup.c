@@ -7,29 +7,22 @@
 #include "defs.h"
 #include "ErrorHandler.h"
 
-VerticesGroup *createVerticesGroup() {
+VerticesGroup *createVerticesGroup(unsigned int capacity) {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
     assertMemoryAllocation(group);
-    group->size = 0;
+    group->verticesArr = malloc(capacity * sizeof(int));
+    assertMemoryAllocation(group->verticesArr);
+    group->capacity = capacity;
     group->edgeSubMatrix = NULL;
     group->modularityRowSums = NULL;
     group->modularityAbsColSum = NULL;
-    group->verticesArr = NULL;
-    group->isVerticesArrSorted = 0;
+    group->isVerticesArrSorted = 1;
+    group->size = 0;
     return group;
 }
 
 void freeVerticesGroup(VerticesGroup *group) {
-    VertexNode *temp;
-    VertexNode *node = group->first;
-    if (node != NULL) {
-        do {
-            temp = node->next;
-            free(node);
-            node = temp;
-        } while (node != group->first);
-    }
-
+    free(group->verticesArr);
     if (group->edgeSubMatrix != NULL) {
         /* the modularity was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
@@ -39,35 +32,26 @@ void freeVerticesGroup(VerticesGroup *group) {
     free(group);
 }
 
-VertexNode *addVertexToGroup(VerticesGroup *group, int index) {
-    VertexNode *node = malloc(sizeof(VertexNode));
-    assertMemoryAllocation(node);
-    node->index = index;
-    node->hasMoved = 0;
-    if (group->size != 0) {
-        node->next = group->first;
-        node->prev = group->first->prev;
-        group->first->prev->next = node;
-        group->first->prev = node;
-    } else {
-        group->first = node;
-        node->prev = node;
-        node->next = node;
-    }
-    group->size++;
-    return node;
+void addVertexToGroup(VerticesGroup *group, int index) {
+    assertBooleanStatementIsTrue(group->size < group->capacity);
+    group->verticesArr[group->size] = index;
+    if(group->size > 2 && group->verticesArr[group->size] < group->verticesArr[group->size - 1])
+        group->isVerticesArrSorted = 0;
+    ++group->size;
 }
 
 /**
  * Adds a sequence of indices to the group.
  * @param group the group to which nodes are added.
- * @param sequence a sequence of integers, representing nodes in a graph.
- * @param length the length of the input sequence.
+ * @param sequence a sequence of group->capacity distinct integers, representing vertices.
  */
 void addSequence(VerticesGroup *group, int *sequence, int length) {
     int i;
-    for (i = 0; i < length; ++i)
-        addVertexToGroup(group, sequence[i]);
+    assertBooleanStatementIsTrue(length <= group->capacity);
+    for(i = 0; i < length; ++i) {
+        group->verticesArr[i] = sequence[i];
+        ++group->size;
+    }
 }
 
 /**
@@ -97,7 +81,6 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
         group->highestColSumIndex = 0;
         row = malloc(sizeof(double) * group->size);
         assertMemoryAllocation(row);
-        fillVerticesArr(group);
         for (i = 0; i < group->size; i++) {
             for (j = 0; j < group->size; j++) {
                 row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
@@ -128,30 +111,6 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
 
         free(row);
     }
-}
-
-/**
- * This function allocates space for group->verticesArr
- * and fills it up with the group's vertices. It also
- * tracks whether or not the array is considered sorted.
- * (otherwise, we'll have to sort it later).
- * @param group a non-empty VerticesGroup.
- */
-void fillVerticesArr(VerticesGroup *group) {
-    VertexNode *node = group->first;
-    int i = 0;
-    char isSorted = 1;
-    int prevIndex = node->index;
-    group->verticesArr = malloc(sizeof(int) * group->size);
-    assertMemoryAllocation(group->verticesArr);
-    do {
-        if (node->index < prevIndex)
-            isSorted = 0;
-        group->verticesArr[i] = node->index;
-        ++i;
-        node = node->next;
-    } while (node != group->first);
-    group->isVerticesArrSorted = isSorted;
 }
 
 /**

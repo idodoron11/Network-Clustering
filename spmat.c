@@ -158,9 +158,9 @@ void array_free(struct _spmat *A) {
 /**
  * Multiplies an array-based sparse matrix by a given vector.
  * Saves the result to a new vector.
- * @param A an array-based sparse matrix, of size n by n, to be multiplied.
- * @param v a column vector of size n to be multiplied.
- * @param result a new empty or arbitrary vector of size n, to be filled with the multiplication result.
+ * @param A an array-based sparse matrix, of capacity n by n, to be multiplied.
+ * @param v a column vector of capacity n to be multiplied.
+ * @param result a new empty or arbitrary vector of capacity n, to be filled with the multiplication result.
  */
 void array_mult(const struct _spmat *A, const double *v, double *result) {
     register int currentInd;
@@ -238,9 +238,9 @@ void list_free(struct _spmat *A) {
 /**
  * Multiplies a lists-based sparse matrix by a given vector.
  * Saves the result to a new vector.
- * @param A a lists-based sparse matrix, of size n by n, to be multiplied.
- * @param v a column vector of size n to be multiplied.
- * @param result a new empty or arbitrary vector of size n, to be filled with the multiplication result.
+ * @param A a lists-based sparse matrix, of capacity n by n, to be multiplied.
+ * @param v a column vector of capacity n to be multiplied.
+ * @param result a new empty or arbitrary vector of capacity n, to be filled with the multiplication result.
  */
 void list_mult(const struct _spmat *A, const double *v, double *result) {
     register int i, j;

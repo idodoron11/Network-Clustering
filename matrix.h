@@ -2,7 +2,7 @@
 #define _MATRIX_H
 
 typedef struct matrix {
-    /* matrix size (n*n) */
+    /* matrix capacity (n*n) */
     int n;
     double **values;
 } Matrix;

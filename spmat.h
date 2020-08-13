@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 typedef struct _spmat {
-    /* Matrix size (n*n) */
+    /* Matrix capacity (n*n) */
     int n;
 
     /* Adds row i the matrix. Called before any other call,
@@ -31,10 +31,10 @@ struct linked_list {
 typedef struct linked_list node;
 typedef node *nodeRef;
 
-/* Allocates a new linked-lists sparse matrix of size n */
+/* Allocates a new linked-lists sparse matrix of capacity n */
 spmat *spmat_allocate_list(int n);
 
-/* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */
+/* Allocates a new arrays sparse matrix of capacity n with nnz non-zero elements */
 spmat *spmat_allocate_array(int n, int nnz);
 
 double spmatValuesSum(spmat *mat);
