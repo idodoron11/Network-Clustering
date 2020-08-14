@@ -12,6 +12,8 @@ void printVect(double *vector, int length);
 
 void printGroupList(LinkedList *groupList, int n);
 
+void printGroupList2(LinkedList *groupList);
+
 double calculateDivisionModularity(Graph *G, LinkedList *groupLst);
 
 double calculateModularityOfGroup(Graph *G, VerticesGroup *group);
@@ -27,5 +29,7 @@ void compareExpected(char *inputPath, LinkedList *lst, int *expected);
 Graph* constructGraphFromMatrix(double* adjMatrix, int n);
 
 Graph *constructGraphFromAdjMat(Matrix *mat);
+
+spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);
 
 #endif

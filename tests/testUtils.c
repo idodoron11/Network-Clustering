@@ -109,19 +109,28 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
 void printSpmat(spmat *spm) {
     int i, j, col;
     nodeRef *rows = (nodeRef *) spm->private;
+    printf("\n[");
     for (i = 0; i < spm->n; i++) {
         nodeRef node = rows[i];
+        if (i > 0) {
+            printf(",");
+        }
+        printf("[");
         for (j = 0; j < spm->n; j++) {
             col = node != NULL ? node->colind : spm->n;
+            if (j > 0) {
+                printf(",");
+            }
             if (j < col) {
-                printf("%d ", 0);
+                printf("%d", 0);
             } else {
-                printf("%d ", (int) node->value);
+                printf("%f", node->value);
                 node = node->next;
             }
         }
-        printf("\n");
+        printf("]\n");
     }
+    printf("]\n");
 }
 
 /**
@@ -159,6 +168,25 @@ void printGroupList(LinkedList *groupList, int n) {
     free(coloring);
 }
 
+void printGroupList2(LinkedList *groupList) {
+    int i, j;
+    LinkedListNode *node = groupList->first;
+    VerticesGroup *group;
+    for (i = 0; i < groupList->length; i++) {
+        group = node->pointer;
+        printf("Group %d: ", i + 1);
+        for (j = 0; j < group->size; j++) {
+            if (j > 0) {
+                printf(", ");
+            }
+            printf("%d", group->verticesArr[j]);
+        }
+        printf("\n");
+        node = node->next;
+    }
+
+}
+
 
 /**
  * Calculate modularity of a graph's division
@@ -166,14 +194,9 @@ void printGroupList(LinkedList *groupList, int n) {
  * @return modularity
  */
 double calculateDivisionModularity(Graph *G, LinkedList *groupLst) {
-    double *s = malloc(sizeof(double) * G->n);
     VerticesGroup *group;
     double modularity = 0;
-    int i;
     LinkedListNode *node = groupLst->first;
-    for (i = 0; i < G->n; i++) {
-        s[i] = 1;
-    }
     if (node != NULL) {
         do {
             group = node->pointer;

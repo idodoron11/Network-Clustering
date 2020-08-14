@@ -172,14 +172,15 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
     if (G->degreeSum == 0) {
         return 0;
     }
+
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
     for (i = 0; i < group->size; i++) {
-        degreesCommon += G->degrees[i] * s[i];
+        degreesCommon += (double) G->degrees[group->verticesArr[i]] * s[i];
         res[i] += (modularityNorm1 - group->modularityRowSums[i]) * s[i];
     }
 
     for (i = 0; i < group->size; i++) {
-        res[i] -= G->degrees[i] * degreesCommon / G->degreeSum;
+        res[i] -= (double) G->degrees[group->verticesArr[i]] * degreesCommon / G->degreeSum;
         if (bothSides) {
             numRes += s[i] * res[i];
         } else {
@@ -190,7 +191,6 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
         /* if the result is a vector, we return its norm */
         numRes = sqrt(numRes);
     }
-
 
     return numRes;
 }
