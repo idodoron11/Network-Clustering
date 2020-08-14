@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
         assertMemoryAllocation(input_file_path);
         printf("Please specify a valid input file path.\n");
         if (scanf("%s", input_file_path) != 1) {
-            printf("Error: the path exceeds 200 characters, and is too long to load.");
+            printf("Error: the path exceeds %d characters, and is too long to load.", FILE_PATH_MAX_LENGTH);
             exit(6);
         }
     }
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         assertMemoryAllocation(input_file_path);
         printf("Please specify a valid output file path.\n");
         if (scanf("%s", output_file_path) != 1) {
-            printf("Error: the path exceeds 200 characters, and is too long to load.");
+            printf("Error: the path exceeds %d characters, and is too long to load.", FILE_PATH_MAX_LENGTH);
             exit(6);
         }
     }
