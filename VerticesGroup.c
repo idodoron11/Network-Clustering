@@ -129,9 +129,12 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
         return 0;
     }
 
+    /* multiply A by s */
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
     for (i = 0; i < group->size; i++) {
+        /* degreesCommon is what we sometimes called y */
         degreesCommon += (double) G->degrees[group->verticesArr[i]] * s[i];
+        /* subtracting f_i[g] * s, and adding shift constant to the result. */
         res[i] += (modularityNorm1 - group->modularityRowSums[i]) * s[i];
     }
 
