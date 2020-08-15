@@ -15,6 +15,4 @@ void setVal(Matrix *mat, int r, int c, double val);
 
 double readVal(Matrix *mat, int r, int c);
 
-void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult);
-
 #endif

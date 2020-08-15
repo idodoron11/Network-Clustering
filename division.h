@@ -1,5 +1,6 @@
 #ifndef CLUSTER_DIVISION_H
 #define CLUSTER_DIVISION_H
+
 #include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
@@ -14,10 +15,11 @@ void divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **s
                               unsigned int numberOfPositiveVertices);
 
 double
-maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity, unsigned int *numberOfPositiveVertices);
+maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity,
+                   unsigned int *numberOfPositiveVertices);
 
 void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
-                             VerticesGroup **newGroupB);
+                        VerticesGroup **newGroupB);
 
 void saveOutputToFile(LinkedList *groupLst, char *output_path);
 

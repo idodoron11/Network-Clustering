@@ -5,6 +5,11 @@
 #include "defs.h"
 #include "ErrorHandler.h"
 
+/**
+ * Create a group of vertices
+ * @param capacity amount of vertices
+ * @return group
+ */
 VerticesGroup *createVerticesGroup(unsigned int capacity) {
     VerticesGroup *group = malloc(sizeof(VerticesGroup));
     assertMemoryAllocation(group);
@@ -18,6 +23,10 @@ VerticesGroup *createVerticesGroup(unsigned int capacity) {
     return group;
 }
 
+/**
+ * Free memory allocated for vertices group
+ * @param group
+ */
 void freeVerticesGroup(VerticesGroup *group) {
     free(group->verticesArr);
     if (group->edgeSubMatrix != NULL) {
@@ -29,24 +38,15 @@ void freeVerticesGroup(VerticesGroup *group) {
     free(group);
 }
 
+/**
+ * Add a vertex to a group
+ * @param group vertices group
+ * @param index the index in the graph
+ */
 void addVertexToGroup(VerticesGroup *group, int index) {
     assertBooleanStatementIsTrue(group->size < group->capacity);
     group->verticesArr[group->size] = index;
     ++group->size;
-}
-
-/**
- * Adds a sequence of indices to the group.
- * @param group the group to which nodes are added.
- * @param sequence a sequence of group->capacity distinct integers, representing vertices.
- */
-void addSequence(VerticesGroup *group, int *sequence, int length) {
-    int i;
-    assertBooleanStatementIsTrue(length <= group->capacity);
-    for(i = 0; i < length; ++i) {
-        group->verticesArr[i] = sequence[i];
-        ++group->size;
-    }
 }
 
 /**

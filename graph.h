@@ -34,19 +34,4 @@ Graph *constructGraphFromInput(char *inputFilePath);
  */
 void destroyGraph(Graph *G);
 
-/**
- * Returns the value kept in the (i,j) entry of G's adjacency matrix.
- * @param G a pointer to a graph
- * @param i the vertex from which the edge exists. Should satisfy 0 <= i < G->n.
- * @param j the vertex to which the edge enters. Should satisfy 0 <= j < G->n.
- * @return 1 if the edge (i,j) exists, and 0 otherwise.
- */
-int getEdge(Graph *G, int i, int j);
-
-/**
- * Prints a representation of G.
- * @param G a not too large graph.
- */
-void printGraph(Graph *G);
-
 #endif /*GRAPH_H*/

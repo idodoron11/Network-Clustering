@@ -3,8 +3,6 @@
 #include "matrix.h"
 #include "ErrorHandler.h"
 
-void printVect(double *vector, int length);
-
 /**
  * Generate a square matrix object
  * @param n capacity of matrix is nxn
@@ -57,17 +55,5 @@ void setVal(Matrix *mat, int r, int c, double val) {
  */
 double readVal(Matrix *mat, int r, int c) {
     return mat->values[r][c];
-}
-
-void matrixVectorMult(Matrix *mat, double *vector, double *vectorResult) {
-    int r, c;
-    double sum;
-    for (r = 0; r < mat->n; r++) {
-        sum = 0;
-        for (c = 0; c < mat->n; c++) {
-            sum += readVal(mat, r, c) * vector[c];
-        }
-        vectorResult[r] = sum;
-    }
 }
 

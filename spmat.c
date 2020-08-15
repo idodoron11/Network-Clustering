@@ -63,124 +63,12 @@ void empty_list(nodeRef list_head) {
     }
 }
 
-/* linked list implementation ends here */
-
-typedef struct matrix_pointers {
-    int *rowptr;
-    int *colind;
-    double *values;
-    int nextValueIndex;
-} matrix_pointers;
-
-/* function declarations. to be implemented later. */
-void array_add_row(struct _spmat *A, const double *row, int i);
-
-void array_free(struct _spmat *A);
-
-void array_mult(const struct _spmat *A, const double *v, double *result);
-
 void list_add_row(struct _spmat *A, const double *row, int i);
 
 void list_free(struct _spmat *A);
 
 void list_mult(const struct _spmat *A, const double *v, double *result);
 
-/**
- * Initialize a new array-based sparse matrix.
- * The private field is used to store an implementation-specific struct.
- * @param n the dimension of the matrix.
- * @param nnz the number of non-zero elements in the matrix.
- * @return a pointer to a sparse matrix structure, implemented by arrays.
- */
-spmat *spmat_allocate_array(int n, int nnz) {
-    register spmat *mat = malloc(sizeof(spmat));
-    register matrix_pointers *pointers = malloc(sizeof(matrix_pointers));
-    assertMemoryAllocation(mat);
-    assertMemoryAllocation(pointers);
-    pointers->rowptr = (int *) calloc(n + 1, sizeof(int));
-    assertMemoryAllocation(pointers->rowptr);
-    pointers->colind = (int *) calloc(nnz, sizeof(int));
-    assertMemoryAllocation(pointers->colind);
-    pointers->values = (double *) calloc(nnz, sizeof(double));
-    assertMemoryAllocation(pointers->values);
-    (pointers->rowptr)[n] = nnz; /* This is where we keep the number of non-zero items is the spmat */
-    pointers->nextValueIndex = 0;
-
-    mat->n = n;
-    mat->add_row = array_add_row;
-    mat->free = array_free;
-    mat->mult = array_mult;
-    /* private field holds a pointer to a struct (using casting) */
-    mat->private = pointers;
-    return mat;
-}
-
-/**
- * Given an array-implemented sparse matrix,
- * this function inserts a given row as the i'th row.
- * @param A a pointer to the sparse matrix.
- * @param row a pointer to the row base address.
- * @param i the inserted row's index.
- */
-void array_add_row(struct _spmat *A, const double *row, int i) {
-    register matrix_pointers *pointers = (matrix_pointers *) (A->private);
-    register int *rowptr = pointers->rowptr;
-    register int *colind = pointers->colind;
-    register double *values = pointers->values;
-    register int n = A->n;
-    register int j = 0;
-    rowptr[i] = pointers->nextValueIndex;
-    for (j = 0; j < n; j++) {
-        if (row[j] != 0) {
-            values[pointers->nextValueIndex] = row[j];
-            colind[pointers->nextValueIndex] = j;
-            pointers->nextValueIndex++;
-        }
-    }
-}
-
-/**
- * Frees up every resource that has been dynamically allocated
- * by an array-based sparse matrix.
- * @param A a pointer to the array-based sparse matrix.
- */
-void array_free(struct _spmat *A) {
-    register matrix_pointers *pointers = (matrix_pointers *) (A->private);
-    free(pointers->rowptr);
-    free(pointers->colind);
-    free(pointers->values);
-    free(pointers);
-    free(A);
-}
-
-/**
- * Multiplies an array-based sparse matrix by a given vector.
- * Saves the result to a new vector.
- * @param A an array-based sparse matrix, of capacity n by n, to be multiplied.
- * @param v a column vector of capacity n to be multiplied.
- * @param result a new empty or arbitrary vector of capacity n, to be filled with the multiplication result.
- */
-void array_mult(const struct _spmat *A, const double *v, double *result) {
-    register int currentInd;
-    register int n = A->n;
-    register matrix_pointers *pointers = (matrix_pointers *) (A->private);
-    register int *rowptr = pointers->rowptr;
-    register int *colind = pointers->colind;
-    register double *values = pointers->values;
-    register int i;
-
-    for (i = 0; i < n; ++i) {
-        if (rowptr[i] == rowptr[i + 1]) /* This condition is met iff the i'th row is all zeros */
-            result[i] = 0;
-        else {
-            double value = 0;
-            for (currentInd = rowptr[i]; currentInd < rowptr[i + 1]; currentInd++) {
-                value += values[currentInd] * v[colind[currentInd]];
-            }
-            result[i] = value;
-        }
-    }
-}
 
 /**
  * Initialize a new list-based sparse matrix.
@@ -253,14 +141,4 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
         }
         result[i] = sum;
     }
-}
-
-/**
- * Generate a random double
- * @param low inclusive
- * @param high inclusive
- * @return random number
- */
-double drand(double low, double high) {
-    return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
 }

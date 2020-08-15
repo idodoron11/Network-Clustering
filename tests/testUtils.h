@@ -32,4 +32,8 @@ Graph *constructGraphFromAdjMat(Matrix *mat);
 
 spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);
 
+void addSequence(VerticesGroup *group, int *sequence, int length);
+
+double drand(double low, double high);
+
 #endif

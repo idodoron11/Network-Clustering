@@ -23,6 +23,7 @@ void randVector(double *vector, int n) {
  * @param s the eigenvector to split by
  * @param splitGroupA the first sub group, should be null
  * @param splitGroupB the second sub group, should be null
+ * @param numberOfPositiveVertices number of vertices belonging to sub group A
  * @return
  */
 void
@@ -42,26 +43,11 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
 }
 
 /**
- * Copy double array into another array
- * @param dst destination array
- * @param src source array
- * @param len number of elements to copy
- */
-unsigned int copyArr(double *dst, double *src, int len) {
-    int i;
-    unsigned int counter = 0;
-    for (i = 0; i < len; i++) {
-        dst[i] = src[i];
-        counter += (dst[i] == 1);
-    }
-    return counter;
-}
-
-/**
  * Maximize modularity by moving nodes between the sub groups
  * @param group a group of vertices
  * @param s the eigenvevtor, will be assigned the maximum split
  * @param initialModularity the modularity of the group
+ * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity,
                           unsigned int *numberOfPositiveVertices) {
@@ -203,6 +189,11 @@ LinkedList *divisionAlgorithm(Graph *G) {
     return O;
 }
 
+/**
+ * Save the list of sub groups to an output file
+ * @param groupLst list of vertices groups
+ * @param output_path path of output file
+ */
 void saveOutputToFile(LinkedList *groupLst, char *output_path) {
     FILE *output_file = fopen(output_path, "wb");
     LinkedListNode *currentNode = groupLst->first;

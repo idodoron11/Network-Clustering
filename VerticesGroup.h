@@ -32,8 +32,4 @@ double getModularityMatrixNorm1(VerticesGroup *group);
 
 double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *vectorResult);
 
-void fillVerticesArr(VerticesGroup *group);
-
-void addSequence(VerticesGroup *group, int *sequence, int length);
-
 #endif

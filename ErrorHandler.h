@@ -11,10 +11,6 @@ static const char FileReadErr_end[] = "Make sure the content is valid and format
 static const char FileWriteErr[] = "The program encountered a problem when writing to the file:";
 static const char GeneralErr[] = "The program encountered an unknown problem.";
 
-/**
- * Throw an error
- * @param msg error message to print
- */
 void throw(char *msg);
 
 void assertMemoryAllocation(void *p);

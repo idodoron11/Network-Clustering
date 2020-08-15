@@ -34,9 +34,4 @@ typedef node *nodeRef;
 /* Allocates a new linked-lists sparse matrix of capacity n */
 spmat *spmat_allocate_list(int n);
 
-/* Allocates a new arrays sparse matrix of capacity n with nnz non-zero elements */
-spmat *spmat_allocate_array(int n, int nnz);
-
-double drand(double low, double high);
-
 #endif

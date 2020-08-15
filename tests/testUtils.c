@@ -309,3 +309,27 @@ Graph *constructGraphFromAdjMat(Matrix *mat) {
 
     return G;
 }
+
+/**
+ * Adds a sequence of indices to the group.
+ * @param group the group to which nodes are added.
+ * @param sequence a sequence of group->capacity distinct integers, representing vertices.
+ */
+void addSequence(VerticesGroup *group, int *sequence, int length) {
+    int i;
+    assertBooleanStatementIsTrue(length <= group->capacity);
+    for(i = 0; i < length; ++i) {
+        group->verticesArr[i] = sequence[i];
+        ++group->size;
+    }
+}
+
+/**
+ * Generate a random double
+ * @param low inclusive
+ * @param high inclusive
+ * @return random number
+ */
+double drand(double low, double high) {
+    return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
+}
