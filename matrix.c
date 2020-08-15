@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "matrix.h"
-#include "VerticesGroup.h"
-#include "defs.h"
 #include "ErrorHandler.h"
-#include <math.h>
 
 void printVect(double *vector, int length);
 

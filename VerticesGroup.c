@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "VerticesGroup.h"
-#include "matrix.h"
-#include "spmat.h"
 #include "defs.h"
 #include "ErrorHandler.h"
 
