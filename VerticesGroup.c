@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "VerticesGroup.h"
-#include "matrix.h"
-#include "spmat.h"
 #include "defs.h"
 #include "ErrorHandler.h"
 
@@ -96,10 +94,6 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
                 }
             }
             if (group->modularityAbsColSum[i] >= getModularityMatrixNorm1(group)) {
-                /* replace highest column absolute sum
-                 * TODO:    I think it is a good idea to require group->modularityAbsColSum[i] to be
-                 *          strictly greater than getModularityMatrixNorm1(group), to avoid unnecessary
-                 *          changes in group->highestColSumIndex. */
                 group->highestColSumIndex = i;
             }
             /* TODO: improve instead of adding row at a time */
@@ -125,9 +119,6 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
     /* the common value of all rows of the multiplication of the expectedEdges (K) matrix by s */
     double degreesCommon = 0;
     double modularityNorm1 = withNorm ? getModularityMatrixNorm1(group) : 0;
-    if (G->degreeSum == 0) {
-        return 0;
-    }
 
     /* multiply A by s */
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);

@@ -13,40 +13,16 @@
 int main(int argc, char **argv) {
     LinkedList *groupsLst;
     Graph *G;
-    char *input_file_path, *output_file_path;
 
-    if (argc == 3) {
-        input_file_path = argv[1];
-        output_file_path = argv[2];
-    } else {
-        input_file_path = malloc(sizeof(char) * FILE_PATH_MAX_LENGTH);
-        assertMemoryAllocation(input_file_path);
-        printf("Please specify a valid input file path.\n");
-        if (scanf("%s", input_file_path) != 1) {
-            printf("Error: the path exceeds %d characters, and is too long to load.", FILE_PATH_MAX_LENGTH);
-            exit(6);
-        }
+    srand(time(0));
+    if (argc != 3) {
+        throw("Two command line arguments expected");
     }
 
-    G = constructGraphFromInput(input_file_path);
-    if (argc != 3)
-        free(input_file_path);
-    srand(time(0));
+    G = constructGraphFromInput(argv[1]);
     groupsLst = divisionAlgorithm(G);
 
-    if (argc != 3) {
-        output_file_path = malloc(sizeof(char) * FILE_PATH_MAX_LENGTH);
-        assertMemoryAllocation(input_file_path);
-        printf("Please specify a valid output file path.\n");
-        if (scanf("%s", output_file_path) != 1) {
-            printf("Error: the path exceeds %d characters, and is too long to load.", FILE_PATH_MAX_LENGTH);
-            exit(6);
-        }
-    }
-    saveOutputToFile(groupsLst, output_file_path);
-
-    if (argc != 3)
-        free(output_file_path);
+    saveOutputToFile(groupsLst, argv[2]);
 
     return 0;
 }

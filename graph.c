@@ -6,8 +6,8 @@
 Graph *constructGraphFromInput(char *inputFilePath) {
     Graph *G = (Graph *) malloc(sizeof(Graph));
     int n, i, j, k;
-    int* list;
-    FILE* graph_file = fopen(inputFilePath, "rb");
+    int *list;
+    FILE *graph_file = fopen(inputFilePath, "rb");
     assertMemoryAllocation(G);
     assertFileOpen(graph_file, inputFilePath);
     assertFileRead(fread(&n, sizeof(int), 1, graph_file), 1, inputFilePath);
@@ -20,7 +20,7 @@ Graph *constructGraphFromInput(char *inputFilePath) {
     G->adjMat = createMatrix(n);
     G->expectedEdges = createMatrix(n);
 
-    for(i=0; i < n; ++i){
+    for (i = 0; i < n; ++i) {
         assertFileRead(fread(&k, sizeof(int), 1, graph_file), 1, inputFilePath);
         assertFileRead(fread(list, sizeof(int), k, graph_file), k, inputFilePath);
         G->degreeSum += k;
@@ -31,11 +31,14 @@ Graph *constructGraphFromInput(char *inputFilePath) {
         }
     }
 
-    if(G->degreeSum != 0) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-            }
+    /* unsupported case because of division by 0 */
+    if (G->degreeSum == 0) {
+        throw("Degrees sum of 0 is not supported because of division by 0");
+    }
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
         }
     }
     fclose(graph_file);

@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "spmat.h"
-#include "matrix.h"
 #include "ErrorHandler.h"
-
 
 /* linked list operations */
 /**

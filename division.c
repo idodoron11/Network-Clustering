@@ -1,7 +1,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mem.h>
 #include "division.h"
 #include "defs.h"
 #include "ErrorHandler.h"
@@ -162,24 +161,9 @@ LinkedList *divisionAlgorithm(Graph *G) {
     double *vector, *s;
     LinkedList *P, *O;
     VerticesGroup *group, *groupA, *groupB;
+
     P = createLinkedList();
     O = createLinkedList();
-
-    /* Notice that the formula for the expected number of edges
-     * between two given vertices requires division by zero if
-     * G->degreeSum == 0. So we have to handle this case
-     * separately. In this case, there is no need to divide to groups
-     * since the max modularity is 0.
-     * TODO: Are you sure about that? Intuitively, if all vertices are isolated,
-     *  I would expect each of them to be in a separate group. */
-    if (G->degreeSum == 0) {
-        group = createVerticesGroup(G->n);
-        insertItem(O, group);
-        for (i = 0; i < G->n; ++i) {
-            addVertexToGroup(group, i);
-        }
-        return O;
-    }
 
     vector = malloc(G->n * sizeof(double));
     assertMemoryAllocation(vector);
