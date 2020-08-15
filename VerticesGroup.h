@@ -5,19 +5,10 @@
 #include "spmat.h"
 #include "graph.h"
 
-typedef struct vertexNode {
-    int index;
-    /*Has the node's group changed during modularity maximization*/
-    int hasMoved;
-    struct vertexNode *next;
-    struct vertexNode *prev;
-} VertexNode;
-
 typedef struct verticesGroup {
-    VertexNode *first;
+    int capacity;
     int size;
     int *verticesArr;
-    char isVerticesArrSorted;
     spmat *edgeSubMatrix;
     double *modularityRowSums;
     double *modularityAbsColSum;
@@ -25,11 +16,11 @@ typedef struct verticesGroup {
 
 } VerticesGroup;
 
-VerticesGroup *createVerticesGroup();
+VerticesGroup *createVerticesGroup(unsigned int capacity);
 
 void freeVerticesGroup(VerticesGroup *group);
 
-VertexNode *addVertexToGroup(VerticesGroup *group, int index);
+void addVertexToGroup(VerticesGroup *group, int index);
 
 void calculateModularitySubMatrix(Graph *G, VerticesGroup *group);
 
