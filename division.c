@@ -193,11 +193,13 @@ LinkedList *divisionAlgorithm(Graph *G) {
             } else {
                 insertItem(P, groupB);
             }
+            freeVerticesGroup(group);
         }
     }
 
     free(vector);
     free(s);
+    deepFreeGroupList(P);
     return O;
 }
 
