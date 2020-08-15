@@ -110,15 +110,6 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
     }
 
     free(indices);
-
-    /* TODO: if maxModularity > initialModularity, this function will not
-     *  be called again. also, this function will free hasMoved before exit.
-     *  so why are we doing this? */
-    if (maxModularity > initialModularity) {
-        for (i = 0; i < group->size; i++) {
-            hasMoved[i] = 0;
-        }
-    }
     free(hasMoved);
     return maxModularity;
 }
