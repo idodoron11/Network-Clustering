@@ -16,7 +16,6 @@ VerticesGroup *createVerticesGroup(unsigned int capacity) {
     group->edgeSubMatrix = NULL;
     group->modularityRowSums = NULL;
     group->modularityAbsColSum = NULL;
-    group->isVerticesArrSorted = 1;
     group->size = 0;
     return group;
 }
@@ -35,8 +34,6 @@ void freeVerticesGroup(VerticesGroup *group) {
 void addVertexToGroup(VerticesGroup *group, int index) {
     assertBooleanStatementIsTrue(group->size < group->capacity);
     group->verticesArr[group->size] = index;
-    if(group->size > 2 && group->verticesArr[group->size] < group->verticesArr[group->size - 1])
-        group->isVerticesArrSorted = 0;
     ++group->size;
 }
 

@@ -5,8 +5,6 @@
 #include "division.h"
 #include "defs.h"
 #include "ErrorHandler.h"
-#include "quicksort.h"
-#include "tests/testUtils.h"
 
 /**
  * Generate a random vector
@@ -32,11 +30,11 @@ void
 divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB,
                          unsigned int numberOfPositiveVertices) {
     int i;
-    if(numberOfPositiveVertices > 0)
+    if (numberOfPositiveVertices > 0)
         *splitGroupA = createVerticesGroup(numberOfPositiveVertices);
-    if(group->size - numberOfPositiveVertices > 0)
+    if (group->size - numberOfPositiveVertices > 0)
         *splitGroupB = createVerticesGroup(group->size - numberOfPositiveVertices);
-    for(i = 0; i < group->size; ++i){
+    for (i = 0; i < group->size; ++i) {
         if (!IS_POSITIVE(s[i]))
             addVertexToGroup(*splitGroupB, group->verticesArr[i]);
         else
@@ -103,7 +101,7 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
     }
 
     /* this loop moves back vertices that were moved after the best iteration */
-    for(i = group->size - 1; i > bestIteration; --i){
+    for (i = group->size - 1; i > bestIteration; --i) {
         j = indices[i];
         s[j] = -s[j];
         *numberOfPositiveVertices += s[j] == 1.0 ? 1 : (-1);
@@ -224,24 +222,14 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
     LinkedListNode *currentNode = groupLst->first;
     VerticesGroup *currentGroup;
     int i;
-    int *verticesArr;
     assertFileOpen(output_file, output_path);
     assertFileWrite(fwrite(&groupLst->length, sizeof(int), 1, output_file), 1, output_path);
     for (i = 0; i < groupLst->length; ++i) {
         currentGroup = currentNode->pointer;
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
-        if (currentGroup->isVerticesArrSorted) {
-            assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
-                            currentGroup->size, output_path);
-        } else {
-            verticesArr = malloc(sizeof(int) * currentGroup->size);
-            assertMemoryAllocation(verticesArr);
-            memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);
-            quickSortArray(verticesArr, currentGroup->size);
-            assertFileWrite(fwrite(verticesArr, sizeof(int), currentGroup->size, output_file),
-                            currentGroup->size, output_path);
-            free(verticesArr);
-        }
+        assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
+                        currentGroup->size, output_path);
+
         currentNode = currentNode->next;
     }
     fclose(output_file);

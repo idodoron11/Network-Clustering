@@ -9,7 +9,6 @@ typedef struct verticesGroup {
     int capacity;
     int size;
     int *verticesArr;
-    char isVerticesArrSorted;
     spmat *edgeSubMatrix;
     double *modularityRowSums;
     double *modularityAbsColSum;
