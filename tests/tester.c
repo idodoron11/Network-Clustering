@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #define GRAPHS_DIR "tests\\graphs"
+/*#define GRAPHS_DIR "..\\tests\\graphs"*/
 
 void printColorings(int *coloring1, int *coloring2, int n);
 
