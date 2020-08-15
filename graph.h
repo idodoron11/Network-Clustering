@@ -9,7 +9,7 @@ typedef struct _graph {
      * V={1,2,...,n} */
     int n;
 
-    /* adjacency matrix of size nXn
+    /* adjacency matrix of capacity nXn
      * E={(i,j) s.t. spAdjMat[i*n + j]=1} */
     Matrix *adjMat;
     /* the degrees of the graph's vertices */

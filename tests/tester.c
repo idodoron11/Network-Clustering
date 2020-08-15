@@ -30,7 +30,7 @@ Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise) {
     int numberOfClusters = GroupList->length;
     LinkedListNode *node = GroupList->first;
     VerticesGroup *currentGroup;
-    VertexNode *vertexU, *vertexV;
+    int vertexUIndex, vertexVIndex;
     int i, j, k;
     double rnd;
     assertMemoryAllocation(A);
@@ -40,18 +40,15 @@ Graph *generateCommunitiesGraph(LinkedList *GroupList, int n, char noise) {
         currentGroup = node->pointer;
         assertBooleanStatementIsTrue(currentGroup != NULL);
         assertBooleanStatementIsTrue(currentGroup->size > 0);
-        vertexU = currentGroup->first;
-        vertexV = vertexU->next;
 
         for (j = 0; j < currentGroup->size; ++j) {
             for (k = j + 1; k < currentGroup->size; ++k) {
                 /* connects every pair of vertices in a given VerticesGroup */
-                A[n * vertexU->index + vertexV->index] = 1;
-                A[n * vertexV->index + vertexU->index] = 1;
-                vertexV = vertexV->next;
+                vertexVIndex = currentGroup->verticesArr[j];
+                vertexUIndex = currentGroup->verticesArr[k];
+                A[n * vertexUIndex + vertexVIndex] = 1;
+                A[n * vertexVIndex + vertexUIndex] = 1;
             }
-            vertexU = vertexU->next;
-            vertexV = vertexU->next;
         }
         node = node->next;
     }
@@ -91,7 +88,7 @@ char checkGroupListsEquality(LinkedList *GroupList1, testGraph *TG) {
     LinkedList *GroupList2 = TG->GroupList;
     LinkedListNode *node1 = GroupList1->first, *node2 = GroupList2->first;
     VerticesGroup *G1, *G2;
-    VertexNode *vertex1, *vertex2;
+    int vertex1Index, vertex2Index;
     int *coloring1, *coloring2, *colorMapping;
     int n1 = 0, n2 = 0;
     int numberOfGroups = GroupList1->length;
@@ -121,17 +118,15 @@ char checkGroupListsEquality(LinkedList *GroupList1, testGraph *TG) {
     for (i = 0; i < numberOfGroups; ++i) {
         G1 = node1->pointer;
         G2 = node2->pointer;
-        vertex1 = G1->first;
-        vertex2 = G2->first;
         n1 += G1->size;
         n2 += G2->size;
         for (j = 0; j < G1->size; ++j) {
-            coloring1[vertex1->index] = i;
-            vertex1 = vertex1->next;
+            vertex1Index = G1->verticesArr[j];
+            coloring1[vertex1Index] = i;
         }
         for (j = 0; j < G2->size; ++j) {
-            coloring2[vertex2->index] = i;
-            vertex2 = vertex2->next;
+            vertex2Index = G2->verticesArr[j];
+            coloring2[vertex2Index] = i;
         }
         node1 = node1->next;
         node2 = node2->next;
@@ -183,7 +178,7 @@ void printColorings(int *coloring1, int *coloring2, int n) {
 
 /**
  * Creates a new graph object based on a list of edges.
- * @param edges an integer 2d-array of size length X 2. Each row represent a single edge.
+ * @param edges an integer 2d-array of capacity length X 2. Each row represent a single edge.
  * @param length the number of edges
  * @param n the number of vertices in the graph itself.
  * @return the desired graph.
@@ -207,7 +202,7 @@ Graph *createGraphFromEdgesGroup(int edges[][2], int length, int n) {
 /**
  * Constructor of testGraph objects, that creates the graph by getting a list
  * of edges as an input.
- * @param edges an integer 2d-array of size length X 2. Each row represent a single edge.
+ * @param edges an integer 2d-array of capacity length X 2. Each row represent a single edge.
  * @param length the number of edges
  * @param n the number of vertices in the graph itself.
  * @param GroupList the list of groups the graph should be partitioned into by the division algorithm.
@@ -267,9 +262,9 @@ char testRandomGraph() {
 
     /* random community graph */
     GroupList = createLinkedList();
-    c[0] = createVerticesGroup();
-    c[1] = createVerticesGroup();
-    c[2] = createVerticesGroup();
+    c[0] = createVerticesGroup(5);
+    c[1] = createVerticesGroup(10);
+    c[2] = createVerticesGroup(5);
 
     addSequence(c[0], C1, 5);
     addSequence(c[1], C2, 10);
@@ -329,7 +324,7 @@ testGraph *createTestGraphFromFile(char *path) {
 
     /* read groups one by one */
     for (i = 0; i < numberOfClusters - 1; ++i) {
-        group = createVerticesGroup();
+        group = createVerticesGroup(n);
         do {
             assertFileRead(fscanf(file, "%d%c", &value, &delimiter), 2, path);
             addVertexToGroup(group, value);
@@ -339,7 +334,7 @@ testGraph *createTestGraphFromFile(char *path) {
     }
     /* the last row might not end with ' ' or '\n' so we need to handle this differently */
     if (i == numberOfClusters - 1) {
-        group = createVerticesGroup();
+        group = createVerticesGroup(n);
         while (fscanf(file, "%d", &value) == 1)
             addVertexToGroup(group, value);
         insertItem(groupList, group);
@@ -434,9 +429,9 @@ void testModularityChange() {
     s = malloc(n * sizeof(double));
     generateRandomSymSpmat(n, 20, mat);
     G = constructGraphFromAdjMat(mat);
-    group = createVerticesGroup();
-    groupA = createVerticesGroup();
-    groupB = createVerticesGroup();
+    group = createVerticesGroup(n);
+    groupA = createVerticesGroup(n);
+    groupB = createVerticesGroup(n);
     for (i = 0; i < n; i++) {
         addVertexToGroup(group, i);
         if (drand(0, 100) < 20) {

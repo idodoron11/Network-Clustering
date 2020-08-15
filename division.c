@@ -5,13 +5,11 @@
 #include "division.h"
 #include "defs.h"
 #include "ErrorHandler.h"
-#include "quicksort.h"
-#include "tests/testUtils.h"
 
 /**
  * Generate a random vector
- * @param vector an allocated array of size n for the vector
- * @param n the size of the vector
+ * @param vector an allocated array of capacity n for the vector
+ * @param n the capacity of the vector
  */
 void randVector(double *vector, int n) {
     int i;
@@ -29,24 +27,18 @@ void randVector(double *vector, int n) {
  * @return
  */
 void
-divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB) {
+divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB,
+                         unsigned int numberOfPositiveVertices) {
     int i;
-    VertexNode *node = group->first;
-    if (group->size > 0) {
-        for (i = 0; i < group->size; i++) {
-            if (!IS_POSITIVE(s[i])) {
-                if (*splitGroupB == NULL) {
-                    *splitGroupB = createVerticesGroup();
-                }
-                addVertexToGroup(*splitGroupB, node->index);
-            } else {
-                if (*splitGroupA == NULL) {
-                    *splitGroupA = createVerticesGroup();
-                }
-                addVertexToGroup(*splitGroupA, node->index);
-            }
-            node = node->next;
-        }
+    if (numberOfPositiveVertices > 0)
+        *splitGroupA = createVerticesGroup(numberOfPositiveVertices);
+    if (group->size - numberOfPositiveVertices > 0)
+        *splitGroupB = createVerticesGroup(group->size - numberOfPositiveVertices);
+    for (i = 0; i < group->size; ++i) {
+        if (!IS_POSITIVE(s[i]))
+            addVertexToGroup(*splitGroupB, group->verticesArr[i]);
+        else
+            addVertexToGroup(*splitGroupA, group->verticesArr[i]);
     }
 }
 
@@ -56,11 +48,14 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * @param src source array
  * @param len number of elements to copy
  */
-void copyArr(double *dst, double *src, int len) {
+unsigned int copyArr(double *dst, double *src, int len) {
     int i;
+    unsigned int counter = 0;
     for (i = 0; i < len; i++) {
         dst[i] = src[i];
+        counter += (dst[i] == 1);
     }
+    return counter;
 }
 
 /**
@@ -69,46 +64,51 @@ void copyArr(double *dst, double *src, int len) {
  * @param s the eigenvevtor, will be assigned the maximum split
  * @param initialModularity the modularity of the group
  */
-double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity) {
-    int i, j, maxNode;
-    VertexNode *node, *maxNodeRef;
+double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity,
+                          unsigned int *numberOfPositiveVertices) {
+    int i, j, maxNode = 0;
     double modularity, maxModularity, maxIterationModularity;
-    double *maxS = malloc(group->size * sizeof(double));
-    assertMemoryAllocation(maxS);
-    copyArr(maxS, s, group->size);
+    int *indices = malloc(group->size * sizeof(int));
+    char *hasMoved = calloc(group->size, sizeof(char));
+    int bestIteration;
+    char isMaxNodeValid = 0;
+    assertMemoryAllocation(indices);
+    assertMemoryAllocation(hasMoved);
     maxModularity = initialModularity;
+
     for (i = 0; i < group->size; i++) {
-        node = group->first;
-        maxNodeRef = NULL;
+        isMaxNodeValid = 0;
         for (j = 0; j < group->size; j++) {
-            if (!node->hasMoved) {
+            if (hasMoved[j] == 0) {
                 s[j] = -s[j];
                 modularity = calculateModularity(G, group, s);
-                if (modularity > maxIterationModularity || maxNodeRef == NULL) {
+                if (isMaxNodeValid == 0 || modularity > maxIterationModularity) {
                     maxIterationModularity = modularity;
                     maxNode = j;
-                    maxNodeRef = node;
+                    isMaxNodeValid = 1;
                 }
                 s[j] = -s[j];
             }
-            node = node->next;
         }
         s[maxNode] = -s[maxNode];
-        maxNodeRef->hasMoved = 1;
-        if (maxIterationModularity > maxModularity) {
+        *numberOfPositiveVertices += s[maxNode] == 1.0 ? 1 : (-1);
+        indices[i] = maxNode;
+        hasMoved[maxNode] = 1;
+        if (i == 0 || maxIterationModularity > maxModularity) {
             maxModularity = maxIterationModularity;
-            copyArr(maxS, s, group->size);
+            bestIteration = i;
         }
     }
-    copyArr(s, maxS, group->size);
-    free(maxS);
-    if (maxModularity > initialModularity) {
-        node = group->first;
-        for (i = 0; i < group->size; i++) {
-            node->hasMoved = 0;
-            node = node->next;
-        }
+
+    /* this loop moves back vertices that were moved after the best iteration */
+    for (i = group->size - 1; i > bestIteration; --i) {
+        j = indices[i];
+        s[j] = -s[j];
+        *numberOfPositiveVertices += s[j] == 1.0 ? 1 : (-1);
     }
+
+    free(indices);
+    free(hasMoved);
     return maxModularity;
 }
 
@@ -116,8 +116,8 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
  * Divide a group into two.
  * @param G graph object
  * @param group vertices group
- * @param vector an empty allocated array the size of the graph's vertices, used for power iteration
- * @param s an empty allocated array the size of the graph's vertices, used for storing an eigenvector
+ * @param vector an empty allocated array the capacity of the graph's vertices, used for power iteration
+ * @param s an empty allocated array the capacity of the graph's vertices, used for storing an eigenvector
  * @param newGroupA the first divided group will be assigned to this parameter (or left as NULL)
  * @param newGroupB the second divided group will be assigned to this parameter (or left as NULL)
  */
@@ -125,6 +125,7 @@ void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *
                         VerticesGroup **newGroupB) {
     int i;
     double lambda, modularity, modularityAfterMax;
+    unsigned int numberOfPositiveVertices = 0;
 
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
@@ -135,19 +136,20 @@ void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *
     /* turn s eigenvector into +1 and -1 */
     for (i = 0; i < group->size; i++) {
         s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
+        numberOfPositiveVertices += (s[i] == 1);
     }
 
     modularityAfterMax = calculateModularity(G, group, s);
     do {
         modularity = modularityAfterMax;
-        modularityAfterMax = maximizeModularity(G, group, s, modularity);
+        modularityAfterMax = maximizeModularity(G, group, s, modularity, &numberOfPositiveVertices);
     } while (modularityAfterMax > modularity);
 
     if (!IS_POSITIVE(modularityAfterMax)) {
         return;
     }
 
-    divideGroupByEigenvector(group, s, newGroupA, newGroupB);
+    divideGroupByEigenvector(group, s, newGroupA, newGroupB, numberOfPositiveVertices);
 }
 
 /**
@@ -168,7 +170,7 @@ LinkedList *divisionAlgorithm(Graph *G) {
     assertMemoryAllocation(vector);
     s = malloc(G->n * sizeof(double));
     assertMemoryAllocation(s);
-    group = createVerticesGroup();
+    group = createVerticesGroup(G->n);
     for (i = 0; i < G->n; i++) {
         addVertexToGroup(group, i);
     }
@@ -205,26 +207,14 @@ void saveOutputToFile(LinkedList *groupLst, char *output_path) {
     LinkedListNode *currentNode = groupLst->first;
     VerticesGroup *currentGroup;
     int i;
-    int *verticesArr;
     assertFileOpen(output_file, output_path);
     assertFileWrite(fwrite(&groupLst->length, sizeof(int), 1, output_file), 1, output_path);
     for (i = 0; i < groupLst->length; ++i) {
         currentGroup = currentNode->pointer;
         assertFileWrite(fwrite(&currentGroup->size, sizeof(int), 1, output_file), 1, output_path);
-        if (currentGroup->verticesArr == NULL)
-            fillVerticesArr(currentGroup);
-        if (currentGroup->isVerticesArrSorted) {
-            assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
-                            currentGroup->size, output_path);
-        } else {
-            verticesArr = malloc(sizeof(int) * currentGroup->size);
-            assertMemoryAllocation(verticesArr);
-            memcpy(verticesArr, currentGroup->verticesArr, currentGroup->size);
-            quickSortArray(verticesArr, currentGroup->size);
-            assertFileWrite(fwrite(verticesArr, sizeof(int), currentGroup->size, output_file),
-                            currentGroup->size, output_path);
-            free(verticesArr);
-        }
+        assertFileWrite(fwrite(currentGroup->verticesArr, sizeof(int), currentGroup->size, output_file),
+                        currentGroup->size, output_path);
+
         currentNode = currentNode->next;
     }
     fclose(output_file);

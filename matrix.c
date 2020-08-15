@@ -10,7 +10,7 @@ void printVect(double *vector, int length);
 
 /**
  * Generate a square matrix object
- * @param n size of matrix is nxn
+ * @param n capacity of matrix is nxn
  * @return matrix
  */
 Matrix *createMatrix(int n) {

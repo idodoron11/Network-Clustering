@@ -74,7 +74,7 @@ void printVect(double *vector, int length) {
 
 /**
  * Generate a random symmetric sparse matrix
- * @param n matrix of size nxn
+ * @param n matrix of capacity nxn
  * @param percent probability of non-zero values
  * @param mat regular matrix representation, should be allocated
  */
@@ -143,17 +143,16 @@ void printGroupList(LinkedList *groupList, int n) {
     int L = groupList->length;
     int *coloring = malloc(sizeof(int) * n);
     int i, j;
+    int vertexIndex;
     LinkedListNode *node = groupList->first;
     VerticesGroup *group;
-    VertexNode *vertex;
     assertMemoryAllocation(coloring);
 
     for (i = 0; i < L; ++i) {
         group = node->pointer;
-        vertex = group->first;
         for (j = 0; j < group->size; ++j) {
-            coloring[vertex->index] = i;
-            vertex = vertex->next;
+            vertexIndex = group->verticesArr[j];
+            coloring[vertexIndex] = i;
         }
         node = node->next;
     }
@@ -227,7 +226,7 @@ LinkedList *createGroupsFromIndices(Graph *G, int *groups) {
     int i, gIndex = 0, found;
     do {
         found = 0;
-        group = createVerticesGroup();
+        group = createVerticesGroup(G->n);
         for (i = 0; i < G->n; i++) {
             if (groups[i] == gIndex) {
                 addVertexToGroup(group, i);
