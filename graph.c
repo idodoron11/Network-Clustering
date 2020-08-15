@@ -49,5 +49,7 @@ Graph *constructGraphFromInput(char *inputFilePath) {
 
 void destroyGraph(Graph *G) {
     freeMatrix(G->adjMat);
+    freeMatrix(G->expectedEdges);
+    free(G->degrees);
     free(G);
 }

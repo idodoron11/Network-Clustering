@@ -23,6 +23,8 @@ int main(int argc, char **argv) {
     groupsLst = divisionAlgorithm(G);
 
     saveOutputToFile(groupsLst, argv[2]);
+    deepFreeGroupList(groupsLst);
+    destroyGraph(G);
 
     return 0;
 }
