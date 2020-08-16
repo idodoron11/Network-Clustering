@@ -1,14 +1,10 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "spmat.h"
 #include "graph.h"
-#include "VerticesGroup.h"
 #include "LinkedList.h"
 #include "division.h"
 #include "ErrorHandler.h"
-
-#define FILE_PATH_MAX_LENGTH 200
 
 int main(int argc, char **argv) {
     LinkedList *groupsLst;
