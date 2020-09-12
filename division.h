@@ -14,9 +14,7 @@ void randVector(double *vector, int n);
 void divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitGroupA, VerticesGroup **splitGroupB,
                               unsigned int numberOfPositiveVertices);
 
-double
-maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity,
-                   unsigned int *numberOfPositiveVertices);
+double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices);
 
 void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
                         VerticesGroup **newGroupB);

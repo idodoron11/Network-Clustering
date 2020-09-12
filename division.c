@@ -42,59 +42,58 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
     }
 }
 
-/**
- * Maximize modularity by moving nodes between the sub groups
- * @param group a group of vertices
- * @param s the eigenvevtor, will be assigned the maximum split
- * @param initialModularity the modularity of the group
- * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
- */
-double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double initialModularity,
-                          unsigned int *numberOfPositiveVertices) {
-    int i, j, maxNode = 0;
-    double modularity, maxModularity, maxIterationModularity;
-    int *indices = malloc(group->size * sizeof(int));
+double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
+    double bestImprovement, improve, Q0, score, maxScore, finalModularity;
+    int i, j, maxNode, bestIteration, isMaxSet;
     char *hasMoved = calloc(group->size, sizeof(char));
-    int bestIteration;
-    char isMaxNodeValid = 0;
-    assertMemoryAllocation(indices);
-    assertMemoryAllocation(hasMoved);
-    maxModularity = initialModularity;
+    int *indices = malloc(group->size * sizeof(int));
 
-    for (i = 0; i < group->size; i++) {
-        isMaxNodeValid = 0;
-        for (j = 0; j < group->size; j++) {
-            if (hasMoved[j] == 0) {
-                s[j] = -s[j];
-                modularity = calculateModularity(G, group, s);
-                if (isMaxNodeValid == 0 || modularity > maxIterationModularity) {
-                    maxIterationModularity = modularity;
-                    maxNode = j;
-                    isMaxNodeValid = 1;
+    do {
+        bestImprovement = 0;
+        improve = 0;
+        bestIteration = -1;
+        for (i = 0; i < group->size; i++) {
+            isMaxSet = 0;
+            Q0 = calculateModularity(G, group, s);
+            for (j = 0; j < group->size; j++) {
+                if (!hasMoved[j]) {
+                    s[j] = -s[j];
+                    score = calculateModularity(G, group, s) - Q0;
+                    if (!isMaxSet || score > maxScore) {
+                        maxScore = score;
+                        maxNode = j;
+                        isMaxSet = 1;
+                    }
+                    s[j] = -s[j];
                 }
-                s[j] = -s[j];
+            }
+            s[maxNode] = -s[maxNode];
+            hasMoved[maxNode] = 1;
+            indices[i] = maxNode;
+
+            improve += maxScore;
+            if (improve > bestImprovement) {
+                bestIteration = i;
+                bestImprovement = improve;
             }
         }
-        s[maxNode] = -s[maxNode];
-        *numberOfPositiveVertices += s[maxNode] == 1.0 ? 1 : (-1);
-        indices[i] = maxNode;
-        hasMoved[maxNode] = 1;
-        if (i == 0 || maxIterationModularity > maxModularity) {
-            maxModularity = maxIterationModularity;
-            bestIteration = i;
-        }
-    }
 
-    /* this loop moves back vertices that were moved after the best iteration */
-    for (i = group->size - 1; i > bestIteration; --i) {
-        j = indices[i];
-        s[j] = -s[j];
-        *numberOfPositiveVertices += s[j] == 1.0 ? 1 : (-1);
-    }
+        *numberOfPositiveVertices=0;
+        for (i = 0; i<group->size; i++) {
+            j = indices[i];
+            hasMoved[i]=0;
+            if (i>bestIteration) {
+                s[j] = -s[j];
+            }
+            *numberOfPositiveVertices += (s[j] == 1);
+        }
+    } while (IS_POSITIVE(bestImprovement));
+
+    finalModularity = calculateModularity(G, group, s);
 
     free(indices);
     free(hasMoved);
-    return maxModularity;
+    return finalModularity;
 }
 
 /**
@@ -109,7 +108,7 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, double init
 void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *s, VerticesGroup **newGroupA,
                         VerticesGroup **newGroupB) {
     int i;
-    double lambda, modularity, modularityAfterMax;
+    double lambda, modularity;
     unsigned int numberOfPositiveVertices = 0;
 
     calculateModularitySubMatrix(G, group);
@@ -121,16 +120,11 @@ void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *
     /* turn s eigenvector into +1 and -1 */
     for (i = 0; i < group->size; i++) {
         s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
-        numberOfPositiveVertices += (s[i] == 1);
     }
 
-    modularityAfterMax = calculateModularity(G, group, s);
-    do {
-        modularity = modularityAfterMax;
-        modularityAfterMax = maximizeModularity(G, group, s, modularity, &numberOfPositiveVertices);
-    } while (modularityAfterMax > modularity);
+    modularity = maximizeModularity(G, group, s, &numberOfPositiveVertices);
 
-    if (!IS_POSITIVE(modularityAfterMax)) {
+    if (!IS_POSITIVE(modularity)) {
         return;
     }
 
