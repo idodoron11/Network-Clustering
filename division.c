@@ -50,8 +50,8 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
-    double bestImprovement = 0, improve, modularity, maxScore;
-    int i, j, maxNode, bestIteration, isMaxSet;
+    double bestImprovement = 0, improve, modularity, maxScore, sum;
+    int i, j, index, maxNode, bestIteration, isMaxSet;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
@@ -67,7 +67,13 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
             for (j = 0; j < group->size; j++) {
                 if (!hasMoved[j]) {
                     s[j] = -s[j];
-                    score[j] = calculateModularity(G, group, s) - modularity;
+                    sum = 0;
+                    for (index = 0; index < group->size; index++) {
+                        sum += (readVal(G->adjMat, group->verticesArr[j], group->verticesArr[index]) -
+                                readVal(G->expectedEdges, group->verticesArr[j], group->verticesArr[index])) * s[index];
+                    }
+                    score[j] = 4 * s[j] * sum +
+                               4 * readVal(G->expectedEdges, group->verticesArr[j], group->verticesArr[j]);
                     if (!isMaxSet || score[j] > maxScore) {
                         maxScore = score[j];
                         maxNode = j;
