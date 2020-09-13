@@ -45,9 +45,9 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
 
 /**
  * Find increasing index elements in row of sparse matrix
- * @param group vertices group
- * @param row row of sparse matrix
+ * @param spmNode node of sparse matrix
  * @param col column of sparse matrix
+ * @return value
  */
 double loopFindSpmValue(nodeRef spmNode, int col) {
     double spmValue;
