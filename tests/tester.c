@@ -456,13 +456,13 @@ int main() {
     }
     tstModularityChange(); */
 
-    /*printf("Testing graph 1 from file.\n");
+    printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));
-    *//*printResultsFromOutputFile("out");*//*
+    /*printResultsFromOutputFile("out");*/
     printf("Testing graph 2 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph2-adjMat.txt"));
-    *//*printf("Testing graph 3 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph3-adjMat.txt"));*//*
+    /*printf("Testing graph 3 from file.\n");
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph3-adjMat.txt"));*/
     printf("Testing graph 4 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph4-adjMat.txt"));
     printf("Testing graph 5 from file.\n");
@@ -474,7 +474,7 @@ int main() {
     printf("Testing graph 8 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph8-adjMat.txt"));
     printf("Testing graph 9 from file.\n");
-    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));*/
+    printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph9-adjMat.txt"));
     printf("Testing graph 10 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph10-adjMat.txt"));
     /*printf("Testing random graph.\n");
