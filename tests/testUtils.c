@@ -213,8 +213,8 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
     calculateModularitySubMatrix(G, group);
     for (i = 0; i < group->size; i++) {
         for (j = 0; j < group->size; j++) {
-            modularity += readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) +
-                    readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
+            modularity += readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
+                    getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]);
         }
     }
     return modularity;
