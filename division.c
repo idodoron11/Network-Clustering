@@ -52,7 +52,7 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
     nodeRef *adjRows, spmNode;
     double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
-    int iteration, i, j, maxNode, bestIteration, isMaxSet, con;
+    int iteration, i, j, maxNode, bestIteration, isMaxSet, con, isBestImprovementSet;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
@@ -61,6 +61,7 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
     modularity = calculateModularity(G, group, s);
     do {
         modularity += bestImprovement;
+        isBestImprovementSet = 0;
         bestImprovement = 0;
         improve = 0;
         bestIteration = -1;
@@ -103,9 +104,10 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
 
             improve += maxScore;
             modularity += maxScore;
-            if (improve > bestImprovement) {
+            if (!isBestImprovementSet || improve > bestImprovement) {
                 bestIteration = iteration;
                 bestImprovement = improve;
+                isBestImprovementSet = 1;
             }
         }
 
