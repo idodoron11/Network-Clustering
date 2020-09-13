@@ -161,6 +161,7 @@ void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *
     }
 
     divideGroupByEigenvector(group, s, newGroupA, newGroupB, numberOfPositiveVertices);
+    freeVerticesGroupModularitySubMatrix(group);
 }
 
 /**

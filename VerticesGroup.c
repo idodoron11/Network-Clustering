@@ -29,13 +29,20 @@ VerticesGroup *createVerticesGroup(unsigned int capacity) {
  */
 void freeVerticesGroup(VerticesGroup *group) {
     free(group->verticesArr);
+    free(group);
+}
+
+/**
+ * Free memory allocated for vertices group's modularity sub matrix
+ * @param group
+ */
+void freeVerticesGroupModularitySubMatrix(VerticesGroup *group) {
     if (group->edgeSubMatrix != NULL) {
         /* the modularity was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
         free(group->modularityRowSums);
         free(group->modularityAbsColSum);
     }
-    free(group);
 }
 
 /**
