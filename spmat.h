@@ -32,6 +32,5 @@ typedef node *nodeRef;
 /* Allocates a new linked-lists sparse matrix of capacity n */
 spmat *spmat_allocate_list(int n);
 
-double readSpmVal(spmat *spm, int r, int c);
 
 #endif

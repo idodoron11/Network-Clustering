@@ -142,15 +142,3 @@ void list_mult(const struct _spmat *A, const double *v, double *result) {
         result[i] = sum;
     }
 }
-
-double readSpmVal(spmat *spm, int r, int c) {
-    nodeRef *rows = spm->private;
-    nodeRef node = rows[r];
-    while (node != NULL && node->colind <= c) {
-        if (node->colind == c) {
-            return 1;
-        }
-        node = node->next;
-    }
-    return 0;
-}

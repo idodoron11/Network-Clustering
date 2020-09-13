@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "division.h"
 #include "defs.h"
-#include "spmat.h"
 #include "ErrorHandler.h"
 
 /**
@@ -51,11 +50,13 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
+    nodeRef *adjRows, spmNode;
     double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
-    int iteration, i, j, maxNode, bestIteration, isMaxSet;
+    int iteration, i, j, maxNode, bestIteration, isMaxSet, con;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
+    adjRows = group->edgeSubMatrix->private;
 
     modularity = calculateModularity(G, group, s);
     do {
@@ -69,10 +70,22 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
                 if (!hasMoved[i]) {
                     s[i] = -s[i];
                     sum = 0;
+                    spmNode = adjRows[i];
                     for (j = 0; j < group->size; j++) {
-                        spmValue = readSpmVal(group->edgeSubMatrix, i, j);
+                        con = 1;
+                        while (con) {
+                            if (spmNode == NULL || spmNode->colind > j) {
+                                spmValue = 0;
+                                con = 0;
+                            } else if (spmNode->colind == j) {
+                                spmValue = 1;
+                                con = 0;
+                            } else {
+                                spmNode = spmNode->next;
+                            }
+                        }
                         sum += (spmValue - getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]))
-                                * s[j];
+                               * s[j];
                     }
                     score[i] = 4 * s[i] * sum +
                                4 * getExpectedEdges(G, group->verticesArr[i], group->verticesArr[i]);
@@ -80,7 +93,6 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
                         maxScore = score[i];
                         maxNode = i;
                         isMaxSet = 1;
-                        printf("maxScore=score[%d]=%f\n", i, score[i]);
                     }
                     s[i] = -s[i];
                 }
@@ -106,7 +118,6 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
             }
             *numberOfPositiveVertices += (s[i] == 1);
         }
-        printf("bestImprovement=%f, bestIteration=%d. Repeat?: %d\n", bestImprovement, bestIteration, IS_POSITIVE(bestIteration));
     } while (IS_POSITIVE(bestImprovement));
 
     free(indices);
