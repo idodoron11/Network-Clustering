@@ -78,10 +78,19 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
     nodeRef *adjRows, spmNode;
     double bestImprovement = 0, improve, modularity, maxScore, spmValue, bValue;
     int iteration, i, maxNode, prevMaxNode, bestIteration, isMaxSet, isSetBestImprovement;
-    char *hasMoved = calloc(group->size, sizeof(char));
-    int *indices = malloc(group->size * sizeof(int));
-    double *score = malloc(group->size * sizeof(double));
-    double *x = malloc(group->size * sizeof(double));
+    char *hasMoved;
+    int *indices;
+    double *score;
+    double *x;
+
+    hasMoved = calloc(group->size, sizeof(char));
+    assertMemoryAllocation(hasMoved);
+    indices = malloc(group->size * sizeof(int));
+    assertMemoryAllocation(indices);
+    score = malloc(group->size * sizeof(double));
+    assertMemoryAllocation(score);
+    x = malloc(group->size * sizeof(double));
+    assertMemoryAllocation(x);
     adjRows = group->edgeSubMatrix->private;
 
     do {
@@ -165,21 +174,18 @@ void divisionAlgorithm2(Graph *G, VerticesGroup *group, double *vector, double *
     calculateModularitySubMatrix(G, group);
     randVector(vector, group->size);
     lambda = powerIteration(G, group, vector, s);
-    if (!IS_POSITIVE(lambda)) {
-        return;
-    }
-    /* turn s eigenvector into +1 and -1 */
-    for (i = 0; i < group->size; i++) {
-        s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
-    }
+    if (IS_POSITIVE(lambda)) {
+        /* turn s eigenvector into +1 and -1 */
+        for (i = 0; i < group->size; i++) {
+            s[i] = IS_POSITIVE(s[i]) ? 1 : -1;
+        }
 
-    modularity = maximizeModularity(G, group, s, &numberOfPositiveVertices);
+        modularity = maximizeModularity(G, group, s, &numberOfPositiveVertices);
 
-    if (!IS_POSITIVE(modularity)) {
-        return;
+        if (IS_POSITIVE(modularity)) {
+            divideGroupByEigenvector(group, s, newGroupA, newGroupB, numberOfPositiveVertices);
+        }
     }
-
-    divideGroupByEigenvector(group, s, newGroupA, newGroupB, numberOfPositiveVertices);
     freeVerticesGroupModularitySubMatrix(group);
 }
 
