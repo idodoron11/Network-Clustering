@@ -5,8 +5,9 @@
 
 Graph *constructGraphFromInput(char *inputFilePath) {
     Graph *G = (Graph *) malloc(sizeof(Graph));
-    int n, i, j, k;
+    int n, i, k;
     int *list;
+    double *row;
     FILE *graph_file = fopen(inputFilePath, "rb");
     assertMemoryAllocation(G);
     assertFileOpen(graph_file, inputFilePath);
@@ -17,18 +18,20 @@ Graph *constructGraphFromInput(char *inputFilePath) {
     assertMemoryAllocation(list);
     G->n = n;
     G->degreeSum = 0;
-    G->adjMat = createMatrix(n);
-    G->expectedEdges = createMatrix(n);
+    G->adjMat = spmat_allocate_list(n);
 
     for (i = 0; i < n; ++i) {
+        row = calloc(n, sizeof(double));
         assertFileRead(fread(&k, sizeof(int), 1, graph_file), 1, inputFilePath);
         assertFileRead(fread(list, sizeof(int), k, graph_file), k, inputFilePath);
         G->degreeSum += k;
         G->degrees[i] = k;
         while (k > 0) {
             --k;
-            setVal(G->adjMat, i, list[k], 1);
+            row[list[k]] = 1;
         }
+        G->adjMat->add_row(G->adjMat, row, i);
+        free(row);
     }
 
     /* unsupported case because of division by 0 */
@@ -36,20 +39,24 @@ Graph *constructGraphFromInput(char *inputFilePath) {
         throw("Degrees sum of 0 is not supported because of division by 0");
     }
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-        }
-    }
     fclose(graph_file);
     free(list);
 
     return G;
 }
 
+/**
+ * Get the expected edges between vertices i and j (matrix K)
+ * @param i first vertex
+ * @param j second vertex
+ * @return expected edges
+ */
+double getExpectedEdges(Graph *G, int i, int j) {
+    return (double) G->degrees[i] * G->degrees[j] / G->degreeSum;
+}
+
 void destroyGraph(Graph *G) {
-    freeMatrix(G->adjMat);
-    freeMatrix(G->expectedEdges);
+    G->adjMat->free(G->adjMat);
     free(G->degrees);
     free(G);
 }

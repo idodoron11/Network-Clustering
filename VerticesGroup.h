@@ -1,7 +1,6 @@
 #ifndef CLUSTER_VERTICESGROUP_H
 #define CLUSTER_VERTICESGROUP_H
 
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 

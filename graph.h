@@ -9,15 +9,12 @@ typedef struct _graph {
      * V={1,2,...,n} */
     int n;
 
-    /* adjacency matrix of capacity nXn
-     * E={(i,j) s.t. spAdjMat[i*n + j]=1} */
-    Matrix *adjMat;
+    /* adjacency matrix of capacity nXn */
+    spmat *adjMat;
     /* the degrees of the graph's vertices */
     int *degrees;
     /* sum of vertices' degrees */
     int degreeSum;
-    /* "K", a symmetric matrix, each entry i,j equals degrees[i]*degrees[j]/degreeSum */
-    Matrix *expectedEdges;
 
 } Graph;
 
@@ -33,5 +30,7 @@ Graph *constructGraphFromInput(char *inputFilePath);
  * @param G a pointer to a graph
  */
 void destroyGraph(Graph *G);
+
+double getExpectedEdges(Graph *G, int i, int j);
 
 #endif /*GRAPH_H*/

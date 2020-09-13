@@ -1,7 +1,6 @@
 #ifndef CLUSTER_DIVISION_H
 #define CLUSTER_DIVISION_H
 
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 #include "VerticesGroup.h"

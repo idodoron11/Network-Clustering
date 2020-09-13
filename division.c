@@ -50,11 +50,13 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
-    double bestImprovement = 0, improve, modularity, maxScore, sum;
-    int i, j, index, maxNode, bestIteration, isMaxSet;
+    nodeRef *adjRows, spmNode;
+    double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
+    int i, j, index, maxNode, bestIteration, isMaxSet, con;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
+    adjRows = group->edgeSubMatrix->private;
 
     modularity = calculateModularity(G, group, s);
     do {
@@ -68,12 +70,25 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
                 if (!hasMoved[j]) {
                     s[j] = -s[j];
                     sum = 0;
+                    spmNode = adjRows[j];
                     for (index = 0; index < group->size; index++) {
-                        sum += (readVal(G->adjMat, group->verticesArr[j], group->verticesArr[index]) -
-                                readVal(G->expectedEdges, group->verticesArr[j], group->verticesArr[index])) * s[index];
+                        con = 1;
+                        while (con) {
+                            if (spmNode == NULL || spmNode->colind > index) {
+                                spmValue = 0;
+                                con = 0;
+                            } else if (spmNode->colind == index) {
+                                spmValue = 1;
+                                con = 0;
+                            } else {
+                                spmNode = spmNode->next;
+                            }
+                        }
+                        sum += (spmValue - getExpectedEdges(G, group->verticesArr[j], group->verticesArr[index])) *
+                               s[index];
                     }
                     score[j] = 4 * s[j] * sum +
-                               4 * readVal(G->expectedEdges, group->verticesArr[j], group->verticesArr[j]);
+                               4 * getExpectedEdges(G, group->verticesArr[j], group->verticesArr[j]);
                     if (!isMaxSet || score[j] > maxScore) {
                         maxScore = score[j];
                         maxNode = j;

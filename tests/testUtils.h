@@ -36,4 +36,6 @@ void addSequence(VerticesGroup *group, int *sequence, int length);
 
 double drand(double low, double high);
 
+double readSpmVal(spmat *spm, int r, int c);
+
 #endif
