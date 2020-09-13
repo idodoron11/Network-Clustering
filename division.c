@@ -46,13 +46,12 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * Maximize modularity by moving nodes between the sub groups
  * @param group a group of vertices
  * @param s the eigenvevtor, will be assigned the maximum split
- * @param initialModularity the modularity of the group
  * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
     nodeRef *adjRows, spmNode;
     double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
-    int iteration, i, j, maxNode, bestIteration, isMaxSet, con, isBestImprovementSet;
+    int iteration, i, j, maxNode, bestIteration, isMaxSet, con;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
@@ -61,7 +60,6 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
     modularity = calculateModularity(G, group, s);
     do {
         modularity += bestImprovement;
-        isBestImprovementSet = 0;
         bestImprovement = 0;
         improve = 0;
         bestIteration = -1;
@@ -104,10 +102,9 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
 
             improve += maxScore;
             modularity += maxScore;
-            if (!isBestImprovementSet || improve > bestImprovement) {
+            if (improve > bestImprovement) {
                 bestIteration = iteration;
                 bestImprovement = improve;
-                isBestImprovementSet = 1;
             }
         }
 
@@ -120,7 +117,7 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
             }
             *numberOfPositiveVertices += (s[i] == 1);
         }
-    } while (IS_POSITIVE(bestImprovement));
+    } while (bestIteration != group->size - 1 && IS_POSITIVE(bestImprovement));
 
     free(indices);
     free(hasMoved);
