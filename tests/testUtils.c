@@ -9,7 +9,7 @@
  * Print matrix (python style)
  * @param mat
  */
-void printMatrix(Matrix *mat) {
+/*void printMatrix(Matrix *mat) {
     int i, j;
     double val;
     char *delimiter1 = "[";
@@ -20,7 +20,7 @@ void printMatrix(Matrix *mat) {
         delimiter1 = ",\n[";
         delimiter2 = "";
         for (j = 0; j < mat->n; j++) {
-            val = readVal(mat, i, j);
+            val = readMatVal(mat, i, j);
             printf("%s", delimiter2);
             delimiter2 = ",";
             printf("%.4f", val);
@@ -28,13 +28,13 @@ void printMatrix(Matrix *mat) {
         printf("]");
     }
     printf("]\n");
-}
+}*/
 
 /**
  * Print matrix Wolfram-style
  * @param mat
  */
-void printMatrixPy(Matrix *mat) {
+/*void printMatrixPy(Matrix *mat) {
     int i, j;
     double val;
     printf("[");
@@ -44,7 +44,7 @@ void printMatrixPy(Matrix *mat) {
         }
         printf("[");
         for (j = 0; j < mat->n; j++) {
-            val = readVal(mat, i, j);
+            val = readMatVal(mat, i, j);
             if (j > 0) {
                 printf(",");
             }
@@ -56,7 +56,7 @@ void printMatrixPy(Matrix *mat) {
         printf("]\n");
     }
     printf("]\n");
-}
+}*/
 
 /**
  * Print vector
@@ -78,7 +78,7 @@ void printVect(double *vector, int length) {
  * @param percent probability of non-zero values
  * @param mat regular matrix representation, should be allocated
  */
-spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
+/* spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
     int i, j;
     double randNum;
     spmat *spm = spmat_allocate_list(n);
@@ -91,7 +91,7 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
                 } else {
                     setVal(mat, i, j, 0);
                 }
-                setVal(mat, j, i, readVal(mat, i, j));
+                setVal(mat, j, i, readMatVal(mat, i, j));
             } else if (i == j) {
                 setVal(mat, i, j, 0);
             }
@@ -100,7 +100,7 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
     }
 
     return spm;
-}
+} */
 
 /**
  * Print sparse matrix
@@ -213,8 +213,8 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
     calculateModularitySubMatrix(G, group);
     for (i = 0; i < group->size; i++) {
         for (j = 0; j < group->size; j++) {
-            modularity += readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
-                          readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
+            modularity += readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
+                    getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]);
         }
     }
     return modularity;
@@ -259,56 +259,37 @@ Graph *constructGraphFromMatrix(double *adjMatrix, int n) {
     assertMemoryAllocation(G->degrees);
     G->n = n;
     G->degreeSum = 0;
-    G->adjMat = createMatrix(n);
-    G->expectedEdges = createMatrix(n);
+    G->adjMat = spmat_allocate_list(n);
 
-    for (i = 0; i < n; ++i) {
+    for(i = 0; i < n; ++i){
         G->degrees[i] = 0;
-        for (j = 0; j < n; ++j) {
-            setVal(G->adjMat, i, j, adjMatrix[i * n + j]);
+        for(j = 0; j < n; ++j)
             G->degrees[i] += adjMatrix[i * n + j];
-        }
+        G->adjMat->add_row(G->adjMat, adjMatrix + i * n, i);
         G->degreeSum += G->degrees[i];
-    }
-
-    if (G->degreeSum != 0) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-            }
-        }
     }
 
     return G;
 }
 
-Graph *constructGraphFromAdjMat(Matrix *mat) {
+/* Graph *constructGraphFromAdjMat(Matrix *mat) {
     Graph *G = (Graph *) malloc(sizeof(Graph));
     int i, j;
     G->degrees = malloc(mat->n * sizeof(int));
     G->n = mat->n;
     G->degreeSum = 0;
     G->adjMat = mat;
-    G->expectedEdges = createMatrix(mat->n);
 
     for (i = 0; i < mat->n; ++i) {
         G->degrees[i] = 0;
         for (j = 0; j < mat->n; ++j) {
-            G->degrees[i] += readVal(G->adjMat, i, j);
+            G->degrees[i] += readSpmVal(G->adjMat, i, j);
         }
         G->degreeSum += G->degrees[i];
     }
 
-    if (G->degreeSum != 0) {
-        for (i = 0; i < mat->n; i++) {
-            for (j = 0; j < mat->n; j++) {
-                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-            }
-        }
-    }
-
     return G;
-}
+} */
 
 /**
  * Adds a sequence of indices to the group.
@@ -318,7 +299,7 @@ Graph *constructGraphFromAdjMat(Matrix *mat) {
 void addSequence(VerticesGroup *group, int *sequence, int length) {
     int i;
     assertBooleanStatementIsTrue(length <= group->capacity);
-    for(i = 0; i < length; ++i) {
+    for (i = 0; i < length; ++i) {
         group->verticesArr[i] = sequence[i];
         ++group->size;
     }
@@ -332,4 +313,16 @@ void addSequence(VerticesGroup *group, int *sequence, int length) {
  */
 double drand(double low, double high) {
     return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
+}
+
+double readSpmVal(spmat *spm, int r, int c) {
+    nodeRef *rows = spm->private;
+    nodeRef node = rows[r];
+    while (node != NULL && node->colind <= c) {
+        if (node->colind == c) {
+            return 1;
+        }
+        node = node->next;
+    }
+    return 0;
 }

@@ -420,7 +420,7 @@ void printResultsFromOutputFile(char *output_file_path) {
     assert(fabs(numRes1 - numRes2) < 0.01);
 }*/
 
-void testModularityChange() {
+/*void testModularityChange() {
     Graph *G;
     VerticesGroup *group, *groupA, *groupB;
     int n = 200, i;
@@ -447,14 +447,14 @@ void testModularityChange() {
     aModularity = calculateModularityOfGroup(G, groupA);
     bModularity = calculateModularityOfGroup(G, groupB);
     assert(fabs(modularity - (aModularity + bModularity)) < 0.001);
-}
+}*/
 
 int main() {
     srand(time(0));
     /*for (i = 0; i < 10; i++) {
         testMatrixMult();
-    }*/
-    testModularityChange();
+    }
+    tstModularityChange(); */
 
     printf("Testing graph 1 from file.\n");
     printf("Result: %d\n", testGraphFromFile(GRAPHS_DIR"\\graph1-adjMat.txt"));

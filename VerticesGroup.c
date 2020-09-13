@@ -29,13 +29,20 @@ VerticesGroup *createVerticesGroup(unsigned int capacity) {
  */
 void freeVerticesGroup(VerticesGroup *group) {
     free(group->verticesArr);
+    free(group);
+}
+
+/**
+ * Free memory allocated for vertices group's modularity sub matrix
+ * @param group
+ */
+void freeVerticesGroupModularitySubMatrix(VerticesGroup *group) {
     if (group->edgeSubMatrix != NULL) {
         /* the modularity was calculated, so all related data should be freed */
         group->edgeSubMatrix->free(group->edgeSubMatrix);
         free(group->modularityRowSums);
         free(group->modularityAbsColSum);
     }
-    free(group);
 }
 
 /**
@@ -65,8 +72,10 @@ double getModularityMatrixNorm1(VerticesGroup *group) {
  */
 void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
     double *row, modularityEntry;
-    int i = 0, j;
+    nodeRef *rowLists, spmNode;
+    int i = 0, j, con;
     if (group->size != 0) {
+        rowLists = (nodeRef *) G->adjMat->private;
         group->edgeSubMatrix = spmat_allocate_list(group->size);
         assertMemoryAllocation(group->edgeSubMatrix);
         group->modularityRowSums = calloc(group->size, sizeof(double));
@@ -77,10 +86,22 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
         row = malloc(sizeof(double) * group->size);
         assertMemoryAllocation(row);
         for (i = 0; i < group->size; i++) {
+            spmNode = rowLists[group->verticesArr[i]];
             for (j = 0; j < group->size; j++) {
-                row[j] = readVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
+                con = 1;
+                while (con) {
+                    if (spmNode == NULL || spmNode->colind > group->verticesArr[j]) {
+                        row[j] = 0;
+                        con = 0;
+                    } else if (spmNode->colind == group->verticesArr[j]) {
+                        row[j] = 1;
+                        con = 0;
+                    } else {
+                        spmNode = spmNode->next;
+                    }
+                }
                 /* modularityEntry is B_hat[i][j] = A[i][j]-K[i][j], if we use the original notation. */
-                modularityEntry = row[j] - readVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
+                modularityEntry = row[j] - getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]);
                 group->modularityRowSums[i] += modularityEntry;
                 if (i != j) {
                     /* the case of non diagonal values.
@@ -96,7 +117,6 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
             if (group->modularityAbsColSum[i] >= getModularityMatrixNorm1(group)) {
                 group->highestColSumIndex = i;
             }
-            /* TODO: improve instead of adding row at a time */
             group->edgeSubMatrix->add_row(group->edgeSubMatrix, row, i);
         }
 

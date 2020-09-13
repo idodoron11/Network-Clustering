@@ -1,8 +1,6 @@
 #ifndef _SPMAT_H
 #define _SPMAT_H
 
-#include "matrix.h"
-
 typedef struct _spmat {
     /* Matrix capacity (n*n) */
     int n;
@@ -33,5 +31,6 @@ typedef node *nodeRef;
 
 /* Allocates a new linked-lists sparse matrix of capacity n */
 spmat *spmat_allocate_list(int n);
+
 
 #endif

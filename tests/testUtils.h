@@ -1,12 +1,12 @@
 #ifndef CLUSTER_TESTUTILS_H
 #define CLUSTER_TESTUTILS_H
 
-#include "../matrix.h"
 #include "../LinkedList.h"
+#include "../spmat.h"
 
-void printMatrix(Matrix *mat);
+/*void printMatrix(Matrix *mat);*/
 
-void printMatrixPy(Matrix *mat);
+/*void printMatrixPy(Matrix *mat);*/
 
 void printVect(double *vector, int length);
 
@@ -28,12 +28,14 @@ void compareExpected(char *inputPath, LinkedList *lst, int *expected);
  */
 Graph* constructGraphFromMatrix(double* adjMatrix, int n);
 
-Graph *constructGraphFromAdjMat(Matrix *mat);
+/*Graph *constructGraphFromAdjMat(Matrix *mat);*/
 
-spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);
+/*spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat);*/
 
 void addSequence(VerticesGroup *group, int *sequence, int length);
 
 double drand(double low, double high);
+
+double readSpmVal(spmat *spm, int r, int c);
 
 #endif

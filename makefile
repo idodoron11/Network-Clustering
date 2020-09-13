@@ -1,8 +1,8 @@
 FLAGS=-ansi -Wall -Wextra -Werror -pedantic-errors -c
 LIBS=-lm
 
-all: cluster.o defs.o division.o ErrorHandler.o graph.o LinkedList.o matrix.o spmat.o VerticesGroup.o
-	gcc cluster.o defs.o division.o ErrorHandler.o graph.o LinkedList.o matrix.o spmat.o VerticesGroup.o -o cluster ${LIBS}
+all: cluster.o defs.o division.o ErrorHandler.o graph.o LinkedList.o spmat.o VerticesGroup.o
+	gcc cluster.o defs.o division.o ErrorHandler.o graph.o LinkedList.o spmat.o VerticesGroup.o -o cluster ${LIBS}
 
 cluster.o: cluster.c spmat.h graph.h LinkedList.h division.h ErrorHandler.h
 	gcc ${FLAGS} cluster.c
@@ -21,9 +21,6 @@ graph.o: graph.c ErrorHandler.h
 
 LinkedList.o: LinkedList.c ErrorHandler.h
 	gcc ${FLAGS} LinkedList.c
-
-matrix.o: matrix.c ErrorHandler.h
-	gcc ${FLAGS} matrix.c
 
 spmat.o: spmat.c ErrorHandler.h
 	gcc ${FLAGS} spmat.c

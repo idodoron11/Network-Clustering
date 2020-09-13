@@ -1,7 +1,6 @@
 #ifndef CLUSTER_VERTICESGROUP_H
 #define CLUSTER_VERTICESGROUP_H
 
-#include "matrix.h"
 #include "spmat.h"
 #include "graph.h"
 
@@ -19,6 +18,8 @@ typedef struct verticesGroup {
 VerticesGroup *createVerticesGroup(unsigned int capacity);
 
 void freeVerticesGroup(VerticesGroup *group);
+
+void freeVerticesGroupModularitySubMatrix(VerticesGroup *group);
 
 void addVertexToGroup(VerticesGroup *group, int index);
 
