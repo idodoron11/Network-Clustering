@@ -9,7 +9,7 @@
  * Print matrix (python style)
  * @param mat
  */
-void printMatrix(Matrix *mat) {
+/*void printMatrix(Matrix *mat) {
     int i, j;
     double val;
     char *delimiter1 = "[";
@@ -28,13 +28,13 @@ void printMatrix(Matrix *mat) {
         printf("]");
     }
     printf("]\n");
-}
+}*/
 
 /**
  * Print matrix Wolfram-style
  * @param mat
  */
-void printMatrixPy(Matrix *mat) {
+/*void printMatrixPy(Matrix *mat) {
     int i, j;
     double val;
     printf("[");
@@ -56,7 +56,7 @@ void printMatrixPy(Matrix *mat) {
         printf("]\n");
     }
     printf("]\n");
-}
+}*/
 
 /**
  * Print vector
@@ -78,7 +78,7 @@ void printVect(double *vector, int length) {
  * @param percent probability of non-zero values
  * @param mat regular matrix representation, should be allocated
  */
-spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
+/* spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
     int i, j;
     double randNum;
     spmat *spm = spmat_allocate_list(n);
@@ -100,7 +100,7 @@ spmat *generateRandomSymSpmat(int n, double percent, Matrix *mat) {
     }
 
     return spm;
-}
+} */
 
 /**
  * Print sparse matrix
@@ -213,8 +213,8 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
     calculateModularitySubMatrix(G, group);
     for (i = 0; i < group->size; i++) {
         for (j = 0; j < group->size; j++) {
-            modularity += readMatVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
-                          readMatVal(G->expectedEdges, group->verticesArr[i], group->verticesArr[j]);
+            modularity += readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) +
+                    readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]);
         }
     }
     return modularity;
@@ -259,31 +259,22 @@ Graph *constructGraphFromMatrix(double *adjMatrix, int n) {
     assertMemoryAllocation(G->degrees);
     G->n = n;
     G->degreeSum = 0;
-    G->adjMat = createMatrix(n);
+    G->adjMat = spmat_allocate_list(n);
 
-    for (i = 0; i < n; ++i) {
+    for(i = 0; i < n; ++i){
         G->degrees[i] = 0;
-        for (j = 0; j < n; ++j) {
-            setVal(G->adjMat, i, j, adjMatrix[i * n + j]);
+        for(j = 0; j < n; ++j)
             G->degrees[i] += adjMatrix[i * n + j];
-        }
+        G->adjMat->add_row(G->adjMat, adjMatrix + i * n, i);
         G->degreeSum += G->degrees[i];
-    }
-
-    if (G->degreeSum != 0) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                setVal(G->expectedEdges, i, j, (double) G->degrees[i] * G->degrees[j] / G->degreeSum);
-            }
-        }
     }
 
     return G;
 }
 
-Graph *constructGraphFromAdjMat(Matrix *mat) {
+/* Graph *constructGraphFromAdjMat(Matrix *mat) {
     Graph *G = (Graph *) malloc(sizeof(Graph));
-    /*int i, j;
+    int i, j;
     G->degrees = malloc(mat->n * sizeof(int));
     G->n = mat->n;
     G->degreeSum = 0;
@@ -295,10 +286,10 @@ Graph *constructGraphFromAdjMat(Matrix *mat) {
             G->degrees[i] += readSpmVal(G->adjMat, i, j);
         }
         G->degreeSum += G->degrees[i];
-    }*/
+    }
 
     return G;
-}
+} */
 
 /**
  * Adds a sequence of indices to the group.
