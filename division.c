@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "division.h"
 #include "defs.h"
+#include "spmat.h"
 #include "ErrorHandler.h"
 
 /**
@@ -50,13 +51,11 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  * @param numberOfPositiveVertices will be assigned the number of vertices in sub group A after the division
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
-    nodeRef *adjRows, spmNode;
     double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
-    int i, j, index, maxNode, bestIteration, isMaxSet, con;
+    int i, j, index, maxNode, bestIteration, isMaxSet;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
-    adjRows = group->edgeSubMatrix->private;
 
     modularity = calculateModularity(G, group, s);
     do {
@@ -70,20 +69,8 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
                 if (!hasMoved[j]) {
                     s[j] = -s[j];
                     sum = 0;
-                    spmNode = adjRows[j];
                     for (index = 0; index < group->size; index++) {
-                        con = 1;
-                        while (con) {
-                            if (spmNode == NULL || spmNode->colind > index) {
-                                spmValue = 0;
-                                con = 0;
-                            } else if (spmNode->colind == index) {
-                                spmValue = 1;
-                                con = 0;
-                            } else {
-                                spmNode = spmNode->next;
-                            }
-                        }
+                        spmValue = readSpmVal(group->edgeSubMatrix, j, index);
                         sum += (spmValue - getExpectedEdges(G, group->verticesArr[j], group->verticesArr[index])) *
                                s[index];
                     }

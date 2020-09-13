@@ -314,15 +314,3 @@ void addSequence(VerticesGroup *group, int *sequence, int length) {
 double drand(double low, double high) {
     return ((double) rand() * (high - low)) / (double) RAND_MAX + low;
 }
-
-double readSpmVal(spmat *spm, int r, int c) {
-    nodeRef *rows = spm->private;
-    nodeRef node = rows[r];
-    while (node != NULL && node->colind <= c) {
-        if (node->colind == c) {
-            return 1;
-        }
-        node = node->next;
-    }
-    return 0;
-}
