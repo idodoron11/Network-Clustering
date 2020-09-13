@@ -52,7 +52,10 @@ Graph *constructGraphFromInput(char *inputFilePath) {
  * @return expected edges
  */
 double getExpectedEdges(Graph *G, int i, int j) {
-    return (double) G->degrees[i] * G->degrees[j] / G->degreeSum;
+    if(G->degreeSum == 0)
+        return 0;
+    else
+        return (double) G->degrees[i] * G->degrees[j] / G->degreeSum;
 }
 
 void destroyGraph(Graph *G) {
