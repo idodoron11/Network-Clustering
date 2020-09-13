@@ -133,12 +133,14 @@ void calculateModularitySubMatrix(Graph *G, VerticesGroup *group) {
  * storing the result in res and returning the the norm of res
  * @return multiplication result (or the vector's norm if bothSides=0)
  */
-double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides, int withNorm) {
+double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides, int withNorm,
+                                  int withF) {
     int i;
     double numRes = 0;
     /* the common value of all rows of the multiplication of the expectedEdges (K) matrix by s */
     double degreesCommon = 0;
     double modularityNorm1 = withNorm ? getModularityMatrixNorm1(group) : 0;
+    double f;
 
     /* multiply A by s */
     group->edgeSubMatrix->mult(group->edgeSubMatrix, s, res);
@@ -146,7 +148,8 @@ double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, dou
         /* degreesCommon is what we sometimes called y */
         degreesCommon += (double) G->degrees[group->verticesArr[i]] * s[i];
         /* subtracting f_i[g] * s, and adding shift constant to the result. */
-        res[i] += (modularityNorm1 - group->modularityRowSums[i]) * s[i];
+        f = withF ? group->modularityRowSums[i] : 0;
+        res[i] += (modularityNorm1 - f) * s[i];
     }
 
     for (i = 0; i < group->size; i++) {
@@ -175,7 +178,7 @@ double calculateModularity(Graph *G, VerticesGroup *group, double *s) {
     double *res, numRes;
     res = malloc(group->size * sizeof(double));
     assertMemoryAllocation(res);
-    numRes = multiplyModularityByVector(G, group, s, res, 1, 0);
+    numRes = multiplyModularityByVector(G, group, s, res, 1, 0, 1);
     numRes *= 0.5;
     free(res);
     return numRes;
@@ -193,7 +196,7 @@ double powerIteration(Graph *G, VerticesGroup *group, double *vector, double *ve
     double vectorNorm, dif, lambda, x, y;
     while (con) {
         x = y = 0;
-        vectorNorm = multiplyModularityByVector(G, group, vector, vectorResult, 0, 1);
+        vectorNorm = multiplyModularityByVector(G, group, vector, vectorResult, 0, 1, 1);
         con = 0;
         for (i = 0; i < group->size; i++) {
             x += vector[i] * vectorResult[i];

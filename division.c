@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "division.h"
 #include "defs.h"
 #include "ErrorHandler.h"
@@ -43,6 +44,31 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
 }
 
 /**
+ * Find increasing index elements in row of sparse matrix
+ * @param group vertices group
+ * @param row row of sparse matrix
+ * @param col column of sparse matrix
+ */
+double loopFindSpmValue(nodeRef spmNode, int col) {
+    double spmValue;
+    int con = 1;
+    /* this while loop essentially finds the (i,j) value
+     * in the sparse adjacency matrix of the sub-graph */
+    while (con) {
+        if (spmNode == NULL || spmNode->colind > col) {
+            spmValue = 0;
+            con = 0;
+        } else if (spmNode->colind == col) {
+            spmValue = 1;
+            con = 0;
+        } else {
+            spmNode = spmNode->next;
+        }
+    }
+    return spmValue;
+}
+
+/**
  * Maximize modularity by moving nodes between the sub groups
  * @param group a group of vertices
  * @param s the eigenvevtor, will be assigned the maximum split
@@ -50,14 +76,17 @@ divideGroupByEigenvector(VerticesGroup *group, double *s, VerticesGroup **splitG
  */
 double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned int *numberOfPositiveVertices) {
     nodeRef *adjRows, spmNode;
-    double bestImprovement = 0, improve, modularity, maxScore, sum, spmValue;
-    int iteration, i, j, maxNode, bestIteration, isMaxSet, con, isSetBestImprovement;
+    double bestImprovement = 0, improve, modularity, maxScore, spmValue, bValue;
+    int iteration, i, maxNode, prevMaxNode, bestIteration, isMaxSet, isSetBestImprovement;
     char *hasMoved = calloc(group->size, sizeof(char));
     int *indices = malloc(group->size * sizeof(int));
     double *score = malloc(group->size * sizeof(double));
+    double *x = malloc(group->size * sizeof(double));
     adjRows = group->edgeSubMatrix->private;
 
     do {
+        multiplyModularityByVector(G, group, s, x, 0, 0, 0);
+
         bestImprovement = 0;
         improve = 0;
         bestIteration = -1;
@@ -66,38 +95,27 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
             isMaxSet = 0;
             for (i = 0; i < group->size; i++) {
                 if (!hasMoved[i]) {
-                    s[i] = -s[i];
-                    sum = 0;
-                    spmNode = adjRows[i];
-                    for (j = 0; j < group->size; j++) {
-                        con = 1;
-                        /* this while loop essentially finds the (i,j) value
-                         * in the sparse adjacency matrix of the sub-graph */
-                        while (con) {
-                            if (spmNode == NULL || spmNode->colind > j) {
-                                spmValue = 0;
-                                con = 0;
-                            } else if (spmNode->colind == j) {
-                                spmValue = 1;
-                                con = 0;
-                            } else {
-                                spmNode = spmNode->next;
-                            }
-                        }
-                        sum += (spmValue - getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]))
-                               * s[j];
+                    if (iteration == 0) {
+                        score[i] = -2 *
+                                   (s[i] * x[i] +
+                                    pow(G->degrees[group->verticesArr[i]], 2) /
+                                    G->degreeSum);
+                    } else {
+                        spmNode = adjRows[i];
+                        spmValue = loopFindSpmValue(spmNode, prevMaxNode);
+                        bValue = spmValue - getExpectedEdges(G, group->verticesArr[i], group->verticesArr[prevMaxNode]);
+                        score[i] -= 4 * s[i] * s[prevMaxNode] * bValue;
                     }
-                    score[i] = 4 * s[i] * sum +
-                               4 * getExpectedEdges(G, group->verticesArr[i], group->verticesArr[i]);
+
                     if (!isMaxSet || score[i] > maxScore) {
                         maxScore = score[i];
                         maxNode = i;
                         isMaxSet = 1;
                     }
-                    s[i] = -s[i];
                 }
             }
             s[maxNode] = -s[maxNode];
+            prevMaxNode = maxNode;
             hasMoved[maxNode] = 1;
             indices[iteration] = maxNode;
 
@@ -123,6 +141,7 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
     free(indices);
     free(hasMoved);
     free(score);
+    free(x);
 
     modularity = calculateModularity(G, group, s);
     return modularity;

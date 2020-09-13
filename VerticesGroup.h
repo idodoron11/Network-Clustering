@@ -25,7 +25,8 @@ void addVertexToGroup(VerticesGroup *group, int index);
 
 void calculateModularitySubMatrix(Graph *G, VerticesGroup *group);
 
-double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides, int withNorm);
+double multiplyModularityByVector(Graph *G, VerticesGroup *group, double *s, double *res, int bothSides, int withNorm,
+                                  int withF);
 
 double calculateModularity(Graph *G, VerticesGroup *group, double *s);
 
