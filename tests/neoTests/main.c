@@ -140,11 +140,9 @@ int main() {
     int i;
 
     /** ---------------------- making res arrays that we know are results ---------------------- **/
-    int threeEmpty[] = {0, 0, 0};
     int threeC[] = {0, 0, 0};
     int thirtyC[30];
     int thirtyA[30];
-    int thirtyEmpty[30];
     int threeHundredC[300];
     int threeHundredA[300];
     int twentyThirty1[50];
@@ -155,11 +153,6 @@ int main() {
     int argc = 3;
     int flag;
     int allGood = 1;
-
-    for (i = 0; i < 30; i++) {
-        thirtyEmpty[i] = 0;
-    }
-
 
     for (i = 0; i < 30; i++) {
         thirtyC[i] = 0;
@@ -213,14 +206,6 @@ int main() {
 
     argv[0] = "name";
 
-    argv[1] = "3empty";
-    argv[2] = "3emptyOut";
-    compareExpected(argv[1], cluster(argc, argv), threeEmpty);
-
-    argv[1] = "30empty";
-    argv[2] = "30emptyOut";
-    compareExpected(argv[1], cluster(argc, argv), thirtyEmpty);
-
     argv[1] = "3c";
     argv[2] = "3cOut";
     compareExpected(argv[1], cluster(argc, argv), threeC);
@@ -259,22 +244,6 @@ int main() {
 
 
     /** ---------- checking if outFiles from our code is the same as expected result arrays ---------- **/
-    flag = check("3emptyOut", threeEmpty, NULL, 1, 3);
-    if (flag == 0) {
-        printf("Error in 3empty graph\n");
-        allGood = 0;
-    } else if (flag == 1) {
-        printf("3empty graph is correct\n");
-    }
-
-    flag = check("30emptyOut", thirtyEmpty, NULL, 1, 30);
-    if (flag == 0) {
-        printf("Error in 30empty graph\n");
-        allGood = 0;
-    } else if (flag == 1) {
-        printf("30empty graph is correct\n");
-    }
-
     flag = check("3cOut", threeC, NULL, 1, 3);
     if (flag == 0) {
         printf("Error in 3 clique graph\n");

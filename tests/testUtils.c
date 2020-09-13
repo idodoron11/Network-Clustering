@@ -214,7 +214,7 @@ double calculateModularityOfGroup(Graph *G, VerticesGroup *group) {
     for (i = 0; i < group->size; i++) {
         for (j = 0; j < group->size; j++) {
             modularity += readSpmVal(G->adjMat, group->verticesArr[i], group->verticesArr[j]) -
-                    getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]);
+                          getExpectedEdges(G, group->verticesArr[i], group->verticesArr[j]);
         }
     }
     return modularity;
@@ -261,9 +261,9 @@ Graph *constructGraphFromMatrix(double *adjMatrix, int n) {
     G->degreeSum = 0;
     G->adjMat = spmat_allocate_list(n);
 
-    for(i = 0; i < n; ++i){
+    for (i = 0; i < n; ++i) {
         G->degrees[i] = 0;
-        for(j = 0; j < n; ++j)
+        for (j = 0; j < n; ++j)
             G->degrees[i] += adjMatrix[i * n + j];
         G->adjMat->add_row(G->adjMat, adjMatrix + i * n, i);
         G->degreeSum += G->degrees[i];
