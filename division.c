@@ -72,6 +72,8 @@ double maximizeModularity(Graph *G, VerticesGroup *group, double *s, unsigned in
                     spmNode = adjRows[i];
                     for (j = 0; j < group->size; j++) {
                         con = 1;
+                        /* this while loop essentially finds the (i,j) value
+                         * in the sparse adjacency matrix of the sub-graph */
                         while (con) {
                             if (spmNode == NULL || spmNode->colind > j) {
                                 spmValue = 0;
